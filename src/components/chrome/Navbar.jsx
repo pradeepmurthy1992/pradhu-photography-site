@@ -52,7 +52,7 @@ export default function Navbar({ T, path, theme, setTheme, brand = "PRADHU PHOTO
           ))}
         </ul>
 
-        {/* Theme */}
+        {/* Theme toggle */}
         <ThemeSlider theme={theme} setTheme={setTheme} />
       </nav>
 
@@ -75,24 +75,25 @@ export default function Navbar({ T, path, theme, setTheme, brand = "PRADHU PHOTO
           ref={drawerRef}
           className={[
             "absolute left-0 top-0 h-full w-[82%] max-w-[360px]",
-            "bg-black text-white shadow-xl", // solid black background with white text
+            // 👇 Light mode = white bg + black text, Dark mode = black bg + white text
+            "bg-white text-black dark:bg-black dark:text-white shadow-xl",
             open ? "translate-x-0" : "-translate-x-full",
             "transition-transform duration-200 ease-out",
           ].join(" ")}
         >
           {/* Header */}
-          <div className="p-3 border-b border-white/20 flex justify-between items-center">
+          <div className="p-3 border-b border-black/10 dark:border-white/20 flex justify-between items-center">
             <span className="text-sm font-semibold">Menu</span>
             <button
               type="button"
               aria-label="Close menu"
               onClick={() => setOpen(false)}
-              className="p-2 rounded-md hover:bg-white/10"
+              className="p-2 rounded-md hover:bg-black/5 dark:hover:bg-white/10"
             >
               {/* X icon */}
               <svg
                 xmlns="http://www.w3.org/2000/svg"
-                className="h-5 w-5 text-white"
+                className="h-5 w-5"
                 fill="none"
                 viewBox="0 0 24 24"
                 stroke="currentColor"
@@ -111,10 +112,10 @@ export default function Navbar({ T, path, theme, setTheme, brand = "PRADHU PHOTO
                   <a
                     href={`#${id}`}
                     onClick={() => setOpen(false)}
-                    className="flex items-center gap-3 px-3 py-3 border-b border-white/10 hover:bg-white/10"
+                    className="flex items-center gap-3 px-3 py-3 border-b border-black/10 dark:border-white/10 hover:bg-black/5 dark:hover:bg-white/10"
                   >
-                    <Icon name={icon} className="h-4 w-4 text-white" />
-                    <span className="text-white">{label}</span>
+                    <Icon name={icon} className="h-4 w-4" />
+                    <span>{label}</span>
                   </a>
                 </li>
               ))}
