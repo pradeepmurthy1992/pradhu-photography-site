@@ -14,6 +14,34 @@
       content="Pradhu Photography — Fashion · Portraits · Candids · Portfolio · Professional Headshots · Events."
     />
 
+    <!-- Open Graph (for Facebook / LinkedIn / WhatsApp) -->
+    <meta property="og:title" content="Pradhu Photography" />
+    <meta
+      property="og:description"
+      content="Fashion · Portraits · Candids · Portfolio · Professional Headshots · Events."
+    />
+    <meta
+      property="og:image"
+      content="https://pradeepmurthy1992.github.io/pradhu-site-test/baseimg/02.jpg"
+    />
+    <meta
+      property="og:url"
+      content="https://pradeepmurthy1992.github.io/pradhu-site-test/"
+    />
+    <meta property="og:type" content="website" />
+
+    <!-- Twitter Cards -->
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:title" content="Pradhu Photography" />
+    <meta
+      name="twitter:description"
+      content="Fashion · Portraits · Candids · Portfolio · Professional Headshots · Events."
+    />
+    <meta
+      name="twitter:image"
+      content="https://pradeepmurthy1992.github.io/pradhu-site-test/baseimg/02.jpg"
+    />
+
     <!-- Preconnect for performance -->
     <link rel="preconnect" href="https://raw.githubusercontent.com" />
     <link rel="preconnect" href="https://fonts.googleapis.com" />
@@ -23,21 +51,24 @@
       crossorigin="anonymous"
     />
 
-    <!-- Fonts (will also be loaded dynamically in HeadFonts.jsx) -->
+    <!-- Fonts (loaded dynamically in HeadFonts.jsx too) -->
     <link
       href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Playfair+Display:wght@600;700;800;900&display=swap"
       rel="stylesheet"
     />
 
-    <!-- Tailwind + globals -->
+    <!-- Tailwind + global styles -->
     <link rel="stylesheet" href="/src/styles/globals.css" />
     <link rel="stylesheet" href="/src/styles/cinematic.css" />
 
-    <!-- Vite will inject the compiled JS -->
+    <!-- Vite injects JS bundle -->
     <script type="module" src="/src/main.jsx"></script>
 
-    <!-- Google Analytics (optional, safe stub) -->
-    <script async src="https://www.googletagmanager.com/gtag/js?id=G-XXXXXXX"></script>
+    <!-- Google Analytics (optional; replace G-XXXXXXX with your GA4 ID) -->
+    <script
+      async
+      src="https://www.googletagmanager.com/gtag/js?id=G-XXXXXXX"
+    ></script>
     <script>
       window.dataLayer = window.dataLayer || [];
       function gtag() {
