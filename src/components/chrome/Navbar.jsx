@@ -69,38 +69,52 @@ export default function Navbar({ T, path, theme, setTheme, brand = "PRADHU PHOTO
           className={`absolute inset-0 bg-black/40 transition-opacity ${open ? "opacity-100" : "opacity-0"}`}
           onClick={() => setOpen(false)}
         />
+
         {/* Panel */}
         <aside
           ref={drawerRef}
           className={[
             "absolute left-0 top-0 h-full w-[82%] max-w-[360px]",
-            "bg-white dark:bg-[#111] border-r shadow-xl", // solid bg
+            "bg-black text-white shadow-xl", // solid black background with white text
             open ? "translate-x-0" : "-translate-x-full",
             "transition-transform duration-200 ease-out",
-            T.navBorder,
           ].join(" ")}
         >
-          <div className="p-3 border-b sticky top-0 backdrop-blur-sm flex justify-between items-center">
-            <span className={`text-sm ${T.navTextStrong}`}>Menu</span>
+          {/* Header */}
+          <div className="p-3 border-b border-white/20 flex justify-between items-center">
+            <span className="text-sm font-semibold">Menu</span>
             <button
               type="button"
-              className="rounded-md border px-2 py-1 bg-black text-white dark:bg-white dark:text-black"
+              aria-label="Close menu"
               onClick={() => setOpen(false)}
+              className="p-2 rounded-md hover:bg-white/10"
             >
-              ×
+              {/* X icon */}
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                className="h-5 w-5 text-white"
+                fill="none"
+                viewBox="0 0 24 24"
+                stroke="currentColor"
+                strokeWidth={2}
+              >
+                <path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12" />
+              </svg>
             </button>
           </div>
+
+          {/* Links */}
           <nav className="p-2">
             <ul className="flex flex-col">
               {NAV_ITEMS.map(({ label, id, icon }) => (
                 <li key={`m-${id}`}>
                   <a
                     href={`#${id}`}
-                    className={`flex items-center gap-3 px-3 py-3 border-b ${T.navBorder} hover:bg-black/5 dark:hover:bg-white/10`}
                     onClick={() => setOpen(false)}
+                    className="flex items-center gap-3 px-3 py-3 border-b border-white/10 hover:bg-white/10"
                   >
-                    <Icon name={icon} className="h-4 w-4" />
-                    <span>{label}</span>
+                    <Icon name={icon} className="h-4 w-4 text-white" />
+                    <span className="text-white">{label}</span>
                   </a>
                 </li>
               ))}
