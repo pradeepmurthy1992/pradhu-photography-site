@@ -1,9 +1,9 @@
 import React, { useMemo, useState } from "react";
 import { Input } from "@/components/common/Input";
 import AboutBlock from "./AboutBlock";
-import { SHEET_WEB_APP, WHATSAPP_NUMBER } from "@/app/config";
+import { SHEET_WEB_APP, WHATSAPP_NUMBER } from "@/app/config.js";
 import { trackEvent } from "@/app/track";
-import { fmtHuman, getMinDateStr } from "@/utils/date";
+import { fmtHuman, getMinDateStr } from "@/utils/date.js";
 
 export default function ContactPage({ T }) {
   const [form, setForm] = useState({ name: "", email: "", phone: "", service: "Portraits", city: "Pune", date: "", message: "" });
