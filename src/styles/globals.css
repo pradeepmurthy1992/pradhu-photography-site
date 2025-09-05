@@ -1,0 +1,22 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* ===== Background dot patterns ===== */
+.bg-dots-light {
+  background-image: radial-gradient(#e0e0e0 1px, transparent 1px);
+  background-size: 24px 24px;
+}
+
+.bg-dots-dark {
+  background-image: radial-gradient(#2d2f38 1px, transparent 1px);
+  background-size: 24px 24px;
+}
+
+/* Scrollbar reset (hidden by default for carousels) */
+::-webkit-scrollbar {
+  display: none;
+}
+html {
+  scrollbar-width: none;
+}
