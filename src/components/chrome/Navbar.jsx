@@ -2,7 +2,7 @@
 import React, { useEffect, useRef, useState } from "react";
 import { NAV_ITEMS } from "@/app/config";
 import ThemeSlider from "@/components/common/ThemeSlider";
-import Icon from "@/components/common/Icon";
+import { Icon } from "@/components/common/Icon";
 
 export default function Navbar({ T, path, theme, setTheme, brand = "PRADHU PHOTOGRAPHY" }) {
   const [open, setOpen] = useState(false);
