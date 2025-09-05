@@ -17,6 +17,7 @@ concurrency:
 jobs:
   build:
     runs-on: ubuntu-latest
+
     steps:
       - name: Checkout repo
         uses: actions/checkout@v4
@@ -25,7 +26,8 @@ jobs:
         uses: actions/setup-node@v4
         with:
           node-version: 20
-          cache: "npm"
+          # ⬇️ remove caching because there's no lockfile
+          # cache: npm
 
       - name: Install deps
         run: npm install --no-audit --no-fund
