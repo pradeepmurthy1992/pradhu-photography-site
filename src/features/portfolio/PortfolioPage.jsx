@@ -1,5 +1,6 @@
+// src/features/portfolio/PortfolioPage.jsx
 import React, { useEffect, useMemo, useRef, useState } from "react";
-import { GH_CATEGORIES_EXT } from "./categoriesMeta";
+import { GH_CATEGORIES, GH_CATEGORIES_EXT } from "./categoriesMeta";
 import { trackEvent } from "@/app/track";
 
 export default function PortfolioPage({ T, cat, state, onBack }) {
@@ -16,13 +17,13 @@ export default function PortfolioPage({ T, cat, state, onBack }) {
     const q = (u.searchParams.get("layout") || "").toLowerCase();
     return LAYOUTS.includes(q) ? q : "carousel";
   });
-
   useEffect(() => {
     const u = new URL(window.location.href);
     u.searchParams.set("layout", layout);
     window.history.replaceState(null, "", u.toString());
   }, [layout]);
 
+  // Track active slide in carousel layout
   useEffect(() => {
     if (layout !== "carousel") return;
     const root = containerRef.current;
@@ -51,6 +52,7 @@ export default function PortfolioPage({ T, cat, state, onBack }) {
     };
   }, [layout]);
 
+  // Keyboard nav (lightbox + gallery)
   useEffect(() => {
     if (lbIdx >= 0) return;
 
@@ -84,6 +86,7 @@ export default function PortfolioPage({ T, cat, state, onBack }) {
     el?.scrollIntoView({ behavior: "smooth", inline: "center", block: "nearest" });
   };
 
+  // Lightbox controls
   const navLightbox = (dir) => {
     setLbIdx((i) => {
       if (i < 0) return i;
@@ -91,7 +94,6 @@ export default function PortfolioPage({ T, cat, state, onBack }) {
       return next;
     });
   };
-
   const closeLbAndSync = () => {
     const idx = lbIdx;
     setLbIdx(-1);
@@ -135,6 +137,7 @@ export default function PortfolioPage({ T, cat, state, onBack }) {
     };
   }, [lbIdx]);
 
+  // Vertical layout snapping
   const vWrapRef = useRef(null);
   const vItemRefs = useRef([]);
   vItemRefs.current = [];
@@ -186,6 +189,13 @@ export default function PortfolioPage({ T, cat, state, onBack }) {
     };
   }, [layout, items.length]);
 
+  // Helpers: UI
+  const onOpenImage = (i) => {
+    setActiveIndex(i);
+    setLbIdx(i);
+    trackEvent("image_open", { category: cat.label, idx: i + 1 });
+  };
+
   return (
     <section className="py-2" id="portfolio">
       {/* Floating quick-exit button */}
@@ -200,9 +210,12 @@ export default function PortfolioPage({ T, cat, state, onBack }) {
         </button>
       </div>
 
-      {/* Sticky breadcrumb + title */}
-      <div className="mb-4 sticky top-[72px] z-[1] backdrop-blur">
-        <div className="pt-3">
+      {/* Sticky breadcrumb + title + mobile chip bar */}
+      <div
+        className={`mb-2 sticky top-[72px] z-[10] backdrop-blur ${T.pageBg} bg-opacity-80 border-b ${T.navBorder}`}
+        style={{ WebkitBackdropFilter: "blur(10px)" }}
+      >
+        <div className="pt-3 px-0">
           <button
             className={`${T.linkSubtle} text-sm`}
             onClick={() => { onBack(); trackEvent("breadcrumb_back", { from: cat.label }); }}
@@ -212,11 +225,40 @@ export default function PortfolioPage({ T, cat, state, onBack }) {
           <span className={`mx-2 ${T.muted2}`}>/</span>
           <span className={`text-sm ${T.navTextStrong}`}>{cat.label}</span>
         </div>
+
         <h2 className={`mt-1 text-4xl md:text-5xl font-['Playfair_Display'] uppercase tracking-[0.08em] ${T.navTextStrong}`}>
           {cat.label}
         </h2>
-        {blurb ? <p className={`mt-1 ${T.muted}`}>{blurb}</p> : null}
+        {blurb ? <p className={`mt-1 pb-2 ${T.muted}`}>{blurb}</p> : <div className="pb-2" />}
+
+        {/* Mobile-only quick category chips */}
+        <div className="mt-1 sm:hidden -mx-2 overflow-x-auto [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
+          <div className="flex gap-2 px-2 pb-2">
+            {GH_CATEGORIES.map((c) => {
+              const isActive = c.label.toLowerCase() === cat.label.toLowerCase();
+              return (
+                <button
+                  key={`mchip-${c.label}`}
+                  onClick={() => {
+                    window.location.hash = `#portfolio/${encodeURIComponent(c.label)}`;
+                    trackEvent("mobile_chip_nav", { to: c.label });
+                  }}
+                  className={[
+                    "px-3 py-1.5 rounded-2xl border text-xs whitespace-nowrap transition shadow-sm",
+                    isActive ? T.chipActive : T.chipInactive,
+                  ].join(" ")}
+                  aria-current={isActive ? "true" : undefined}
+                >
+                  {c.label}
+                </button>
+              );
+            })}
+          </div>
+        </div>
       </div>
+
+      {/* Spacer to prevent gallery being covered by sticky header on some devices */}
+      <div className="h-1 sm:h-2" />
 
       {/* Layout picker */}
       <div className="mb-4 flex items-center gap-2">
@@ -241,7 +283,7 @@ export default function PortfolioPage({ T, cat, state, onBack }) {
         {items.length ? `${activeIndex + 1} / ${items.length}` : "0 / 0"}
       </div>
 
-      {/* ======== Gallery conditional ======== */}
+      {/* ======== GALLERY CONDITIONAL ======== */}
       {state.error ? (
         <div className="text-red-500">{String(state.error)}</div>
       ) : state.loading ? (
@@ -249,6 +291,7 @@ export default function PortfolioPage({ T, cat, state, onBack }) {
       ) : !items.length ? (
         <div className={`${T.muted}`}>No images yet for {cat.label}.</div>
       ) : layout === "vertical" ? (
+        /* ===== VERTICAL (Insta-style) with CLS guards ===== */
         <div
           ref={vWrapRef}
           className="
@@ -264,17 +307,19 @@ export default function PortfolioPage({ T, cat, state, onBack }) {
           {items.map((it, i) => (
             <article key={it.sha || i} ref={registerVItem} data-idx={i} className="snap-start">
               <div className={`rounded-2xl border shadow-sm ${T.cardBg} ${T.cardBorder}`}>
+                {/* CLS guard: aspect box; image is object-contain */}
                 <div className="relative w-full" style={{ aspectRatio: "3 / 4" }}>
                   <button
-                    onClick={() => { setActiveIndex(i); setLbIdx(i); trackEvent("image_open", { category: cat.label, idx: i + 1 }); }}
+                    onClick={() => onOpenImage(i)}
                     className="absolute inset-0 block w-full h-full"
                     aria-label={`Open image ${i + 1}`}
                   >
                     <img
                       src={it.url}
-                      alt={cat.label}
+                      alt={it.alt || cat.label}
                       loading="lazy"
                       decoding="async"
+                      fetchpriority="low"
                       className="w-full h-full object-contain bg-black/5"
                     />
                   </button>
@@ -290,6 +335,7 @@ export default function PortfolioPage({ T, cat, state, onBack }) {
           ))}
         </div>
       ) : layout === "carousel" ? (
+        /* ===== HORIZONTAL CAROUSEL with CLS guards ===== */
         <>
           <div
             ref={containerRef}
@@ -321,15 +367,17 @@ export default function PortfolioPage({ T, cat, state, onBack }) {
                   ${i === activeIndex ? "scale-[1.01]" : "scale-[0.995]"}
                 `}
               >
+                {/* CLS guard: fixed box, inner img object-contain */}
                 <div className="rounded-2xl shadow-sm">
                   <div className="relative w-full" style={{ aspectRatio: "3 / 2" }}>
                     <img
                       src={it.url}
-                      alt={cat.label}
+                      alt={it.alt || cat.label}
                       className="absolute inset-0 mx-auto rounded-2xl object-contain h-full w-full cursor-zoom-in"
                       loading="lazy"
                       decoding="async"
-                      onClick={() => { setLbIdx(i); trackEvent("image_open", { category: cat.label, idx: i + 1 }); }}
+                      fetchpriority="low"
+                      onClick={() => onOpenImage(i)}
                     />
                   </div>
                 </div>
@@ -338,6 +386,7 @@ export default function PortfolioPage({ T, cat, state, onBack }) {
             <div className="flex-shrink-0 w-[9%] sm:w-[14%] md:w-[18%] lg:w-[21%]" aria-hidden="true" />
           </div>
 
+          {/* Thumbnails */}
           <div className="mt-2 flex justify-center">
             <div className="flex gap-2 overflow-x-auto px-2 pb-1" style={{ scrollbarWidth: "none" }}>
               {items.map((it, i) => (
@@ -350,32 +399,47 @@ export default function PortfolioPage({ T, cat, state, onBack }) {
                     ${i === activeIndex ? "opacity-100 ring-2 ring-white" : "opacity-60 hover:opacity-90"}
                   `}
                 >
-                  <img src={it.url} alt="" className="h-full w-full object-cover" loading="lazy" decoding="async" />
+                  {/* CLS guard: fixed thumb size, cover */}
+                  <img src={it.url} alt={it.alt || ""} className="h-full w-full object-cover" loading="lazy" decoding="async" />
                 </button>
               ))}
             </div>
           </div>
         </>
       ) : (
+        /* ===== MASONRY (CSS columns) with CLS guard ===== */
         <div className="mx-auto max-w-[1600px] px-2 sm:px-3 md:px-4">
           <div className="columns-2 md:columns-3 lg:columns-4 gap-3 sm:gap-4 md:gap-5 [column-fill:_balance]">
             {items.map((it, i) => (
               <button
                 key={it.sha || i}
-                onClick={() => { setActiveIndex(i); setLbIdx(i); trackEvent("image_open", { category: cat.label, idx: i + 1 }); }}
+                onClick={() => onOpenImage(i)}
                 className="mb-3 sm:mb-4 md:mb-5 w-full overflow-hidden rounded-2xl border shadow-sm hover:shadow-md transition"
                 style={{ breakInside: "avoid" }}
               >
+                {/* CLS guard: aspect box; cover keeps the grid neat */}
                 <div className="relative w-full" style={{ aspectRatio: "3 / 4" }}>
-                  <img src={it.url} alt={cat.label} className="absolute inset-0 w-full h-full object-cover" loading="lazy" decoding="async" />
+                  <img
+                    src={it.url}
+                    alt={it.alt || cat.label}
+                    className="absolute inset-0 w-full h-full object-cover"
+                    loading="lazy"
+                    decoding="async"
+                    fetchpriority="low"
+                  />
                 </div>
+                {it.caption ? (
+                  <div className="px-3 py-2 text-left">
+                    <p className={`text-xs ${T.muted}`}>{it.caption}</p>
+                  </div>
+                ) : null}
               </button>
             ))}
           </div>
         </div>
       )}
 
-      {/* Lightbox */}
+      {/* ===== Lightbox ===== */}
       {lbIdx >= 0 && (
         <div
           className="fixed inset-0 z-[9999] bg-black/90 flex items-center justify-center p-4"
@@ -386,6 +450,7 @@ export default function PortfolioPage({ T, cat, state, onBack }) {
           onTouchStart={(e) => e.stopPropagation()}
           onTouchEnd={(e) => e.stopPropagation()}
         >
+          {/* edge controls */}
           <div className="absolute inset-0 flex items-center justify-between pointer-events-none">
             <button
               type="button"
@@ -412,7 +477,7 @@ export default function PortfolioPage({ T, cat, state, onBack }) {
 
           <img
             src={items[lbIdx].url}
-            alt={cat.label}
+            alt={items[lbIdx].alt || cat.label}
             className="max-h-[92vh] max-w-[92vw] object-contain cursor-zoom-out"
             onClick={(e) => { e.stopPropagation(); closeLbAndSync(); }}
             onTouchStart={onLbTouchStart}
@@ -420,6 +485,15 @@ export default function PortfolioPage({ T, cat, state, onBack }) {
             decoding="async"
             loading="eager"
           />
+
+          {/* optional caption inside LB */}
+          {items[lbIdx]?.caption ? (
+            <div className="absolute bottom-4 left-4 right-4 text-center">
+              <span className="inline-block bg-black/60 text-white text-xs rounded-full px-3 py-1">
+                {items[lbIdx].caption}
+              </span>
+            </div>
+          ) : null}
         </div>
       )}
     </section>
