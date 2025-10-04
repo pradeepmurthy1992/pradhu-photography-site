@@ -1,6 +1,13 @@
+// src/components/pages/ServicesPricingPage.jsx
 import React from "react";
+import { usePageMeta } from "@/app/seo";
 
 export default function ServicesPricingPage({ T }) {
+  usePageMeta(
+    "Services & Pricing | PRADHU Photography",
+    "Portraits, headshots, fashion/editorial, and event coverage with transparent packages. Request a custom quote tailored to your brief."
+  );
+
   const tiers = [
     {
       name: "Portrait Session",
@@ -15,20 +22,12 @@ export default function ServicesPricingPage({ T }) {
     {
       name: "Headshots (Solo/Team)",
       price: "from ₹5,000",
-      includes: [
-        "Consistent lighting & framing",
-        "On-location or studio",
-        "Curated 3–5 edited images per outfit",
-      ],
+      includes: ["Consistent lighting & framing", "On-location or studio", "Curated 3–5 edited images per outfit"],
     },
     {
       name: "Fashion / Editorial (Half-day)",
       price: "from ₹10,000",
-      includes: [
-        "Pre-production & moodboard",
-        "Lighting & look management",
-        "Team coordination on request",
-      ],
+      includes: ["Pre-production & moodboard", "Lighting & look management", "Team coordination on request"],
     },
     {
       name: "Event Coverage (2 hrs)",
@@ -47,21 +46,28 @@ export default function ServicesPricingPage({ T }) {
         locations. Final quotes depend on scope, team and timelines.
       </p>
 
-      {/* Services overview (cards) */}
+      {/* Services overview */}
       <div className="mt-6 grid md:grid-cols-2 xl:grid-cols-3 gap-6">
         {[
           [
             "Portraits & Headshots",
-            ["60–90 min · up to 2 outfits", "Natural retouching with clean skin tones", "Wardrobe & posing guidance", "On-location or studio"],
+            [
+              "60–90 min · up to 2 outfits",
+              "Natural retouching with clean skin tones",
+              "Wardrobe & posing guidance",
+              "On-location or studio",
+            ],
           ],
           [
             "Fashion / Editorial",
-            ["Moodboard & looks planning", "On-set lighting & styling coordination", "Clean, contemporary colour and skin tones", "Half-day / full-day options"],
+            [
+              "Moodboard & looks planning",
+              "On-set lighting & styling coordination",
+              "Clean, contemporary colour and skin tones",
+              "Half-day / full-day options",
+            ],
           ],
-          [
-            "Events & Candids",
-            ["By hours or blocks", "Key moments & people, storytelling frames", "Balanced set of colour-graded selects"],
-          ],
+          ["Events & Candids", ["By hours or blocks", "Key moments & people, storytelling frames", "Balanced set of colour-graded selects"]],
         ].map(([title, lines]) => (
           <article key={title} className={`rounded-2xl border p-5 shadow-sm ${T.panelBg} ${T.panelBorder}`}>
             <h2 className={`text-lg font-medium ${T.navTextStrong}`}>{title}</h2>
@@ -76,7 +82,9 @@ export default function ServicesPricingPage({ T }) {
 
       {/* Pricing tiers */}
       <div className="mt-10">
-        <h2 className={`text-2xl md:text-3xl font-['Playfair_Display'] uppercase tracking-[0.08em] ${T.navTextStrong}`}>Indicative Packages</h2>
+        <h2 className={`text-2xl md:text-3xl font-['Playfair_Display'] uppercase tracking-[0.08em] ${T.navTextStrong}`}>
+          Indicative Packages
+        </h2>
         <p className={`mt-2 ${T.muted}`}>Request a custom estimate for multi-day shoots, larger teams or special deliverables.</p>
 
         <div className="mt-6 grid md:grid-cols-2 xl:grid-cols-3 gap-6">
@@ -91,10 +99,7 @@ export default function ServicesPricingPage({ T }) {
                   <li key={l}>{l}</li>
                 ))}
               </ul>
-              <a
-                href="#/contact"
-                className={`${T.link} text-sm mt-4 inline-block`}
-              >
+              <a href="#/contact" className={`${T.link} text-sm mt-4 inline-block`}>
                 Request a quote →
               </a>
             </article>
