@@ -3,7 +3,8 @@ import React, { useMemo, useState } from "react";
 import { usePageMeta } from "@/app/seo";
 import { SHEET_WEB_APP, WHATSAPP_NUMBER } from "@/app/config";
 import AboutBlock from "./AboutBlock";
-import Input from "@/components/common/Input";
+// ⬇️ FIX: use named import
+import { Input } from "@/components/common/Input";
 
 export default function ContactPage({ T }) {
   usePageMeta(
