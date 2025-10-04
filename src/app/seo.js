@@ -5,32 +5,43 @@ export function usePageMeta(title, description) {
   useEffect(() => {
     if (title) document.title = title;
 
-    const setMeta = (name, content) => {
-      let tag = document.querySelector(`meta[name="${name}"]`);
-      if (!tag) {
-        tag = document.createElement("meta");
-        tag.setAttribute("name", name);
-        document.head.appendChild(tag);
+    const upsertMeta = (selector, makeEl, setAttrs) => {
+      let el = document.querySelector(selector);
+      if (!el) {
+        el = makeEl();
+        document.head.appendChild(el);
       }
-      tag.setAttribute("content", content);
-    };
-
-    const setOG = (property, content) => {
-      let tag = document.querySelector(`meta[property="${property}"]`);
-      if (!tag) {
-        tag = document.createElement("meta");
-        tag.setAttribute("property", property);
-        document.head.appendChild(tag);
-      }
-      tag.setAttribute("content", content);
+      setAttrs(el);
     };
 
     if (description) {
-      setMeta("description", description);
-      setOG("og:description", description);
+      upsertMeta('meta[name="description"]',
+        () => {
+          const m = document.createElement("meta");
+          m.setAttribute("name", "description");
+          return m;
+        },
+        (m) => m.setAttribute("content", description)
+      );
+      upsertMeta('meta[property="og:description"]',
+        () => {
+          const m = document.createElement("meta");
+          m.setAttribute("property", "og:description");
+          return m;
+        },
+        (m) => m.setAttribute("content", description)
+      );
     }
+
     if (title) {
-      setOG("og:title", title);
+      upsertMeta('meta[property="og:title"]',
+        () => {
+          const m = document.createElement("meta");
+          m.setAttribute("property", "og:title");
+          return m;
+        },
+        (m) => m.setAttribute("content", title)
+      );
     }
   }, [title, description]);
 }
