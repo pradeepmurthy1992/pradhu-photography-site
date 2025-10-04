@@ -1,22 +1,56 @@
+// src/components/pages/ContactPage.jsx
 import React, { useMemo, useState } from "react";
-import { Input } from "@/components/common/Input";
+import { usePageMeta } from "@/app/seo";
+import { SHEET_WEB_APP, WHATSAPP_NUMBER } from "@/app/config";
 import AboutBlock from "./AboutBlock";
-import { SHEET_WEB_APP, WHATSAPP_NUMBER } from "@/app/config.js";
-import { trackEvent } from "@/app/track";
-import { fmtHuman, getMinDateStr } from "@/utils/date.js";
+import Input from "@/components/common/Input";
 
 export default function ContactPage({ T }) {
-  const [form, setForm] = useState({ name: "", email: "", phone: "", service: "Portraits", city: "Pune", date: "", message: "" });
+  usePageMeta(
+    "Book a Shoot | PRADHU Photography",
+    "Get in touch to schedule your shoot — portraits, fashion, events. Quick WhatsApp or form booking with transparent timelines."
+  );
+
+  const [form, setForm] = useState({
+    name: "",
+    email: "",
+    phone: "",
+    service: "Portraits",
+    city: "Pune",
+    date: "",
+    message: "",
+  });
   const [submitting, setSubmitting] = useState(false);
   const [note, setNote] = useState({ kind: "", text: "" });
   const [whatsCTA, setWhatsCTA] = useState("");
 
-  const minDateStr = useMemo(() => getMinDateStr(2), []);
-  const onChange = (e) => { setWhatsCTA(""); setNote({ kind: "", text: "" }); setForm({ ...form, [e.target.name]: e.target.value }); };
+  const minDateStr = useMemo(() => {
+    const d = new Date();
+    d.setDate(d.getDate() + 2);
+    const off = d.getTimezoneOffset();
+    const local = new Date(d.getTime() - off * 60000);
+    return local.toISOString().slice(0, 10);
+  }, []);
 
+  const fmtHuman = (s) => {
+    if (!s) return "";
+    const [y, m, d] = s.split("-").map(Number);
+    return new Date(y, m - 1, d).toLocaleDateString(undefined, {
+      day: "2-digit",
+      month: "short",
+      year: "numeric",
+    });
+  };
+
+  const onChange = (e) => {
+    setWhatsCTA("");
+    setNote({ kind: "", text: "" });
+    setForm({ ...form, [e.target.name]: e.target.value });
+  };
   const isValidEmail = (v) => /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(v.trim());
   const normalizePhone = (v) => v.replace(/[^\d]/g, "");
-  const isValidINPhone = (v) => /^(?:\+?91)?[6-9]\d{9}$/.test(normalizePhone(v)) || /^0[6-9]\d{9}$/.test(normalizePhone(v));
+  const isValidINPhone = (v) =>
+    /^(?:\+?91)?[6-9]\d{9}$/.test(normalizePhone(v)) || /^0[6-9]\d{9}$/.test(normalizePhone(v));
 
   const onSubmit = async (e) => {
     e.preventDefault();
@@ -31,8 +65,12 @@ export default function ContactPage({ T }) {
 
     setSubmitting(true);
     try {
-      await fetch(SHEET_WEB_APP, { method: "POST", mode: "no-cors", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ ...form, source: "website" }) });
-      trackEvent("form_submit", { location: "contact", status: "success", service: form.service, city: form.city || "NA" });
+      await fetch(SHEET_WEB_APP, {
+        method: "POST",
+        mode: "no-cors",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ ...form, source: "website" }),
+      });
 
       const waText = encodeURIComponent(
         `Hi Pradhu! This is ${form.name}. I just sent an enquiry from your website.\nService: ${form.service}\nCity: ${form.city}\nPreferred date: ${
@@ -46,22 +84,36 @@ export default function ContactPage({ T }) {
       setForm({ name: "", email: "", phone: "", service: "Portraits", city: "Pune", date: "", message: "" });
     } catch (err) {
       setNote({ kind: "error", text: "Couldn’t submit right now. Please try again." });
-      trackEvent("form_submit", { location: "contact", status: "error", error: String(err?.message || "unknown") });
-    } finally { setSubmitting(false); }
+    } finally {
+      setSubmitting(false);
+    }
   };
 
   return (
     <section className="py-6" id="contact">
-      <h1 className={`text-4xl md:text-5xl font-['Playfair_Display'] uppercase tracking-[0.08em] ${T.navTextStrong}`}>Contact</h1>
+      <h1 className={`text-4xl md:text-5xl font-['Playfair_Display'] uppercase tracking-[0.08em] ${T.navTextStrong}`}>
+        Contact
+      </h1>
       <p className={`mt-2 ${T.muted}`}>Share details and I’ll reply with availability and a quote.</p>
 
-      <div className="mt-6"><AboutBlock T={T} /></div>
+      <div className="mt-6">
+        <AboutBlock T={T} />
+      </div>
 
       <form onSubmit={onSubmit} className={`mt-4 rounded-2xl border p-6 shadow-sm ${T.panelBg} ${T.panelBorder}`}>
         <div className="grid grid-cols-1 gap-4">
           <Input T={T} label="Name" name="name" value={form.name} onChange={onChange} required />
           <Input T={T} label="Email" name="email" type="email" value={form.email} onChange={onChange} required />
-          <Input T={T} label="Phone" name="phone" type="tel" value={form.phone} onChange={onChange} required placeholder="+91-XXXXXXXXXX" />
+          <Input
+            T={T}
+            label="Phone"
+            name="phone"
+            type="tel"
+            value={form.phone}
+            onChange={onChange}
+            required
+            placeholder="+91-XXXXXXXXXX"
+          />
 
           <div>
             <label className={`text-sm ${T.muted}`}>Preferred Date</label>
@@ -107,7 +159,9 @@ export default function ContactPage({ T }) {
                 onChange={onChange}
               >
                 {["Portraits", "Fashion", "Candids", "Street", "Events", "Other"].map((s) => (
-                  <option key={s} value={s}>{s}</option>
+                  <option key={s} value={s}>
+                    {s}
+                  </option>
                 ))}
               </select>
             </div>
@@ -119,7 +173,11 @@ export default function ContactPage({ T }) {
                 value={form.city}
                 onChange={onChange}
               >
-                <option>Pune</option><option>Mumbai</option><option>Chennai</option><option>Bengaluru</option><option>Other</option>
+                <option>Pune</option>
+                <option>Mumbai</option>
+                <option>Chennai</option>
+                <option>Bengaluru</option>
+                <option>Other</option>
               </select>
             </div>
           </div>
@@ -129,12 +187,15 @@ export default function ContactPage({ T }) {
               type="submit"
               disabled={submitting}
               className="rounded-xl bg-neutral-900 text-white px-4 py-2 font-medium hover:opacity-90 disabled:opacity-60"
-              onClick={() => trackEvent("cta_click", { location: "contact_form", cta: "submit" })}
             >
               {submitting ? "Submitting…" : "Send Enquiry"}
             </button>
             {note.text ? (
-              <span className={`text-sm ${note.kind === "error" ? "text-red-600" : note.kind === "success" ? "text-emerald-600" : "opacity-80"}`}>
+              <span
+                className={`text-sm ${
+                  note.kind === "error" ? "text-red-600" : note.kind === "success" ? "text-emerald-600" : "opacity-80"
+                }`}
+              >
                 {note.text}
               </span>
             ) : null}
@@ -144,7 +205,6 @@ export default function ContactPage({ T }) {
                 target="_blank"
                 rel="noreferrer"
                 className="inline-flex items-center gap-2 rounded-xl border px-3 py-2 text-sm hover:bg-neutral-50"
-                onClick={() => trackEvent("cta_click", { location: "contact_success", cta: "whatsapp" })}
               >
                 Continue on WhatsApp
               </a>
