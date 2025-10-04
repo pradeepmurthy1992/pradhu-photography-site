@@ -1,8 +1,15 @@
+// src/components/pages/AboutBlock.jsx
 import React from "react";
+import { usePageMeta } from "@/app/seo";
 import { CONTACT_EMAIL, IG_USERNAME, SERVICE_CITIES } from "@/app/config";
 import { Icon } from "@/components/common/Icon";
 
 export default function AboutBlock({ T }) {
+  usePageMeta(
+    "About PRADHU Photography",
+    "Pradeep Moorthy — photographer behind PRADHU. Fashion, portrait, and editorial work with clean color, natural skin, and simple direction."
+  );
+
   return (
     <section className="py-6">
       <h1 className={`text-4xl md:text-5xl font-['Playfair_Display'] uppercase tracking-[0.08em] ${T.navTextStrong}`}>
