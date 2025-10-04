@@ -24,6 +24,9 @@ export const GH_BRANCH = "main";
 // (Cache TTL is also defined in lib/gh.js; exported here for reference)
 export const GH_CACHE_TTL_MS = 5 * 60 * 1000;
 
+// Calendly (inline + links)
+export const CALENDLY_URL = "https://calendly.com/pradhuphotography";
+
 // ===== Contact / Social =====
 export const CONTACT_EMAIL = "pradhuphotography@gmail.com";
 export const SERVICE_CITIES = "Base : Pune · Available [ Mumbai · Chennai · Bengaluru ]";
