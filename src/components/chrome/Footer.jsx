@@ -1,153 +1,117 @@
 // src/components/chrome/Footer.jsx
-import { IG_USERNAME, WHATSAPP_NUMBER } from "@/app/config";
-import Icon from "@/components/common/Icon";
+import React from "react";
+import {
+  SERVICE_CITIES,
+  WHATSAPP_NUMBER,
+  IG_USERNAME,
+} from "@/app/config";
 
-export default function Footer() {
+export default function Footer({ T, onNavigate }) {
   const year = new Date().getFullYear();
-  const waUrl =
-    WHATSAPP_NUMBER &&
-    `https://wa.me/${WHATSAPP_NUMBER}?text=${encodeURIComponent(
-      "Hi, I’d like to enquire about a photoshoot."
-    )}`;
+  const waHref = `https://wa.me/${WHATSAPP_NUMBER}?text=${encodeURIComponent(
+    "Hi Pradhu, I’d like to enquire about a shoot."
+  )}`;
+  const igHref = `https://instagram.com/${IG_USERNAME}`;
+
+  const go = (e, path) => {
+    if (!onNavigate) return;
+    e.preventDefault();
+    onNavigate(path);
+  };
 
   return (
-    <footer className="mt-10 border-t border-slate-800/70 bg-black/90 text-slate-300">
-      <div className="mx-auto flex max-w-6xl flex-col gap-6 px-4 py-8 sm:px-6 sm:py-10 lg:flex-row lg:items-start lg:justify-between">
-        {/* Brand & NAP */}
-        <div className="space-y-3 text-sm">
-          <p className="text-xs font-semibold uppercase tracking-[0.25em] text-slate-500">
-            PRADHU PHOTOGRAPHY
-          </p>
-          <p className="max-w-sm text-xs text-slate-400">
-            Fashion, editorial and portrait photography for brands, models and
-            couples who want cinematic stories — not just pictures.
-          </p>
-          <div className="space-y-1 text-xs text-slate-400">
-            <p className="flex items-center gap-2">
-              <Icon name="map-pin" size={14} />
-              <span>Chennai, India · Shoots across major cities</span>
-            </p>
-            <p className="flex items-center gap-2">
-              <Icon name="phone" size={14} />
-              <span>+91-XXXXXXXXXX</span>
-            </p>
-            <p className="flex items-center gap-2">
-              <Icon name="mail" size={14} />
-              <span>pradhuphotography@example.com</span>
-            </p>
+    <footer className="border-t border-slate-800/80 bg-slate-950/95 text-xs text-slate-400">
+      <div className="max-w-6xl mx-auto px-4 py-6 grid gap-4 md:grid-cols-[2fr,1fr,1fr]">
+        <div>
+          <div className="font-display text-sm tracking-[0.18em] uppercase text-slate-100">
+            PRADHU <span className="text-emerald-400">Photography</span>
           </div>
+          <p className="mt-2 max-w-md">
+            Cinematic portraits, editorial stories and real moments across{" "}
+            {SERVICE_CITIES.join(", ")}.
+          </p>
+          <p className="mt-2">
+            <span className="font-semibold text-slate-200">WhatsApp:</span>{" "}
+            <a href={waHref} className="text-emerald-400 hover:underline">
+              +{WHATSAPP_NUMBER}
+            </a>
+          </p>
+          <p className="mt-1">
+            <span className="font-semibold text-slate-200">Instagram:</span>{" "}
+            <a href={igHref} className="text-emerald-400 hover:underline">
+              @{IG_USERNAME}
+            </a>
+          </p>
         </div>
 
-        {/* Sitemap */}
-        <div className="flex flex-1 flex-wrap gap-8 text-xs">
-          <div>
-            <h3 className="mb-2 text-[0.7rem] font-semibold uppercase tracking-[0.22em] text-slate-500">
-              Pages
-            </h3>
-            <ul className="space-y-1">
-              <li>
-                <a
-                  href="#/"
-                  className="text-slate-300 hover:text-white"
-                >
-                  Home
-                </a>
-              </li>
-              <li>
-                <a
-                  href="#/portfolio"
-                  className="text-slate-300 hover:text-white"
-                >
-                  Portfolio
-                </a>
-              </li>
-              <li>
-                <a
-                  href="#/services"
-                  className="text-slate-300 hover:text-white"
-                >
-                  Services
-                </a>
-              </li>
-              <li>
-                <a
-                  href="#/pricing"
-                  className="text-slate-300 hover:text-white"
-                >
-                  Pricing
-                </a>
-              </li>
-              <li>
-                <a
-                  href="#/about"
-                  className="text-slate-300 hover:text-white"
-                >
-                  About
-                </a>
-              </li>
-              <li>
-                <a
-                  href="#/reviews"
-                  className="text-slate-300 hover:text-white"
-                >
-                  Reviews
-                </a>
-              </li>
-              <li>
-                <a
-                  href="#/contact"
-                  className="text-slate-300 hover:text-white"
-                >
-                  Contact
-                </a>
-              </li>
-            </ul>
-          </div>
+        <div>
+          <h3 className="text-slate-200 text-[0.7rem] uppercase tracking-[0.2em] mb-2">
+            Navigate
+          </h3>
+          <ul className="space-y-1">
+            <li>
+              <a
+                href="/"
+                onClick={(e) => go(e, "/")}
+                className="hover:text-emerald-300"
+              >
+                Home
+              </a>
+            </li>
+            <li>
+              <a
+                href="/portfolio"
+                onClick={(e) => go(e, "/portfolio")}
+                className="hover:text-emerald-300"
+              >
+                Portfolio
+              </a>
+            </li>
+            <li>
+              <a
+                href="/services-pricing"
+                onClick={(e) => go(e, "/services-pricing")}
+                className="hover:text-emerald-300"
+              >
+                Services &amp; Pricing
+              </a>
+            </li>
+            <li>
+              <a
+                href="/reviews"
+                onClick={(e) => go(e, "/reviews")}
+                className="hover:text-emerald-300"
+              >
+                Reviews
+              </a>
+            </li>
+            <li>
+              <a
+                href="/contact"
+                onClick={(e) => go(e, "/contact")}
+                className="hover:text-emerald-300"
+              >
+                Contact
+              </a>
+            </li>
+          </ul>
+        </div>
 
-          {/* Social / Actions */}
-          <div>
-            <h3 className="mb-2 text-[0.7rem] font-semibold uppercase tracking-[0.22em] text-slate-500">
-              Connect
-            </h3>
-            <ul className="space-y-1">
-              {IG_USERNAME && (
-                <li>
-                  <a
-                    href={`https://instagram.com/${IG_USERNAME}`}
-                    target="_blank"
-                    rel="noreferrer"
-                    className="flex items-center gap-2 text-slate-300 hover:text-pink-400"
-                  >
-                    <Icon name="instagram" size={14} />
-                    <span>@{IG_USERNAME}</span>
-                  </a>
-                </li>
-              )}
-              {waUrl && (
-                <li>
-                  <a
-                    href={waUrl}
-                    target="_blank"
-                    rel="noreferrer"
-                    className="flex items-center gap-2 text-slate-300 hover:text-emerald-400"
-                  >
-                    <Icon name="whatsapp" size={14} />
-                    <span>WhatsApp</span>
-                  </a>
-                </li>
-              )}
-            </ul>
-          </div>
+        <div>
+          <h3 className="text-slate-200 text-[0.7rem] uppercase tracking-[0.2em] mb-2">
+            Studio
+          </h3>
+          <p>Based in Chennai &amp; Bengaluru.</p>
+          <p className="mt-1">
+            Available for travel across {SERVICE_CITIES.join(", ")} and beyond.
+          </p>
         </div>
       </div>
-
-      <div className="border-t border-slate-800/80 bg-black/95">
-        <div className="mx-auto flex max-w-6xl flex-col gap-3 px-4 py-4 text-[0.7rem] text-slate-500 sm:flex-row sm:items-center sm:justify-between sm:px-6">
+      <div className="border-t border-slate-800/80">
+        <div className="max-w-6xl mx-auto px-4 py-3 flex flex-col md:flex-row items-center justify-between gap-2">
           <p>© {year} Pradhu Photography. All rights reserved.</p>
-          <p className="text-slate-500">
-            Crafted with{" "}
-            <span className="text-emerald-400">light, stories</span> &amp; lots
-            of chai.
+          <p className="text-[0.65rem]">
+            Built with React · Tailwind · GitHub Pages.
           </p>
         </div>
       </div>
