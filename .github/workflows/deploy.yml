@@ -26,8 +26,6 @@ jobs:
         uses: actions/setup-node@v4
         with:
           node-version: 20
-          # No cache because there's no lockfile yet
-          # cache: npm
 
       - name: Install deps
         run: npm install --no-audit --no-fund
@@ -37,7 +35,7 @@ jobs:
           CI: true
         run: npm run build
 
-      # 🔁 SPA fallback: make sure dist/404.html exists and serves the SPA
+      # NEW: SPA fallback – copy index.html as 404.html into dist
       - name: Copy SPA fallback (404.html)
         run: cp dist/index.html dist/404.html
 
