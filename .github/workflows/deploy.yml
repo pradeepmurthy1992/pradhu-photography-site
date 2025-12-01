@@ -35,7 +35,6 @@ jobs:
           CI: true
         run: npm run build
 
-      # NEW: SPA fallback – copy index.html as 404.html into dist
       - name: Copy SPA fallback (404.html)
         run: cp dist/index.html dist/404.html
 
