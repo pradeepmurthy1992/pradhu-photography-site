@@ -1,22 +1,17 @@
-import React, { useEffect, useState } from "react";
-import ROUTES from "./routes";
-import { CONTAINER, INTRO_ENABLED, INTRO_FORCE_HASH, INTRO_FORCE_QUERY, INTRO_REMEMBER } from "./config";
-import useHashRoute from "@/hooks/useHashRoute";
-import useThemeTokens from "./themeTokens";
+// src/app/App.jsx
+import React, { useEffect, useMemo, useState } from "react";
+import { ROUTES } from "./routes";
+import { useThemeTokens } from "./themeTokens";
 
-// Chrome
 import Navbar from "@/components/chrome/Navbar";
 import Footer from "@/components/chrome/Footer";
-import HeadFonts from "@/components/chrome/HeadFonts";
-import HeadPerf from "@/components/chrome/HeadPerf";
-
-// Hero / CTAs / Intro
 import Hero from "@/components/hero/Hero";
 import StickyCTA from "@/components/ctas/StickyCTA";
 import MobileActionFab from "@/components/ctas/MobileActionFab";
 import IntroOverlay from "@/components/intro/IntroOverlay";
 
-// Pages
+import Portfolio from "@/features/portfolio/Portfolio";
+
 import HomeTiles from "@/components/pages/HomeTiles";
 import ServicesPricingPage from "@/components/pages/ServicesPricingPage";
 import AboutBlock from "@/components/pages/AboutBlock";
@@ -25,105 +20,127 @@ import ContactPage from "@/components/pages/ContactPage";
 import ReviewsPage from "@/components/pages/ReviewsPage";
 import NotFound from "@/components/pages/NotFound";
 
-// Feature: Portfolio
-import Portfolio from "@/features/portfolio";
+const BASE = (import.meta.env.BASE_URL || "").replace(/\/$/, "");
 
-// Config bits used by Navbar brand
-import { NAV_ITEMS } from "./config";
+function getInitialPath() {
+  if (typeof window === "undefined") return "/";
+  const full = window.location.pathname || "/";
+  let path = full.startsWith(BASE) ? full.slice(BASE.length) : full;
+  if (!path || path === "") return "/";
+  if (!path.startsWith("/")) path = "/" + path;
+  return path;
+}
 
 export default function App() {
-  // Theme
-  const [theme, setTheme] = useState(() => {
-    try { return sessionStorage.getItem("pradhu:theme") || "dark"; } catch { return "dark"; }
-  });
-  const T = useThemeTokens(theme);
-  useEffect(() => { try { sessionStorage.setItem("pradhu:theme", theme); } catch {} }, [theme]);
+  const [theme, setTheme] = useState("dark");
+  const [path, setPath] = useState(getInitialPath);
 
-  // Intro overlay gate
-  const [showIntro, setShowIntro] = useState(() => {
-    if (!INTRO_ENABLED) return false;
-    const url = new URL(window.location.href);
-    const forced = url.searchParams.get(INTRO_FORCE_QUERY) === "1" || url.hash === INTRO_FORCE_HASH;
-    if (forced) return true;
-    if (!INTRO_REMEMBER) return true;
-    return sessionStorage.getItem("pradhu:intro:dismissed") !== "1";
-  });
-  const closeIntro = () => {
-    setShowIntro(false);
-    try { if (INTRO_REMEMBER) sessionStorage.setItem("pradhu:intro:dismissed", "1"); } catch {}
+  const T = useThemeTokens(theme);
+
+  useEffect(() => {
+    const onPop = () => setPath(getInitialPath());
+    window.addEventListener("popstate", onPop);
+    return () => window.removeEventListener("popstate", onPop);
+  }, []);
+
+  const navigate = (nextPath) => {
+    if (typeof window === "undefined") return;
+    if (!nextPath.startsWith("/")) nextPath = "/" + nextPath;
+
+    const target = BASE + (nextPath === "/" ? "" : nextPath);
+
+    if (window.location.pathname !== target) {
+      window.history.pushState({}, "", target);
+    }
+    setPath(nextPath);
   };
 
-  // Router
-  const [path, nav] = useHashRoute(ROUTES);
-  useEffect(() => { if (!window.location.hash) nav("/"); }, []); // default to home
+  const routeKey = useMemo(() => {
+    if (path === "/") return "home";
+    if (path === "/portfolio") return "portfolio";
+    if (path.startsWith("/portfolio/")) return "portfolio-category";
 
-  const isContact = path === "/contact";
+    const match = ROUTES.find((r) => r.path === path);
+    return match ? match.key : "404";
+  }, [path]);
 
   return (
-    <main
-      aria-hidden={showIntro ? "true" : undefined}
-      className={`min-h-screen ${T.pageBg} ${T.pageText} font-['Inter'] ${theme === "light" ? "bg-dots-light" : "bg-dots-dark"}`}
-    >
-      <HeadFonts />
-      <HeadPerf />
-      {showIntro && <IntroOverlay onClose={closeIntro} />}
+    <div className={T.bodyClass}>
+      <IntroOverlay T={T} />
 
-      {/* NAVBAR */}
-      <Navbar T={T} path={path} theme={theme} setTheme={setTheme} brand="PRADHU PHOTOGRAPHY" />
+      <Navbar
+        T={T}
+        path={path}
+        theme={theme}
+        setTheme={setTheme}
+        onNavigate={navigate}
+      />
 
-      {/* ROUTES */}
-      {path === "/" && (
-        <>
-          <Hero />
-          <div className={`${CONTAINER} py-10`}>
-            <HomeTiles T={T} />
-          </div>
-        </>
-      )}
+      <main className="min-h-screen bg-gradient-to-b from-slate-950 to-slate-900 text-slate-100">
+        {routeKey === "home" && (
+          <>
+            <Hero T={T} onNavigate={navigate} />
+            <section
+              id="home-sections"
+              className="max-w-6xl mx-auto px-4 py-10"
+            >
+              <HomeTiles T={T} onNavigate={navigate} />
+            </section>
+          </>
+        )}
 
-      {path === "/portfolio" && (
-        <div className={`${CONTAINER} py-12`}>
-          <Portfolio T={T} />
-        </div>
-      )}
+        {routeKey === "portfolio" && (
+          <section className="max-w-6xl mx-auto px-4 py-10">
+            <Portfolio T={T} path="/portfolio" onNavigate={navigate} />
+          </section>
+        )}
 
-      {(path === "/services" || path === "/pricing") && (
-        <div className={`${CONTAINER} py-12`}>
-          <ServicesPricingPage T={T} />
-        </div>
-      )}
+        {routeKey === "portfolio-category" && (
+          <section className="max-w-6xl mx-auto px-4 py-10">
+            <Portfolio T={T} path={path} onNavigate={navigate} />
+          </section>
+        )}
 
-      {path === "/about" && (
-        <div className={`${CONTAINER} py-12`}>
-          <AboutBlock T={T} />
-          <FaqSection T={T} showTitle />
-        </div>
-      )}
+        {routeKey === "services" && (
+          <section className="max-w-6xl mx-auto px-4 py-10">
+            <ServicesPricingPage T={T} />
+          </section>
+        )}
 
-      {path === "/reviews" && (
-        <div className={`${CONTAINER} py-12`}>
-          <ReviewsPage T={T} />
-        </div>
-      )}
+        {routeKey === "about" && (
+          <section className="max-w-4xl mx-auto px-4 py-10">
+            <AboutBlock T={T} />
+          </section>
+        )}
 
-      {path === "/contact" && (
-        <div className={`${CONTAINER} py-12`}>
-          <ContactPage T={T} />
-        </div>
-      )}
+        {routeKey === "faq" && (
+          <section className="max-w-4xl mx-auto px-4 py-10">
+            <FaqSection T={T} />
+          </section>
+        )}
 
-      {path === "/404" && (
-        <div className={`${CONTAINER} py-20`}>
-          <NotFound />
-        </div>
-      )}
+        {routeKey === "contact" && (
+          <section className="max-w-4xl mx-auto px-4 py-10">
+            <ContactPage T={T} />
+          </section>
+        )}
 
-      {/* CTAs */}
-      <StickyCTA T={T} hide={isContact} />
-      <MobileActionFab hide={isContact} />
+        {routeKey === "reviews" && (
+          <section className="max-w-4xl mx-auto px-4 py-10">
+            <ReviewsPage T={T} />
+          </section>
+        )}
 
-      {/* FOOTER */}
-      <Footer T={T} />
-    </main>
+        {routeKey === "404" && (
+          <section className="max-w-4xl mx-auto px-4 py-10">
+            <NotFound T={T} onNavigate={navigate} />
+          </section>
+        )}
+      </main>
+
+      <StickyCTA T={T} onNavigate={navigate} />
+      <MobileActionFab T={T} onNavigate={navigate} />
+      <Footer T={T} onNavigate={navigate} />
+    </div>
   );
 }
