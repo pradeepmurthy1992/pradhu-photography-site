@@ -1,33 +1,47 @@
+// src/hooks/useHashRoute.js
 import { useEffect, useState } from "react";
 
-/* Minimal hash router: #/route (with portfolio sub-hash normalization) */
-const DEFAULT_ROUTES = ["/", "/portfolio", "/services", "/pricing", "/about", "/reviews", "/contact"];
+/**
+ * Normalizes window.location.hash into a clean SPA "path":
+ *
+ *  "#"                -> "/"
+ *  "#/"               -> "/"
+ *  "#/portfolio"      -> "/portfolio"
+ *  "#portfolio"       -> "/portfolio"
+ *  "#/portfolio/wed"  -> "/portfolio/wed"
+ *  "#portfolio/wed/"  -> "/portfolio/wed"
+ */
+function normalizeHash(hash) {
+  if (!hash || hash === "#") return "/";
 
-export default function useHashRoute(routes = DEFAULT_ROUTES) {
-  const getPath = () => {
-    const h = window.location.hash || "#/";
-    let path = h.replace(/^#/, "");       // remove leading '#'
-    if (!path.startsWith("/")) path = "/" + path; // ensure leading '/'
+  let raw = hash.startsWith("#") ? hash.slice(1) : hash; // remove "#"
+  raw = raw.trim();
 
-    // 👇 normalize any portfolio sub-route like "#portfolio/Category"
-    if (path.startsWith("/portfolio/")) return "/portfolio";
+  // Accept both "/portfolio" and "portfolio"
+  if (raw.startsWith("/")) raw = raw.slice(1);
 
-    // normal match
-    return routes.includes(path) ? path : "/404";
-  };
+  // remove duplicate slashes
+  raw = raw.replace(/\/+/g, "/");
 
-  const [path, setPath] = useState(getPath);
+  if (raw === "" || raw === "/") return "/";
+
+  return "/" + raw.replace(/\/+$/, ""); // strip trailing slash, re-add one leading
+}
+
+export function useHashRoute() {
+  const [path, setPath] = useState(() => normalizeHash(window.location.hash));
 
   useEffect(() => {
-    const onHash = () => setPath(getPath());
-    window.addEventListener("hashchange", onHash, { passive: true });
-    return () => window.removeEventListener("hashchange", onHash);
+    const handler = () => {
+      setPath(normalizeHash(window.location.hash));
+    };
+
+    window.addEventListener("hashchange", handler);
+    // handle initial load (in case hash changed before hook mounted)
+    handler();
+
+    return () => window.removeEventListener("hashchange", handler);
   }, []);
 
-  const nav = (to) => {
-    if (!to.startsWith("#")) to = `#${to}`;
-    if (window.location.hash !== to) window.location.hash = to;
-  };
-
-  return [path, nav];
+  return { path };
 }
