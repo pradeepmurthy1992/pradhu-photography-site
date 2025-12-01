@@ -1,26 +1,34 @@
 // src/components/common/Input.jsx
-export default function Input({
+import React from "react";
+
+function Input({
   label,
-  id,
+  name,
   type = "text",
   required = false,
+  as = "input",
   className = "",
   ...rest
 }) {
+  const Field = as === "textarea" ? "textarea" : "input";
+
   return (
-    <label className="block text-sm mb-4">
+    <label className="block text-sm">
       {label && (
-        <span className="block mb-1 font-medium text-zinc-200 dark:text-zinc-100">
+        <span className="mb-1.5 inline-block font-medium text-slate-200">
           {label}
-          {required && <span className="text-rose-400 ml-0.5">*</span>}
+          {required && <span className="ml-1 text-xs text-emerald-400">*</span>}
         </span>
       )}
-      <input
-        id={id}
+      <Field
+        name={name}
         type={type}
         required={required}
         className={
-          "w-full rounded-xl border border-zinc-700/70 bg-black/40 px-3 py-2 text-sm text-zinc-50 placeholder:text-zinc-500 focus:outline-none focus-visible:ring-2 focus-visible:ring-lime-400/80 focus-visible:ring-offset-2 focus-visible:ring-offset-black/90 transition " +
+          "w-full rounded-xl border border-slate-700/70 bg-slate-900/70 px-3 py-2 " +
+          "text-sm text-slate-50 placeholder:text-slate-500 " +
+          "shadow-sm outline-none ring-0 focus:border-emerald-400/80 " +
+          "focus:bg-slate-900 focus:shadow-[0_0_0_1px_rgba(45,212,191,0.6)] " +
           className
         }
         {...rest}
@@ -28,3 +36,6 @@ export default function Input({
     </label>
   );
 }
+
+export default Input;
+export { Input };
