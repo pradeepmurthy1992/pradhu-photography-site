@@ -1,13 +1,15 @@
 // ===== Intro / Branding =====
+export const BRAND_NAME = "PRADHU PHOTOGRAPHY";   // ⬅️ NEW
 export const INTRO_ENABLED = true;
 export const INTRO_BRAND = "PRADEEP";
 export const INTRO_NAME = "Pradhu Photography";
 export const INTRO_AUTO_DISMISS_MS = 0;
 export const INTRO_LEFT_IMAGE_URL =
-  "https://raw.githubusercontent.com/pradeepmurthy1992/pradhu-site-test/5a13fa5f50b380a30762e6d0f3d74ab44eb505a5/baseimg/187232337_402439238105_n.jpg";
+  "https://raw.githubusercontent.com/pradeepmurthy1992/pradhu-si...30762e6d0f3d74ab44eb505a5/baseimg/187232337_402439238105_n.jpg";
 export const INTRO_REMEMBER = true;
 export const INTRO_FORCE_QUERY = "intro";
 export const INTRO_FORCE_HASH = "#intro";
+
 
 // ===== Hero =====
 export const HERO_BG_URL =
