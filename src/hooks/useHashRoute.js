@@ -1,53 +1,60 @@
 // src/hooks/useHashRoute.js
-import { useCallback, useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 
-/**
- * Normalise the hash into a route path:
- *  "" or "#"            → "/"
- *  "#/about"           → "/about"
- *  "#about"            → "/about"
- *  "#/portfolio/kids"  → "/portfolio"  (category handled inside Portfolio)
- */
-function normalizeHash(hash) {
-  if (!hash || hash === "#") return "/";
+// Normalize any hash into a path like "/",
+function normalizeHash(h) {
+  if (typeof h !== "string" || !h) return "/";
+  let raw = h;
 
-  let h = hash;
-  if (h.startsWith("#")) h = h.slice(1); // remove "#"
-  if (!h.startsWith("/")) h = "/" + h;
+  // Strip leading "#"
+  if (raw.startsWith("#")) raw = raw.slice(1);
 
-  if (h.startsWith("/portfolio")) return "/portfolio";
-  return h;
+  // Default to "/"
+  if (!raw) return "/";
+
+  // Ensure leading slash
+  if (!raw.startsWith("/")) raw = "/" + raw;
+
+  return raw;
 }
 
+/**
+ * Simple hash-based router:
+ * - path examples: "/", "/portfolio", "/portfolio/weddings", "/contact"
+ * - Uses window.location.hash under the hood.
+ */
 export function useHashRoute() {
-  const [path, setPath] = useState(() => {
+  const [path, setPathState] = useState(() => {
     if (typeof window === "undefined") return "/";
-    return normalizeHash(window.location.hash);
+    return normalizeHash(window.location.hash || "#/");
   });
 
   useEffect(() => {
     if (typeof window === "undefined") return;
 
-    const onHashChange = () => {
-      setPath(normalizeHash(window.location.hash));
+    const handle = () => {
+      setPathState(normalizeHash(window.location.hash || "#/"));
     };
 
-    window.addEventListener("hashchange", onHashChange);
-    return () => window.removeEventListener("hashchange", onHashChange);
+    // Sync once on mount
+    handle();
+    window.addEventListener("hashchange", handle);
+    return () => window.removeEventListener("hashchange", handle);
   }, []);
 
-  const navigate = useCallback((nextPath) => {
+  const setPath = (nextPath) => {
     if (typeof window === "undefined") return;
 
-    if (!nextPath || nextPath === "/") {
-      window.location.hash = "";
-      return;
-    }
-
-    let p = nextPath;
+    let p = nextPath || "/";
+    // Allow callers to pass "/contact" or "#/contact"
+    if (p.startsWith("#")) p = p.slice(1);
     if (!p.startsWith("/")) p = "/" + p;
-    window.location.hash = p; // e.g. "#/contact", "#/portfolio"
-  }, []);
 
-  return [path, navigate];
+    const targetHash = "#" + p;
+    if (window.location.hash !== targetHash) {
+      window.location.hash = targetHash;
+    }
+  };
+
+  return { path, setPath };
 }
