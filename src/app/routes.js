@@ -1,11 +1,54 @@
 // src/app/routes.js
+import HomeTiles from "@/components/pages/HomeTiles";
+import ServicesPricingPage from "@/components/pages/ServicesPricingPage";
+import AboutBlock from "@/components/pages/AboutBlock";
+import FaqSection from "@/components/pages/FaqSection";
+import ContactPage from "@/components/pages/ContactPage";
+import ReviewsPage from "@/components/pages/ReviewsPage";
+import Portfolio from "@/features/portfolio/Portfolio";
+import NotFound from "@/components/pages/NotFound";
 
 export const ROUTES = [
-  { path: "/", key: "home", label: "Home" },
-  { path: "/portfolio", key: "portfolio", label: "Portfolio" },
-  { path: "/services-pricing", key: "services", label: "Services & Pricing" },
-  { path: "/about", key: "about", label: "About" },
-  { path: "/faq", key: "faq", label: "FAQ" },
-  { path: "/reviews", key: "reviews", label: "Reviews" },
-  { path: "/contact", key: "contact", label: "Contact" },
+  {
+    path: "/",
+    label: "Home",
+    component: HomeTiles,
+  },
+  {
+    path: "/portfolio",
+    label: "Portfolio",
+    component: Portfolio,
+  },
+  {
+    path: "/services",
+    label: "Services & Pricing",
+    component: ServicesPricingPage,
+  },
+  {
+    path: "/about",
+    label: "About",
+    component: AboutBlock,
+  },
+  {
+    path: "/faq",
+    label: "FAQ",
+    component: FaqSection,
+  },
+  {
+    path: "/reviews",
+    label: "Reviews",
+    component: ReviewsPage,
+  },
+  {
+    path: "/contact",
+    label: "Contact",
+    component: ContactPage,
+  },
+  {
+    path: "/404",
+    label: "Not Found",
+    component: NotFound,
+  },
 ];
+
+export const NAV_ITEMS = ROUTES.filter((r) => r.path !== "/404");
