@@ -1,5 +1,8 @@
-// ===== Intro / Branding =====
-export const BRAND_NAME = "PRADHU PHOTOGRAPHY";   // ⬅️ NEW
+// src/app/config.js
+
+// 🔹 Add this (anywhere near the top is fine)
+export const BRAND_NAME = "PRADHU Photography";
+
 export const INTRO_ENABLED = true;
 export const INTRO_BRAND = "PRADEEP";
 export const INTRO_NAME = "Pradhu Photography";
