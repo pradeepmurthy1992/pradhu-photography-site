@@ -7,7 +7,7 @@ import "@/styles/globals.css";
 import "@/styles/cinematic.css";
 
 // Root app
-import App from "@/app/App";
+import App from "@/app/App.jsx";
 
 ReactDOM.createRoot(document.getElementById("root")).render(
   <React.StrictMode>
