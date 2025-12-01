@@ -1,122 +1,133 @@
 // src/components/chrome/Navbar.jsx
 import React, { useState } from "react";
-import { NAV_ITEMS } from "@/app/config";
+import { NAV_ITEMS } from "@/app/routes";
 import ThemeSlider from "@/components/common/ThemeSlider";
-import Icon from "@/components/common/Icon";
+import { Icon } from "@/components/common/Icon";
 
-export default function Navbar({ T, path, theme, setTheme, onNavigate }) {
+export default function Navbar({
+  T,
+  path,
+  theme,
+  setTheme,
+  onNavigate,
+  brand = "PRADHU PHOTOGRAPHY",
+}) {
   const [open, setOpen] = useState(false);
 
-  const handleNav = (e, p) => {
-    e.preventDefault();
+  const isDark = theme === "dark";
+
+  const handleNav = (p) => {
     setOpen(false);
-    onNavigate && onNavigate(p);
+    if (onNavigate) onNavigate(p);
   };
 
-  const isActive = (itemPath) =>
-    path === itemPath ||
-    (itemPath === "/portfolio" && path.startsWith("/portfolio"));
+  const bgBase = isDark ? "bg-slate-900/80" : "bg-white/90";
+  const borderBase = isDark ? "border-slate-800" : "border-slate-200";
+  const textBase = isDark ? "text-slate-100" : "text-slate-900";
+
+  const mobileDrawerBg = isDark ? "bg-black" : "bg-white";
+  const mobileDrawerText = isDark ? "text-white" : "text-black";
 
   return (
-    <header className="sticky top-0 z-40 border-b border-slate-800/60 backdrop-blur bg-slate-950/80">
-      <nav className="max-w-6xl mx-auto flex items-center justify-between px-4 py-3">
-        <a
-          href="/"
-          onClick={(e) => handleNav(e, "/")}
-          className="font-display text-lg tracking-[0.18em] uppercase"
-        >
-          <span className="text-slate-50">PRADHU</span>
-          <span className="text-emerald-400"> Photography</span>
-        </a>
-
-        {/* Desktop nav */}
-        <div className="hidden md:flex items-center gap-6">
-          <ul className="flex items-center gap-4 text-xs font-medium tracking-wide">
-            {NAV_ITEMS.map((item) => (
-              <li key={item.key}>
-                <a
-                  href={item.path}
-                  onClick={(e) => handleNav(e, item.path)}
-                  className={`uppercase transition-colors ${
-                    isActive(item.path)
-                      ? "text-emerald-400"
-                      : "text-slate-300 hover:text-emerald-300"
-                  }`}
-                >
-                  {item.label}
-                </a>
-              </li>
-            ))}
-          </ul>
-          <ThemeSlider theme={theme} setTheme={setTheme} />
-        </div>
-
-        {/* Mobile toggle */}
+    <header
+      className={`sticky top-0 z-40 backdrop-blur border-b ${bgBase} ${borderBase}`}
+    >
+      <div className="max-w-6xl mx-auto px-4 py-3 flex items-center justify-between gap-3">
+        {/* Left: brand */}
         <button
           type="button"
-          className="md:hidden inline-flex items-center justify-center rounded-full border border-slate-700/70 p-2"
-          onClick={() => setOpen((v) => !v)}
-          aria-label={open ? "Close menu" : "Open menu"}
+          onClick={() => handleNav("/")}
+          className="flex items-center gap-2 group"
         >
-          <Icon
-            name={open ? "x" : "menu"}
-            className="w-5 h-5 text-slate-100"
-          />
+          <span className="inline-flex h-8 w-8 items-center justify-center rounded-full border border-emerald-400/50 bg-emerald-500/10 text-emerald-400">
+            <Icon name="camera" size={18} />
+          </span>
+          <span
+            className={`text-sm sm:text-base font-semibold tracking-[0.18em] uppercase ${textBase}`}
+          >
+            {brand}
+          </span>
         </button>
-      </nav>
+
+        {/* Desktop nav */}
+        <nav className="hidden md:flex items-center gap-6">
+          {NAV_ITEMS.map((item) => {
+            const active = path === item.path;
+            return (
+              <button
+                key={item.path}
+                type="button"
+                onClick={() => handleNav(item.path)}
+                className={`text-xs font-medium tracking-wide uppercase ${
+                  active
+                    ? "text-emerald-400 border-b border-emerald-400 pb-1"
+                    : `${textBase} hover:text-emerald-300`
+                }`}
+              >
+                {item.label}
+              </button>
+            );
+          })}
+
+          <div className="ml-4">
+            <ThemeSlider theme={theme} setTheme={setTheme} />
+          </div>
+        </nav>
+
+        {/* Mobile controls */}
+        <div className="flex md:hidden items-center gap-3">
+          <ThemeSlider theme={theme} setTheme={setTheme} />
+          <button
+            type="button"
+            onClick={() => setOpen((v) => !v)}
+            aria-label="Toggle navigation"
+            className="inline-flex h-9 w-9 items-center justify-center rounded-full border border-slate-600/60 bg-slate-900/80 text-slate-100"
+          >
+            <Icon name={open ? "x" : "menu"} size={18} />
+          </button>
+        </div>
+      </div>
 
       {/* Mobile drawer */}
       {open && (
         <div
-          className={`md:hidden border-t ${
-            theme === "light"
-              ? "bg-white text-slate-900 border-slate-200"
-              : "bg-slate-950 text-slate-50 border-slate-800"
-          }`}
+          className={`md:hidden ${mobileDrawerBg} ${mobileDrawerText} border-t border-slate-700/60`}
         >
-          <div className="max-w-6xl mx-auto px-4 py-4 space-y-4">
-            <div className="flex justify-between items-center">
+          <div className="max-w-6xl mx-auto px-4 py-3 space-y-3">
+            <div className="flex items-center justify-between">
               <span className="text-xs uppercase tracking-[0.2em] opacity-70">
                 Menu
               </span>
               <button
                 type="button"
                 onClick={() => setOpen(false)}
-                className="inline-flex items-center gap-1 text-xs"
+                className="inline-flex h-8 w-8 items-center justify-center rounded-full border border-slate-500/60"
+                aria-label="Close navigation"
               >
-                <Icon name="x" className="w-4 h-4" />
-                <span>Close</span>
+                <Icon name="x" size={16} />
               </button>
             </div>
 
-            <ul className="space-y-2 text-sm">
-              {NAV_ITEMS.map((item) => (
-                <li key={item.key}>
-                  <a
-                    href={item.path}
-                    onClick={(e) => handleNav(e, item.path)}
-                    className={`block rounded-xl px-3 py-2 ${
-                      isActive(item.path)
-                        ? theme === "light"
-                          ? "bg-slate-900 text-emerald-300"
-                          : "bg-slate-100 text-emerald-600"
-                        : theme === "light"
-                        ? "text-slate-900 hover:bg-slate-100"
-                        : "text-slate-100 hover:bg-slate-800"
+            <nav className="flex flex-col gap-2">
+              {NAV_ITEMS.map((item) => {
+                const active = path === item.path;
+                return (
+                  <button
+                    key={item.path}
+                    type="button"
+                    onClick={() => handleNav(item.path)}
+                    className={`flex items-center justify-between rounded-lg px-3 py-2 text-sm ${
+                      active
+                        ? "bg-emerald-500 text-slate-900"
+                        : "hover:bg-slate-800/70"
                     }`}
                   >
-                    {item.label}
-                  </a>
-                </li>
-              ))}
-            </ul>
-
-            <div className="pt-2 border-t border-slate-800/80 flex justify-between items-center">
-              <span className="text-[0.65rem] uppercase tracking-[0.18em] opacity-70">
-                Theme
-              </span>
-              <ThemeSlider theme={theme} setTheme={setTheme} />
-            </div>
+                    <span>{item.label}</span>
+                    {active && <Icon name="chevron-right" size={16} />}
+                  </button>
+                );
+              })}
+            </nav>
           </div>
         </div>
       )}
