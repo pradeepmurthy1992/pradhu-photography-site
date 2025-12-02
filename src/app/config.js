@@ -1,6 +1,6 @@
 // src/app/config.js
 
-// 🔹 Add this (anywhere near the top is fine)
+// 🔹 Brand & intro overlay
 export const BRAND_NAME = "PRADHU Photography";
 
 export const INTRO_ENABLED = true;
@@ -8,11 +8,10 @@ export const INTRO_BRAND = "PRADEEP";
 export const INTRO_NAME = "Pradhu Photography";
 export const INTRO_AUTO_DISMISS_MS = 0;
 export const INTRO_LEFT_IMAGE_URL =
-  "https://raw.githubusercontent.com/pradeepmurthy1992/pradhu-si...30762e6d0f3d74ab44eb505a5/baseimg/187232337_402439238105_n.jpg";
+  "https://raw.githubusercontent.com/pradeepmurthy1992/pradhu-site-test/212bc1f22bc6a32b70ae87d0bb104c38f7c3848e/baseimg/02.jpg";
 export const INTRO_REMEMBER = true;
 export const INTRO_FORCE_QUERY = "intro";
 export const INTRO_FORCE_HASH = "#intro";
-
 
 // ===== Hero =====
 export const HERO_BG_URL =
@@ -34,7 +33,10 @@ export const CALENDLY_URL = "https://calendly.com/pradhuphotography";
 
 // ===== Contact / Social =====
 export const CONTACT_EMAIL = "pradhuphotography@gmail.com";
-export const SERVICE_CITIES = "Base : Pune · Available [ Mumbai · Chennai · Bengaluru ]";
+
+// ✅ Make this an ARRAY, not a string
+export const SERVICE_CITIES = ["Pune", "Mumbai", "Chennai", "Bengaluru"];
+
 export const IG_USERNAME = "pradhu_photography";
 export const WHATSAPP_NUMBER = "919322584410";
 export const SHEET_WEB_APP =
