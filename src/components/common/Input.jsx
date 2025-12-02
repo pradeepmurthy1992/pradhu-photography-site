@@ -2,7 +2,7 @@
 import React from "react";
 
 export function Input({
-  T, // kept in signature in case you use it later
+  T, // kept for signature, but not used here
   label,
   name,
   type = "text",
