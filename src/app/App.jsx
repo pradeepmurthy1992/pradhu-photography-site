@@ -184,14 +184,13 @@ export default function App() {
 
       {/* THEME-AWARE PAGE BACKGROUND */}
       <div
-        className={`min-h-screen ${
-          theme === "dark"
-            ? "bg-gradient-to-b from-slate-950 via-slate-950/95 to-slate-950 text-slate-50"
-                 "bg-gradient-to-b from-[#fef9f3] via-[#f5f0ff] to-[#e7f2ff] text-slate-900"
+  className={`min-h-screen ${
+    theme === "dark"
+      ? "bg-gradient-to-b from-slate-950 via-slate-950/95 to-slate-950 text-slate-50"
+      : "bg-gradient-to-b from-[#fdf3ea] via-[#f7e3cf] to-[#f0d3bd] text-slate-900"
+  }`}
+>
 
-
-        }`}
-      >
         {/* NAVBAR */}
         <Navbar
           T={T}
