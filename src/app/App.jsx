@@ -187,7 +187,7 @@ export default function App() {
         className={`min-h-screen ${
           theme === "dark"
             ? "bg-gradient-to-b from-slate-950 via-slate-950/95 to-slate-950 text-slate-50"
-            : "bg-[#f5f4f0] text-neutral-900"
+            : "bg-gradient-to-b from-[#fbf8f3] via-[#f3eee6] to-[#ebe3da] text-neutral-900"
         }`}
       >
         {/* NAVBAR */}
@@ -224,7 +224,7 @@ function renderRoute(path, { T, theme, setTheme, onNavigate }) {
   // Treat "/faq" as home (fallback for old links)
   if (clean === "/faq") clean = "/";
 
-  // Full-width shell with side padding (wider layout)
+  // Full-width shell with nice side padding
   const Shell = ({ children }) => (
     <div className="w-full px-4 sm:px-8 lg:px-16 xl:px-24 2xl:px-32">
       {children}
@@ -265,19 +265,21 @@ function renderRoute(path, { T, theme, setTheme, onNavigate }) {
   }
 
   if (clean === "/about") {
+    // legacy /about – keep it working, but you’re mostly using home
     return (
       <>
         <Hero T={T} />
         <Shell>
           <div className="mt-10">
             <AboutBlock T={T} />
+            <div className="mt-16">
+              <FaqSection T={T} />
+            </div>
           </div>
         </Shell>
       </>
     );
   }
-
-  // No separate /faq page anymore
 
   if (clean === "/contact") {
     return (
@@ -316,7 +318,7 @@ function renderRoute(path, { T, theme, setTheme, onNavigate }) {
 function useRouteSeo(path) {
   let clean = (path || "/").replace(/\/+$/, "") || "/";
 
-  // Alias /faq → home for SEO as well
+  // Alias /faq → home for SEO too
   if (clean === "/faq") clean = "/";
 
   let title = "PRADHU Photography · Pune Portrait & Fashion Photographer";
