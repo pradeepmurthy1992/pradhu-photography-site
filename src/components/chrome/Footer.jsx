@@ -28,11 +28,24 @@ export default function Footer({ T, theme = "dark", onNavigate }) {
         <div className="grid gap-10 md:grid-cols-3 md:gap-12">
           {/* Brand / intro */}
           <div className="space-y-3">
-            <p
-              className={`text-xs font-semibold tracking-[0.3em] uppercase ${brandAccent}`}
-            >
-              PRADHU PHOTOGRAPHY
-            </p>
+            {/* Logo + brand */}
+            <div className="flex items-center gap-2">
+              <span className="inline-flex h-9 w-9 items-center justify-center rounded-full bg-black text-white shadow-sm">
+                <img
+                  src="/images/pradhu-logo.png"
+                  alt="Pradhu Photography logo"
+                  className="h-7 w-auto"
+                  loading="lazy"
+                  decoding="async"
+                />
+              </span>
+              <p
+                className={`text-xs font-semibold tracking-[0.3em] uppercase ${brandAccent}`}
+              >
+                PRADHU PHOTOGRAPHY
+              </p>
+            </div>
+
             <p className={`text-sm leading-relaxed ${bodyText}`}>
               Cinematic portraits, editorial stories and real moments across
               Pune, Mumbai, Chennai &amp; Bengaluru.
@@ -124,7 +137,11 @@ export default function Footer({ T, theme = "dark", onNavigate }) {
         </div>
 
         {/* Divider */}
-        <div className={`mt-8 border-t ${isDark ? "border-slate-800/80" : "border-[rgba(15,23,42,0.08)]"}`} />
+        <div
+          className={`mt-8 border-t ${
+            isDark ? "border-slate-800/80" : "border-[rgba(15,23,42,0.08)]"
+          }`}
+        />
 
         {/* Bottom row */}
         <div className="mt-4 flex flex-col items-start justify-between gap-2 text-xs md:flex-row md:items-center">
