@@ -13,18 +13,15 @@ export default function Footer({ T, onNavigate }) {
   )}`;
   const igHref = `https://instagram.com/${IG_USERNAME}`;
 
-  // ✅ Always work with an array
-  const cities = Array.isArray(SERVICE_CITIES)
-    ? SERVICE_CITIES
-    : SERVICE_CITIES
-    ? [String(SERVICE_CITIES)]
-    : [];
-
   const go = (e, path) => {
     if (!onNavigate) return;
     e.preventDefault();
     onNavigate(path);
   };
+
+  const citiesText = Array.isArray(SERVICE_CITIES)
+    ? SERVICE_CITIES.join(", ")
+    : SERVICE_CITIES || "";
 
   return (
     <footer className="border-t border-slate-800/80 bg-slate-950/95 text-xs text-slate-400">
@@ -35,7 +32,7 @@ export default function Footer({ T, onNavigate }) {
           </div>
           <p className="mt-2 max-w-md">
             Cinematic portraits, editorial stories and real moments across{" "}
-            {cities.length > 0 ? cities.join(", ") : "multiple cities"}.
+            {citiesText}.
           </p>
           <p className="mt-2">
             <span className="font-semibold text-slate-200">WhatsApp:</span>{" "}
@@ -110,17 +107,14 @@ export default function Footer({ T, onNavigate }) {
           </h3>
           <p>Based in Chennai &amp; Bengaluru.</p>
           <p className="mt-1">
-            Available for travel across{" "}
-            {cities.length > 0 ? cities.join(", ") : "India"} and beyond.
+            Available for travel across {citiesText} and beyond.
           </p>
         </div>
       </div>
       <div className="border-t border-slate-800/80">
         <div className="max-w-6xl mx-auto px-4 py-3 flex flex-col md:flex-row items-center justify-between gap-2">
           <p>© {year} Pradhu Photography. All rights reserved.</p>
-          <p className="text-[0.65rem]">
-            Built with React · Tailwind · GitHub Pages.
-          </p>
+          <p className="text-[0.65rem]">Built with React · Tailwind · GitHub Pages.</p>
         </div>
       </div>
     </footer>
