@@ -41,10 +41,12 @@ export default function Hero({ T }) {
         </div>
       )}
 
-      {/* Content constrained to 6xl, centered */}
-      <div className="relative z-10 max-w-6xl mx-auto px-4 py-10 sm:px-8 sm:py-14 lg:px-12 lg:py-16">
+           {/* Content constrained to 7xl, centered (wider layout) */}
+      <div className="relative z-10 max-w-7xl mx-auto px-4 py-10 sm:px-8 sm:py-14 lg:px-12 lg:py-16">
+
         <div className="flex flex-col gap-10 lg:flex-row lg:items-end lg:justify-between">
-          <div className="max-w-xl space-y-6">
+                    <div className="max-w-2xl space-y-6">
+
             <p className="inline-flex items-center gap-2 rounded-full bg-emerald-500/10 px-3 py-1 text-xs font-semibold uppercase tracking-[0.25em] text-emerald-300">
               <span className="inline-flex h-1.5 w-1.5 rounded-full bg-emerald-400" />
               <span>Pradhu Photography</span>
