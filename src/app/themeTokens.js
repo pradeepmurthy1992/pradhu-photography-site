@@ -1,66 +1,88 @@
 // src/app/themeTokens.js
-// Theme tokens hook used across the app
+
+// Centralised theme tokens for light / dark.
+// Keys (pageBg, pageText, panelBg, etc.) match what other components expect.
+
+const light = {
+  pageBg: "bg-slate-50",
+  pageText: "text-slate-900",
+
+  navBg: "bg-white/90",
+  navBorder: "border-slate-200",
+  navTextStrong: "text-slate-900",
+
+  chipActive: "bg-emerald-500 text-slate-900 border-emerald-400",
+  chipInactive:
+    "bg-white border-slate-300 text-slate-700 hover:bg-slate-50",
+
+  btnOutline: "border-slate-300 text-slate-900 hover:bg-slate-50",
+
+  sectionAltBg: "bg-slate-100",
+
+  panelBg: "bg-white",
+  panelBorder: "border-slate-200",
+
+  muted: "text-slate-600",
+  muted2: "text-slate-500",
+
+  footerBg: "bg-slate-950",
+  footerBorder: "border-slate-800",
+
+  link: "text-emerald-600 underline",
+  linkSubtle: "text-slate-800 underline",
+
+  inputBg: "bg-white",
+  inputBorder: "border-slate-300",
+  inputText: "text-slate-900",
+  placeholder: "placeholder-slate-400",
+
+  cardBg: "bg-white",
+  cardBorder: "border-slate-200",
+};
+
+const dark = {
+  pageBg: "bg-slate-950",
+  pageText: "text-slate-50",
+
+  navBg: "bg-slate-950/90",
+  navBorder: "border-slate-800",
+  navTextStrong: "text-white",
+
+  chipActive: "bg-emerald-500 text-slate-900 border-emerald-400",
+  chipInactive:
+    "bg-slate-900 border-slate-700 text-slate-200 hover:bg-slate-800",
+
+  btnOutline: "border-slate-500 text-slate-100 hover:bg-slate-800",
+
+  sectionAltBg: "bg-slate-900",
+
+  panelBg: "bg-slate-900",
+  panelBorder: "border-slate-800",
+
+  muted: "text-slate-400",
+  muted2: "text-slate-500",
+
+  footerBg: "bg-slate-950",
+  footerBorder: "border-slate-800",
+
+  link: "text-emerald-300 underline",
+  linkSubtle: "text-emerald-200 underline",
+
+  inputBg: "bg-slate-950",
+  inputBorder: "border-slate-700",
+  inputText: "text-slate-100",
+  placeholder: "placeholder-slate-500",
+
+  cardBg: "bg-slate-900",
+  cardBorder: "border-slate-800",
+};
 
 export function useThemeTokens(theme) {
-  const light = {
-    pageBg: "bg-[#faf7f2]",
-    pageText: "text-neutral-900",
-    navBg: "bg-white/85",
-    navBorder: "border-rose-200",
-    navTextStrong: "text-neutral-900",
-    chipActive: "bg-rose-200 text-rose-900 border-rose-300",
-    chipInactive: "bg-white border-neutral-300 text-neutral-700 hover:bg-rose-50",
-    btnOutline: "border-neutral-300 text-neutral-900 hover:bg-rose-50",
-    sectionAltBg: "bg-[#fdfaf7]",
-    panelBg: "bg-white",
-    panelBorder: "border-rose-200",
-    muted: "text-neutral-600",
-    muted2: "text-neutral-500",
-    footerBg: "bg-white",
-    footerBorder: "border-rose-200",
-    link: "text-rose-900 underline",
-    linkSubtle: "text-neutral-800 underline",
-    inputBg: "bg-white",
-    inputBorder: "border-neutral-300",
-    inputText: "text-neutral-900",
-    placeholder: "placeholder-neutral-400",
-    cardBg: "bg-white",
-    cardBorder: "border-rose-200",
-  };
-
-  const dark = {
-    pageBg: "bg-[#1c1e26]",
-    pageText: "text-neutral-100",
-    navBg: "bg-[#1c1e26]/90",
-    navBorder: "border-teal-700",
-    navTextStrong: "text-white",
-    chipActive: "bg-teal-300 text-[#1c1e26] border-teal-400",
-    chipInactive:
-      "bg-[#2a2d36] border-[#3a3d46] text-neutral-200 hover:bg-[#333640]",
-    btnOutline: "border-neutral-600 text-neutral-100 hover:bg-[#333640]",
-    sectionAltBg: "bg-[#22242c]",
-    panelBg: "bg-[#2a2d36]",
-    panelBorder: "border-[#3a3d46]",
-    muted: "text-neutral-300",
-    muted2: "text-neutral-400",
-    footerBg: "bg-[#1c1e26]",
-    footerBorder: "border-teal-700",
-    link: "text-teal-300 underline",
-    linkSubtle: "text-teal-200 underline",
-    inputBg: "bg-[#1c1e26]",
-    inputBorder: "border-neutral-600",
-    inputText: "text-neutral-100",
-    placeholder: "placeholder-neutral-500",
-    cardBg: "bg-[#2a2d36]",
-    cardBorder: "border-[#3a3d46]",
-  };
-
-  // pick current theme tokens
   const base = theme === "light" ? light : dark;
 
-  // Wrap in { T: ... } and add a compatibility alias for bodyBg
+  // Compatibility: App expects T.bodyBg, others use pageBg/pageText/etc.
   const T = {
-    bodyBg: base.pageBg, // 👈 this is what App.jsx uses
+    bodyBg: base.pageBg,
     ...base,
   };
 
