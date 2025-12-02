@@ -88,7 +88,8 @@ export default function App() {
         <MobileActionFab T={T} />
 
         {/* FOOTER */}
-        <Footer T={T} />
+<Footer T={T} onNavigate={handleNavigate} />
+
       </div>
     </div>
   );
