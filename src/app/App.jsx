@@ -214,12 +214,13 @@ export default function App() {
 function renderRoute(path, { T, theme, setTheme, onNavigate }) {
   const clean = (path || "/").replace(/\/+$/, "") || "/";
 
-   // A reusable container for non-hero content – WIDER layout
+    // A reusable container for non-hero content – full-width with nice side padding
   const Shell = ({ children }) => (
-    <div className="max-w-7xl mx-auto px-4 sm:px-6 md:px-8 lg:px-12 xl:px-16">
+    <div className="w-full px-4 sm:px-8 lg:px-16 xl:px-24 2xl:px-32">
       {children}
     </div>
   );
+
 
 
   if (clean === "/" || clean === "/home") {
