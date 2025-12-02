@@ -1,118 +1,138 @@
 // src/components/chrome/Footer.jsx
 import React from "react";
-import { NAV_ITEMS } from "@/app/config";
 
-export default function Footer({ theme = "dark", onNavigate }) {
-  const isDark = theme === "dark";
+export default function Footer({ T, onNavigate }) {
+  const baseBg = T.footerBg || "bg-slate-950";
+  const baseText = T.footerText || "text-slate-200";
+  const headingText = T.footerHeading || "text-slate-50";
+  const accentText = T.footerAccent || "text-emerald-400";
+  const subtleText = T.footerSubtle || "text-slate-400";
 
-  const wrapper =
-    (isDark
-      ? "bg-[#020617] text-slate-100 border-t border-slate-800"
-      : "bg-[#e9e2d5] text-neutral-900 border-t border-neutral-300") +
-    " mt-auto";
-
-  const accent = isDark ? "text-emerald-400" : "text-emerald-700";
-  const mutedText = isDark ? "text-slate-400" : "text-neutral-600";
-  const linkHover = isDark ? "hover:text-emerald-300" : "hover:text-emerald-700";
-
-  const year = new Date().getFullYear();
-
-  // Use same routes as navbar (minus 404)
-  const navItems = NAV_ITEMS.filter((item) => item.path !== "/404");
+  const handleNav = (to) => {
+    if (onNavigate) onNavigate(to);
+  };
 
   return (
-    <footer className={wrapper}>
-      {/* Slightly wider band than before */}
-      <div className="mx-auto w-full max-w-7xl px-6 py-10 sm:px-8 lg:px-10 lg:py-12">
-        <div className="grid gap-10 md:grid-cols-3">
-          {/* Brand / blurb */}
-          <div>
-            <h3 className="text-sm font-semibold tracking-[0.3em] uppercase">
-              <span>PRADHU </span>
-              <span className={accent}>PHOTOGRAPHY</span>
-            </h3>
+    <footer className={`${baseBg} ${baseText} border-t border-white/5`}>
+      {/* full-width, no max-w — stretches to screen edges */}
+      <div className="flex w-full flex-col gap-10 px-4 py-10 sm:px-8 lg:flex-row lg:items-start lg:justify-between">
+        {/* Brand / blurb */}
+        <div className="space-y-3 lg:w-1/3">
+          <h3
+            className={`text-xs font-semibold tracking-[0.35em] uppercase ${accentText}`}
+          >
+            PRADHU PHOTOGRAPHY
+          </h3>
+          <p className={`${subtleText} text-sm leading-relaxed`}>
+            Cinematic portraits, editorial stories and real moments across Pune,
+            Mumbai, Chennai &amp; Bengaluru.
+          </p>
 
-            <p className={`mt-4 text-sm leading-relaxed ${mutedText}`}>
-              Cinematic portraits, editorial stories and real moments across
-              Pune, Mumbai, Chennai & Bengaluru.
+          <div className="space-y-1 text-sm">
+            <p>
+              <span className="font-semibold">WhatsApp: </span>
+              <a
+                href="https://wa.me/919332584410"
+                target="_blank"
+                rel="noreferrer"
+                className={accentText}
+              >
+                +91&nbsp;93325&nbsp;84410
+              </a>
             </p>
-
-            <div className="mt-4 space-y-1 text-sm">
-              <p>
-                <span className="font-semibold">WhatsApp:</span>{" "}
-                <a
-                  className={`${accent} ${linkHover}`}
-                  href="https://wa.me/919322584410"
-                  target="_blank"
-                  rel="noreferrer"
-                >
-                  +91&nbsp;93225&nbsp;84410
-                </a>
-              </p>
-              <p>
-                <span className="font-semibold">Instagram:</span>{" "}
-                <a
-                  className={`${accent} ${linkHover}`}
-                  href="https://instagram.com/pradhu_photography"
-                  target="_blank"
-                  rel="noreferrer"
-                >
-                  @pradhu_photography
-                </a>
-              </p>
-            </div>
-          </div>
-
-          {/* Navigate */}
-          <div>
-            <h4
-              className={`text-xs font-semibold tracking-[0.25em] uppercase ${accent}`}
-            >
-              Navigate
-            </h4>
-            <ul className="mt-4 space-y-2 text-sm">
-              {navItems.map((item) => (
-                <li key={item.path}>
-                  <button
-                    type="button"
-                    onClick={() => onNavigate(item.path)}
-                    className={`${mutedText} ${linkHover}`}
-                  >
-                    {item.label}
-                  </button>
-                </li>
-              ))}
-            </ul>
-          </div>
-
-          {/* Studio */}
-          <div>
-            <h4
-              className={`text-xs font-semibold tracking-[0.25em] uppercase ${accent}`}
-            >
-              Studio
-            </h4>
-            <p className={`mt-4 text-sm leading-relaxed ${mutedText}`}>
-              Based in Chennai & Bengaluru. Available for travel across Pune,
-              Mumbai, Chennai, Bengaluru and beyond.
+            <p>
+              <span className="font-semibold">Instagram: </span>
+              <a
+                href="https://instagram.com/pradhu_photography"
+                target="_blank"
+                rel="noreferrer"
+                className={accentText}
+              >
+                @pradhu_photography
+              </a>
             </p>
           </div>
         </div>
 
-        {/* Bottom strip */}
-        <div
-          className={`mt-8 flex flex-col items-center justify-between gap-4 border-t pt-6 text-xs ${
-            isDark ? "border-slate-800" : "border-neutral-400/40"
-          } ${mutedText} md:flex-row`}
-        >
-          <p>© {year} Pradhu Photography. All rights reserved.</p>
-          <p>
-            Built with{" "}
-            <span className={accent}>React</span> ·{" "}
-            <span className={accent}>Tailwind</span> ·{" "}
-            <span className={accent}>GitHub Pages</span>.
+        {/* Navigate */}
+        <div className="space-y-3 text-sm lg:w-1/3">
+          <h4 className={`${headingText} text-xs font-semibold uppercase`}>
+            NAVIGATE
+          </h4>
+          <ul className="space-y-1">
+            <li>
+              <button
+                type="button"
+                onClick={() => handleNav("/")}
+                className="transition-colors hover:text-emerald-400"
+              >
+                Home
+              </button>
+            </li>
+            <li>
+              <button
+                type="button"
+                onClick={() => handleNav("/portfolio")}
+                className="transition-colors hover:text-emerald-400"
+              >
+                Portfolio
+              </button>
+            </li>
+            <li>
+              <button
+                type="button"
+                onClick={() => handleNav("/services")}
+                className="transition-colors hover:text-emerald-400"
+              >
+                Services &amp; Pricing
+              </button>
+            </li>
+            <li>
+              <button
+                type="button"
+                onClick={() => handleNav("/reviews")}
+                className="transition-colors hover:text-emerald-400"
+              >
+                Reviews
+              </button>
+            </li>
+            <li>
+              <button
+                type="button"
+                onClick={() => handleNav("/contact")}
+                className="transition-colors hover:text-emerald-400"
+              >
+                Contact
+              </button>
+            </li>
+          </ul>
+        </div>
+
+        {/* Studio info */}
+        <div className="space-y-3 text-sm lg:w-1/3">
+          <h4 className={`${headingText} text-xs font-semibold uppercase`}>
+            STUDIO
+          </h4>
+          <p className={`${subtleText} leading-relaxed`}>
+            Based in Chennai &amp; Bengaluru. Available for travel across Pune,
+            Mumbai, Chennai, Bengaluru and beyond.
           </p>
         </div>
+      </div>
+
+      {/* Bottom strip */}
+      <div className="border-t border-white/5 px-4 py-4 text-xs sm:px-8 flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
+        <p className={subtleText}>
+          © {new Date().getFullYear()} Pradhu Photography. All rights reserved.
+        </p>
+        <p className={`${subtleText} space-x-2`}>
+          <span>Built with</span>
+          <span className={accentText}>React</span>
+          <span>·</span>
+          <span className={accentText}>Tailwind</span>
+          <span>·</span>
+          <span className={accentText}>GitHub Pages</span>
+        </p>
       </div>
     </footer>
   );
