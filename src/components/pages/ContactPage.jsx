@@ -4,7 +4,7 @@ import { usePageMeta } from "@/app/seo";
 import { SHEET_WEB_APP, WHATSAPP_NUMBER } from "@/app/config";
 import AboutBlock from "./AboutBlock";
 
-export default function ContactPage({ T, theme }) {
+export default function ContactPage({ T }) {
   usePageMeta(
     "Book a Shoot | PRADHU Photography",
     "Get in touch to schedule your shoot — portraits, fashion, events. Quick WhatsApp or form booking with transparent timelines."
@@ -61,25 +61,21 @@ export default function ContactPage({ T, theme }) {
     if (!form.phone.trim()) missing.push("Phone");
     if (form.date && form.date < minDateStr)
       missing.push(`Preferred Date (≥ ${fmtHuman(minDateStr)})`);
-
-    if (missing.length) {
+    if (missing.length)
       return setNote({
         kind: "error",
         text: `Please fill: ${missing.join(", ")}`,
       });
-    }
-    if (!isValidEmail(form.email)) {
+    if (!isValidEmail(form.email))
       return setNote({
         kind: "error",
         text: "Enter a valid email address.",
       });
-    }
-    if (!isValidINPhone(form.phone)) {
+    if (!isValidINPhone(form.phone))
       return setNote({
         kind: "error",
         text: "Enter a valid Indian mobile.",
       });
-    }
 
     setSubmitting(true);
     try {
@@ -91,9 +87,9 @@ export default function ContactPage({ T, theme }) {
       });
 
       const waText = encodeURIComponent(
-        `Hi Pradhu! This is ${form.name}. I just sent an enquiry from your website.\nService: ${form.service}\nCity: ${
-          form.city
-        }\nPreferred date: ${
+        `Hi Pradhu! This is ${form.name}. I just sent an enquiry from your website.\nService: ${
+          form.service
+        }\nCity: ${form.city}\nPreferred date: ${
           form.date ? fmtHuman(form.date) : "TBD"
         }\nDetails: ${form.message || "—"}`
       );
@@ -128,30 +124,20 @@ export default function ContactPage({ T, theme }) {
     }
   };
 
-  // ---------- FORCED FIELD STYLES ----------
+  // ---------- FORCED FIELD STYLES (dark text in light mode) ----------
   const baseFieldClasses =
-    "mt-1 w-full rounded-xl border px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-emerald-500/70 focus:border-emerald-500/70";
+    "mt-1 w-full rounded-xl border px-3 py-2 text-sm " +
+    "text-neutral-900 placeholder:text-neutral-600 " + // light theme text
+    "dark:text-slate-50 dark:placeholder:text-slate-400 " + // dark theme text
+    "bg-white/90 dark:bg-slate-900/70 " +
+    "border-neutral-300 dark:border-slate-700 " +
+    "focus:outline-none focus:ring-2 focus:ring-emerald-500/70 focus:border-emerald-500/70";
 
-  const labelClasses = "text-sm text-slate-800 dark:text-slate-200";
-
-  const lightFieldStyle = {
-    backgroundColor: "#f3f4f6", // light grey
-    color: "#020617",           // almost black text
-    borderColor: "#d1d5db",     // light grey border
-  };
-
-  const darkFieldStyle = {
-    backgroundColor: "#020617", // very dark background
-    color: "#e5e7eb",           // light text
-    borderColor: "#1e293b",     // dark border
-  };
-
-  const fieldStyle = theme === "dark" ? darkFieldStyle : lightFieldStyle;
-
-  // ----------------------------------------
+  const labelClasses = "text-sm text-slate-900 dark:text-slate-100";
+  // -------------------------------------------------------------
 
   return (
-    <section className="py-6 text-slate-900 dark:text-slate-50" id="contact">
+    <section className="py-6" id="contact">
       <h1
         className={`text-4xl md:text-5xl font-['Playfair_Display'] uppercase tracking-[0.08em] ${T.navTextStrong}`}
       >
@@ -172,62 +158,54 @@ export default function ContactPage({ T, theme }) {
         <div className="grid grid-cols-1 gap-4">
           {/* Name */}
           <div>
-            <label htmlFor="name" className={labelClasses}>
-              Name<span className="text-red-500"> *</span>
+            <label className={labelClasses}>
+              Name <span className="text-red-500">*</span>
             </label>
             <input
-              id="name"
               name="name"
+              type="text"
               value={form.name}
               onChange={onChange}
-              className={baseFieldClasses}
-              style={fieldStyle}
               required
+              className={baseFieldClasses}
             />
           </div>
 
           {/* Email */}
           <div>
-            <label htmlFor="email" className={labelClasses}>
-              Email<span className="text-red-500"> *</span>
+            <label className={labelClasses}>
+              Email <span className="text-red-500">*</span>
             </label>
             <input
-              id="email"
               name="email"
               type="email"
               value={form.email}
               onChange={onChange}
-              className={baseFieldClasses}
-              style={fieldStyle}
               required
+              className={baseFieldClasses}
             />
           </div>
 
           {/* Phone */}
           <div>
-            <label htmlFor="phone" className={labelClasses}>
-              Phone<span className="text-red-500"> *</span>
+            <label className={labelClasses}>
+              Phone <span className="text-red-500">*</span>
             </label>
             <input
-              id="phone"
               name="phone"
               type="tel"
               value={form.phone}
               onChange={onChange}
+              required
               placeholder="+91-XXXXXXXXXX"
               className={baseFieldClasses}
-              style={fieldStyle}
-              required
             />
           </div>
 
-          {/* Preferred Date */}
+          {/* Preferred date */}
           <div>
-            <label htmlFor="date" className={labelClasses}>
-              Preferred Date
-            </label>
+            <label className={labelClasses}>Preferred Date</label>
             <input
-              id="date"
               name="date"
               type="date"
               min={minDateStr}
@@ -245,44 +223,35 @@ export default function ContactPage({ T, theme }) {
                 }
                 setForm({ ...form, date: v });
               }}
-              className={baseFieldClasses}
-              style={fieldStyle}
+              className={`${baseFieldClasses} cursor-pointer`}
             />
-            <p className="mt-1 text-xs opacity-70">
+            <p className="text-xs opacity-70 mt-1">
               Earliest selectable: {fmtHuman(minDateStr)}
             </p>
           </div>
 
           {/* Message */}
           <div>
-            <label htmlFor="message" className={labelClasses}>
-              Message
-            </label>
+            <label className={labelClasses}>Message</label>
             <textarea
-              id="message"
               name="message"
-              rows={5}
               value={form.message}
               onChange={onChange}
+              rows={5}
               className={baseFieldClasses}
-              style={fieldStyle}
               placeholder="Shoot location, timings, concept, references, usage (personal/commercial), etc."
             />
           </div>
 
-          {/* Service + City */}
-          <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
+          {/* Service & City */}
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
             <div>
-              <label htmlFor="service" className={labelClasses}>
-                Service
-              </label>
+              <label className={labelClasses}>Service</label>
               <select
-                id="service"
                 name="service"
+                className={baseFieldClasses}
                 value={form.service}
                 onChange={onChange}
-                className={baseFieldClasses}
-                style={fieldStyle}
               >
                 {["Portraits", "Fashion", "Candids", "Street", "Events", "Other"].map(
                   (s) => (
@@ -293,18 +262,13 @@ export default function ContactPage({ T, theme }) {
                 )}
               </select>
             </div>
-
             <div>
-              <label htmlFor="city" className={labelClasses}>
-                City
-              </label>
+              <label className={labelClasses}>City</label>
               <select
-                id="city"
                 name="city"
+                className={baseFieldClasses}
                 value={form.city}
                 onChange={onChange}
-                className={baseFieldClasses}
-                style={fieldStyle}
               >
                 <option>Pune</option>
                 <option>Mumbai</option>
@@ -315,12 +279,12 @@ export default function ContactPage({ T, theme }) {
             </div>
           </div>
 
-          {/* Actions */}
+          {/* Actions / status */}
           <div className="flex flex-wrap items-center gap-3">
             <button
               type="submit"
               disabled={submitting}
-              className="rounded-xl bg-neutral-900 px-4 py-2 font-medium text-white hover:opacity-90 disabled:opacity-60"
+              className="rounded-xl bg-neutral-900 text-white px-4 py-2 font-medium hover:opacity-90 disabled:opacity-60"
             >
               {submitting ? "Submitting…" : "Send Enquiry"}
             </button>
@@ -344,7 +308,7 @@ export default function ContactPage({ T, theme }) {
                 href={whatsCTA}
                 target="_blank"
                 rel="noreferrer"
-                className="inline-flex items-center gap-2 rounded-xl border border-neutral-300 px-3 py-2 text-sm text-neutral-900 hover:bg-neutral-50 dark:border-slate-600 dark:text-slate-50 dark:hover:bg-slate-800/70"
+                className="inline-flex items-center gap-2 rounded-xl border px-3 py-2 text-sm hover:bg-neutral-50 dark:hover:bg-slate-800"
               >
                 Continue on WhatsApp
               </a>
