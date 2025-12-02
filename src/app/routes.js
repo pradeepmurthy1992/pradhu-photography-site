@@ -2,7 +2,6 @@
 import HomeTiles from "@/components/pages/HomeTiles";
 import ServicesPricingPage from "@/components/pages/ServicesPricingPage";
 import AboutBlock from "@/components/pages/AboutBlock";
-import FaqSection from "@/components/pages/FaqSection";
 import ContactPage from "@/components/pages/ContactPage";
 import ReviewsPage from "@/components/pages/ReviewsPage";
 import Portfolio from "@/features/portfolio/Portfolio";
@@ -29,11 +28,7 @@ export const ROUTES = [
     label: "About",
     component: AboutBlock,
   },
-  {
-    path: "/faq",
-    label: "FAQ",
-    component: FaqSection,
-  },
+  // 🚫 FAQ route removed – FAQ lives only on Home now
   {
     path: "/reviews",
     label: "Reviews",
