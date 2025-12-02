@@ -17,6 +17,13 @@ function buildWhatsAppUrl() {
 export default function Hero({ T }) {
   const waUrl = buildWhatsAppUrl();
 
+  // ✅ Always work with an array
+  const cities = Array.isArray(SERVICE_CITIES)
+    ? SERVICE_CITIES
+    : SERVICE_CITIES
+    ? [String(SERVICE_CITIES)]
+    : [];
+
   return (
     <section
       className="relative overflow-hidden rounded-3xl border border-slate-800/60 bg-gradient-to-br from-slate-950 via-slate-900 to-slate-950 shadow-lg shadow-black/40"
@@ -63,18 +70,18 @@ export default function Hero({ T }) {
             </div>
 
             {/* Cities */}
-            {SERVICE_CITIES?.length ? (
+            {cities.length > 0 && (
               <p className="flex flex-wrap items-center gap-2 text-xs text-slate-300">
                 <Icon name="map-pin" size={14} />
                 <span className="uppercase tracking-[0.22em] text-slate-400">
                   BASED IN
                 </span>
                 <span className="font-medium text-slate-100">
-                  {SERVICE_CITIES.join(" · ")}
+                  {cities.join(" · ")}
                 </span>
                 <span className="text-slate-400">· Available to travel</span>
               </p>
-            ) : null}
+            )}
 
             {/* Desktop CTAs */}
             <div className="hidden gap-3 pt-2 sm:flex">
