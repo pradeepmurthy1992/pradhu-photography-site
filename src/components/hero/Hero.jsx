@@ -17,7 +17,6 @@ function buildWhatsAppUrl() {
 export default function Hero({ T }) {
   const waUrl = buildWhatsAppUrl();
 
-  // ✅ Always work with an array
   const cities = Array.isArray(SERVICE_CITIES)
     ? SERVICE_CITIES
     : SERVICE_CITIES
@@ -26,7 +25,11 @@ export default function Hero({ T }) {
 
   return (
     <section
-      className="relative overflow-hidden rounded-3xl border border-slate-800/60 bg-gradient-to-br from-slate-950 via-slate-900 to-slate-950 shadow-lg shadow-black/40"
+      className="
+        relative overflow-hidden
+        -mx-3 sm:-mx-4 md:-mx-6 lg:-mx-8
+        bg-gradient-to-br from-slate-950 via-slate-900 to-slate-950
+      "
       aria-labelledby="hero-heading"
     >
       {/* Background image */}
