@@ -4,7 +4,7 @@ import { usePageMeta } from "@/app/seo";
 import { SHEET_WEB_APP, WHATSAPP_NUMBER } from "@/app/config";
 import AboutBlock from "./AboutBlock";
 
-export default function ContactPage({ T }) {
+export default function ContactPage({ T, theme }) {
   usePageMeta(
     "Book a Shoot | PRADHU Photography",
     "Get in touch to schedule your shoot — portraits, fashion, events. Quick WhatsApp or form booking with transparent timelines."
@@ -128,14 +128,27 @@ export default function ContactPage({ T }) {
     }
   };
 
-  // shared classes so light mode is always light inputs + dark text
-  const fieldClasses =
-    "mt-1 w-full rounded-xl border px-3 py-2 text-sm " +
-    "bg-slate-100 text-slate-900 border-slate-300 placeholder:text-slate-500 " +
-    "focus:outline-none focus:ring-2 focus:ring-emerald-500/70 focus:border-emerald-500/70 " +
-    "dark:bg-slate-900 dark:text-slate-50 dark:border-slate-700 dark:placeholder:text-slate-400";
+  // ---------- FORCED FIELD STYLES ----------
+  const baseFieldClasses =
+    "mt-1 w-full rounded-xl border px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-emerald-500/70 focus:border-emerald-500/70";
 
   const labelClasses = "text-sm text-slate-800 dark:text-slate-200";
+
+  const lightFieldStyle = {
+    backgroundColor: "#f3f4f6", // light grey
+    color: "#020617",           // almost black text
+    borderColor: "#d1d5db",     // light grey border
+  };
+
+  const darkFieldStyle = {
+    backgroundColor: "#020617", // very dark background
+    color: "#e5e7eb",           // light text
+    borderColor: "#1e293b",     // dark border
+  };
+
+  const fieldStyle = theme === "dark" ? darkFieldStyle : lightFieldStyle;
+
+  // ----------------------------------------
 
   return (
     <section className="py-6 text-slate-900 dark:text-slate-50" id="contact">
@@ -167,7 +180,8 @@ export default function ContactPage({ T }) {
               name="name"
               value={form.name}
               onChange={onChange}
-              className={fieldClasses}
+              className={baseFieldClasses}
+              style={fieldStyle}
               required
             />
           </div>
@@ -183,7 +197,8 @@ export default function ContactPage({ T }) {
               type="email"
               value={form.email}
               onChange={onChange}
-              className={fieldClasses}
+              className={baseFieldClasses}
+              style={fieldStyle}
               required
             />
           </div>
@@ -200,12 +215,13 @@ export default function ContactPage({ T }) {
               value={form.phone}
               onChange={onChange}
               placeholder="+91-XXXXXXXXXX"
-              className={fieldClasses}
+              className={baseFieldClasses}
+              style={fieldStyle}
               required
             />
           </div>
 
-          {/* Preferred date */}
+          {/* Preferred Date */}
           <div>
             <label htmlFor="date" className={labelClasses}>
               Preferred Date
@@ -229,7 +245,8 @@ export default function ContactPage({ T }) {
                 }
                 setForm({ ...form, date: v });
               }}
-              className={fieldClasses}
+              className={baseFieldClasses}
+              style={fieldStyle}
             />
             <p className="mt-1 text-xs opacity-70">
               Earliest selectable: {fmtHuman(minDateStr)}
@@ -247,7 +264,8 @@ export default function ContactPage({ T }) {
               rows={5}
               value={form.message}
               onChange={onChange}
-              className={fieldClasses}
+              className={baseFieldClasses}
+              style={fieldStyle}
               placeholder="Shoot location, timings, concept, references, usage (personal/commercial), etc."
             />
           </div>
@@ -263,7 +281,8 @@ export default function ContactPage({ T }) {
                 name="service"
                 value={form.service}
                 onChange={onChange}
-                className={fieldClasses}
+                className={baseFieldClasses}
+                style={fieldStyle}
               >
                 {["Portraits", "Fashion", "Candids", "Street", "Events", "Other"].map(
                   (s) => (
@@ -284,7 +303,8 @@ export default function ContactPage({ T }) {
                 name="city"
                 value={form.city}
                 onChange={onChange}
-                className={fieldClasses}
+                className={baseFieldClasses}
+                style={fieldStyle}
               >
                 <option>Pune</option>
                 <option>Mumbai</option>
