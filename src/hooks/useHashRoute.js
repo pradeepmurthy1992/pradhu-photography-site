@@ -1,7 +1,7 @@
 // src/hooks/useHashRoute.js
 import { useEffect, useState } from "react";
 
-// Normalize any hash into a path like "/",
+// Normalize any hash into a path like "/", "/portfolio", "/contact", etc.
 function normalizeHash(h) {
   if (typeof h !== "string" || !h) return "/";
   let raw = h;
