@@ -17,17 +17,12 @@ function buildWhatsAppUrl() {
 export default function Hero({ T }) {
   const waUrl = buildWhatsAppUrl();
 
-  const cities = Array.isArray(SERVICE_CITIES)
-    ? SERVICE_CITIES
-    : SERVICE_CITIES
-    ? [String(SERVICE_CITIES)]
-    : [];
-
   return (
     <section
       className="
         relative overflow-hidden
         -mx-3 sm:-mx-4 md:-mx-6 lg:-mx-8
+        min-h-[78vh] md:min-h-[86vh]
         bg-gradient-to-br from-slate-950 via-slate-900 to-slate-950
       "
       aria-labelledby="hero-heading"
@@ -47,7 +42,7 @@ export default function Hero({ T }) {
       )}
 
       {/* Content */}
-      <div className="relative z-10 px-4 py-10 sm:px-8 sm:py-14 lg:px-12 lg:py-16">
+      <div className="relative z-10 px-4 py-10 sm:px-8 sm:py-14 lg:px-12 lg:py-16 max-w-6xl mx-auto">
         <div className="flex flex-col gap-10 lg:flex-row lg:items-end lg:justify-between">
           <div className="max-w-xl space-y-6">
             <p className="inline-flex items-center gap-2 rounded-full bg-emerald-500/10 px-3 py-1 text-xs font-semibold uppercase tracking-[0.25em] text-emerald-300">
@@ -73,14 +68,14 @@ export default function Hero({ T }) {
             </div>
 
             {/* Cities */}
-            {cities.length > 0 && (
+            {Array.isArray(SERVICE_CITIES) && SERVICE_CITIES.length > 0 && (
               <p className="flex flex-wrap items-center gap-2 text-xs text-slate-300">
                 <Icon name="map-pin" size={14} />
                 <span className="uppercase tracking-[0.22em] text-slate-400">
                   BASED IN
                 </span>
                 <span className="font-medium text-slate-100">
-                  {cities.join(" · ")}
+                  {SERVICE_CITIES.join(" · ")}
                 </span>
                 <span className="text-slate-400">· Available to travel</span>
               </p>
