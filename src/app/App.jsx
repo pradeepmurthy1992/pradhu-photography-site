@@ -286,7 +286,7 @@ function renderRoute(path, { T, theme, setTheme, onNavigate }) {
   if (clean === "/contact") {
     return (
       <Shell>
-        <ContactPage T={T} />
+        <ContactPage T={T} theme={theme} />
       </Shell>
     );
   }
