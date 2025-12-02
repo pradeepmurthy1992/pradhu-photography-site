@@ -187,7 +187,8 @@ export default function App() {
   className={`min-h-screen ${
     theme === "dark"
       ? "bg-gradient-to-b from-slate-950 via-slate-950/95 to-slate-950 text-slate-50"
-      : "bg-gradient-to-b from-[#fdf3ea] via-[#f7e3cf] to-[#f0d3bd] text-slate-900"
+           : "bg-gradient-to-b from-[#fdf3ea] via-[#f7e3cf] to-[#f4ddc9] text-slate-900"
+
   }`}
 >
 
