@@ -148,7 +148,7 @@ export default function ContactPage({ T }) {
         className={`mt-4 rounded-2xl border p-6 shadow-sm ${T.panelBg} ${T.panelBorder}`}
       >
         <div className="grid grid-cols-1 gap-4">
-          {/* Name / Email / Phone use shared Input component */}
+          {/* Shared inputs */}
           <Input
             T={T}
             label="Name"
@@ -177,7 +177,7 @@ export default function ContactPage({ T }) {
             placeholder="+91-XXXXXXXXXX"
           />
 
-          {/* Preferred date */}
+          {/* Preferred Date */}
           <div>
             <label className="text-sm text-slate-800 dark:text-slate-200">
               Preferred Date
@@ -207,7 +207,8 @@ export default function ContactPage({ T }) {
                 bg-slate-100 text-slate-900 border-slate-300
                 placeholder:text-slate-500
                 focus:outline-none focus:ring-2 focus:ring-emerald-500/70 focus:border-emerald-500/70
-                dark:bg-slate-800 dark:text-slate-50 dark:border-slate-700 dark:placeholder:text-slate-400
+                dark:bg-slate-800 dark:text-slate-50 dark:border-slate-700
+                dark:placeholder:text-slate-400
               "
             />
             <p className="mt-1 text-xs opacity-70">
@@ -230,7 +231,8 @@ export default function ContactPage({ T }) {
                 bg-slate-100 text-slate-900 border-slate-300
                 placeholder:text-slate-500
                 focus:outline-none focus:ring-2 focus:ring-emerald-500/70 focus:border-emerald-500/70
-                dark:bg-slate-800 dark:text-slate-50 dark:border-slate-700 dark:placeholder:text-slate-400
+                dark:bg-slate-800 dark:text-slate-50 dark:border-slate-700
+                dark:placeholder:text-slate-400
               "
               placeholder="Shoot location, timings, concept, references, usage (personal/commercial), etc."
             />
@@ -292,7 +294,7 @@ export default function ContactPage({ T }) {
             </div>
           </div>
 
-          {/* Actions + messages */}
+          {/* Actions */}
           <div className="flex flex-wrap items-center gap-3">
             <button
               type="submit"
