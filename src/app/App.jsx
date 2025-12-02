@@ -137,50 +137,83 @@ export default function App() {
     onNavigate: handleNavigate,
   });
 
-  return (
-    <div className={`${T.bodyBg} min-h-screen text-sm md:text-base`}>
-      {/* Intro overlay */}
-      {showIntro && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/80 backdrop-blur">
-          <div className="relative mx-4 flex max-w-4xl flex-col overflow-hidden rounded-3xl border border-emerald-500/40 bg-slate-950/95 shadow-2xl md:flex-row">
-            {INTRO_LEFT_IMAGE_URL && (
-              <div className="relative hidden w-1/2 md:block">
-                <img
-                  src={INTRO_LEFT_IMAGE_URL}
-                  alt="Pradhu intro"
-                  className="h-full w-full object-cover"
-                />
-                <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/20 to-transparent" />
-              </div>
-            )}
-            <div className="flex flex-1 flex-col gap-4 p-6 sm:p-8">
-              <p className="text-xs font-semibold uppercase tracking-[0.3em] text-emerald-300">
-                {INTRO_BRAND || "PRADHU PHOTOGRAPHY"}
-              </p>
-              <h1 className="text-2xl font-semibold text-white sm:text-3xl">
-                {INTRO_NAME || "Cinematic portraits & fashion stories"}
-              </h1>
-              <p className="text-sm text-slate-200">
-                A quick intro to my work — portraits, editorials and portfolios
-                shot across Pune, Mumbai, Chennai and Bengaluru.
-              </p>
-              <p className="text-xs text-slate-400">
-                Hit “Enter studio” to step into the full website and explore the
-                portfolio, services and booking.
-              </p>
-              <div className="mt-4 flex flex-wrap gap-3">
-                <button
-                  type="button"
-                  onClick={handleCloseIntro}
-                  className="inline-flex items-center justify-center rounded-full bg-emerald-500 px-6 py-2.5 text-xs font-semibold uppercase tracking-[0.2em] text-white shadow-md shadow-emerald-500/40 hover:bg-emerald-400"
-                >
-                  Enter studio
-                </button>
-              </div>
+ return (
+  <div className="min-h-screen text-sm md:text-base">
+    {/* Intro overlay */}
+    {showIntro && (
+      <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/80 backdrop-blur">
+        <div className="relative mx-4 flex max-w-4xl flex-col overflow-hidden rounded-3xl border border-emerald-500/40 bg-slate-950/95 shadow-2xl md:flex-row">
+          {INTRO_LEFT_IMAGE_URL && (
+            <div className="relative hidden w-1/2 md:block">
+              <img
+                src={INTRO_LEFT_IMAGE_URL}
+                alt="Pradhu intro"
+                className="h-full w-full object-cover"
+              />
+              <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/20 to-transparent" />
+            </div>
+          )}
+          <div className="flex flex-1 flex-col gap-4 p-6 sm:p-8">
+            <p className="text-xs font-semibold uppercase tracking-[0.3em] text-emerald-300">
+              {INTRO_BRAND || "PRADHU PHOTOGRAPHY"}
+            </p>
+            <h1 className="text-2xl font-semibold text-white sm:text-3xl">
+              {INTRO_NAME || "Cinematic portraits & fashion stories"}
+            </h1>
+            <p className="text-sm text-slate-200">
+              A quick intro to my work — portraits, editorials and portfolios
+              shot across Pune, Mumbai, Chennai and Bengaluru.
+            </p>
+            <p className="text-xs text-slate-400">
+              Hit “Enter studio” to step into the full website and explore the
+              portfolio, services and booking.
+            </p>
+            <div className="mt-4 flex flex-wrap gap-3">
+              <button
+                type="button"
+                onClick={handleCloseIntro}
+                className="inline-flex items-center justify-center rounded-full bg-emerald-500 px-6 py-2.5 text-xs font-semibold uppercase tracking-[0.2em] text-white shadow-md shadow-emerald-500/40 hover:bg-emerald-400"
+              >
+                Enter studio
+              </button>
             </div>
           </div>
         </div>
-      )}
+      </div>
+    )}
+
+    {/* THEME-AWARE PAGE BACKGROUND */}
+    <div
+      className={`min-h-screen ${
+        theme === "dark"
+          ? "bg-gradient-to-b from-slate-950 via-slate-950/95 to-slate-950 text-slate-50"
+          : "bg-[#f5f4f0] text-neutral-900"
+      }`}
+    >
+      {/* NAVBAR */}
+      <Navbar
+        T={T}
+        path={path}
+        theme={theme}
+        setTheme={setTheme}
+        onNavigate={handleNavigate}
+        brand={BRAND_NAME || "PRADHU PHOTOGRAPHY"}
+        navItems={NAV_ITEMS}
+      />
+
+      {/* MAIN */}
+      <main className="pt-20 pb-24">{page}</main>
+
+      {/* CTAs */}
+      <StickyCTA T={T} />
+      <MobileActionFab T={T} />
+
+      {/* FOOTER */}
+      <Footer T={T} onNavigate={handleNavigate} />
+    </div>
+  </div>
+);
+
 
       <div className="bg-gradient-to-b from-slate-950 via-slate-950/95 to-slate-950 text-slate-50 min-h-screen">
         {/* NAVBAR */}
