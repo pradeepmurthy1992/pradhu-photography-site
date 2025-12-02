@@ -4,7 +4,8 @@ import { usePageMeta } from "@/app/seo";
 import { SHEET_WEB_APP, WHATSAPP_NUMBER } from "@/app/config";
 import AboutBlock from "./AboutBlock";
 
-export default function ContactPage({ T }) {
+export default function ContactPage({ T, theme }) {
+  // theme is "dark" or "light" passed from App.jsx
   usePageMeta(
     "Book a Shoot | PRADHU Photography",
     "Get in touch to schedule your shoot — portraits, fashion, events. Quick WhatsApp or form booking with transparent timelines."
@@ -62,24 +63,23 @@ export default function ContactPage({ T }) {
     if (form.date && form.date < minDateStr)
       missing.push(`Preferred Date (≥ ${fmtHuman(minDateStr)})`);
 
-    if (missing.length) {
+    if (missing.length)
       return setNote({
         kind: "error",
         text: `Please fill: ${missing.join(", ")}`,
       });
-    }
-    if (!isValidEmail(form.email)) {
+
+    if (!isValidEmail(form.email))
       return setNote({
         kind: "error",
         text: "Enter a valid email address.",
       });
-    }
-    if (!isValidINPhone(form.phone)) {
+
+    if (!isValidINPhone(form.phone))
       return setNote({
         kind: "error",
         text: "Enter a valid Indian mobile.",
       });
-    }
 
     setSubmitting(true);
     try {
@@ -128,18 +128,26 @@ export default function ContactPage({ T }) {
     }
   };
 
-  // ===== Shared classes for labels + fields =====
+  // ------------------------
+  // THEME-AWARE STYLES
+  // ------------------------
   const labelClass =
-    "text-sm font-semibold text-neutral-900 dark:text-slate-50";
+    theme === "dark"
+      ? "text-sm font-semibold text-slate-100"
+      : "text-sm font-semibold text-neutral-900";
 
-  const fieldClass =
-    "mt-1 w-full rounded-xl border px-3 py-2 text-sm " +
-    // light theme
-    "bg-slate-100 text-neutral-900 placeholder:text-neutral-600 border-neutral-300 " +
-    // dark theme
-    "dark:bg-slate-800 dark:text-slate-50 dark:placeholder:text-slate-300 dark:border-slate-600 " +
-    // focus
-    "focus:outline-none focus:ring-2 focus:ring-emerald-500/70 focus:border-emerald-500/70";
+  const fieldBase =
+    "mt-1 w-full rounded-xl border px-3 py-2 text-sm focus:outline-none focus:ring-1 focus:ring-emerald-500";
+
+  const fieldTone =
+    theme === "dark"
+      ? "bg-slate-900/70 border-slate-600 text-slate-100 placeholder:text-slate-400"
+      : "bg-slate-100 border-slate-300 text-neutral-900 placeholder:text-neutral-500";
+
+  const selectTone =
+    theme === "dark"
+      ? "bg-slate-900/70 border-slate-600 text-slate-100"
+      : "bg-slate-100 border-slate-300 text-neutral-900";
 
   return (
     <section className="py-6" id="contact">
@@ -161,7 +169,7 @@ export default function ContactPage({ T }) {
         className={`mt-4 rounded-2xl border p-6 shadow-sm ${T.panelBg} ${T.panelBorder}`}
       >
         <div className="grid grid-cols-1 gap-4">
-          {/* Name */}
+          {/* NAME */}
           <div>
             <label className={labelClass}>
               Name <span className="text-red-500">*</span>
@@ -172,11 +180,11 @@ export default function ContactPage({ T }) {
               value={form.name}
               onChange={onChange}
               required
-              className={fieldClass}
+              className={`${fieldBase} ${fieldTone}`}
             />
           </div>
 
-          {/* Email */}
+          {/* EMAIL */}
           <div>
             <label className={labelClass}>
               Email <span className="text-red-500">*</span>
@@ -187,11 +195,11 @@ export default function ContactPage({ T }) {
               value={form.email}
               onChange={onChange}
               required
-              className={fieldClass}
+              className={`${fieldBase} ${fieldTone}`}
             />
           </div>
 
-          {/* Phone */}
+          {/* PHONE */}
           <div>
             <label className={labelClass}>
               Phone <span className="text-red-500">*</span>
@@ -203,11 +211,11 @@ export default function ContactPage({ T }) {
               onChange={onChange}
               required
               placeholder="+91-XXXXXXXXXX"
-              className={fieldClass}
+              className={`${fieldBase} ${fieldTone}`}
             />
           </div>
 
-          {/* Preferred date */}
+          {/* DATE */}
           <div>
             <label className={labelClass}>Preferred Date</label>
             <input
@@ -228,14 +236,14 @@ export default function ContactPage({ T }) {
                 }
                 setForm({ ...form, date: v });
               }}
-              className={`${fieldClass} cursor-pointer`}
+              className={`${fieldBase} ${fieldTone}`}
             />
             <p className="text-xs opacity-70 mt-1">
               Earliest selectable: {fmtHuman(minDateStr)}
             </p>
           </div>
 
-          {/* Message */}
+          {/* MESSAGE */}
           <div>
             <label className={labelClass}>Message</label>
             <textarea
@@ -243,35 +251,40 @@ export default function ContactPage({ T }) {
               value={form.message}
               onChange={onChange}
               rows={5}
-              className={fieldClass}
+              className={`${fieldBase} ${fieldTone} resize-y`}
               placeholder="Shoot location, timings, concept, references, usage (personal/commercial), etc."
             />
           </div>
 
-          {/* Service & City */}
+          {/* SERVICE & CITY */}
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
             <div>
               <label className={labelClass}>Service</label>
               <select
                 name="service"
-                className={fieldClass}
+                className={`${fieldBase} ${selectTone} cursor-pointer`}
                 value={form.service}
                 onChange={onChange}
               >
-                {["Portraits", "Fashion", "Candids", "Street", "Events", "Other"].map(
-                  (s) => (
-                    <option key={s} value={s}>
-                      {s}
-                    </option>
-                  )
-                )}
+                {[
+                  "Portraits",
+                  "Fashion",
+                  "Candids",
+                  "Street",
+                  "Events",
+                  "Other",
+                ].map((s) => (
+                  <option key={s} value={s}>
+                    {s}
+                  </option>
+                ))}
               </select>
             </div>
             <div>
               <label className={labelClass}>City</label>
               <select
                 name="city"
-                className={fieldClass}
+                className={`${fieldBase} ${selectTone} cursor-pointer`}
                 value={form.city}
                 onChange={onChange}
               >
@@ -284,7 +297,7 @@ export default function ContactPage({ T }) {
             </div>
           </div>
 
-          {/* Actions / status */}
+          {/* ACTIONS */}
           <div className="flex flex-wrap items-center gap-3">
             <button
               type="submit"
@@ -313,7 +326,7 @@ export default function ContactPage({ T }) {
                 href={whatsCTA}
                 target="_blank"
                 rel="noreferrer"
-                className="inline-flex items-center gap-2 rounded-xl border px-3 py-2 text-sm font-medium hover:bg-neutral-50 dark:hover:bg-slate-800"
+                className="inline-flex items-center gap-2 rounded-xl border px-3 py-2 text-sm hover:bg-neutral-50"
               >
                 Continue on WhatsApp
               </a>
