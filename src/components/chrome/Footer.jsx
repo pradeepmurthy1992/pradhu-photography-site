@@ -21,6 +21,9 @@ export default function Footer({ T, theme = "dark", onNavigate }) {
     onNavigate(hash);
   };
 
+  // ✅ Use BASE_URL so it works on GitHub Pages
+  const logoSrc = `${import.meta.env.BASE_URL}images/pradhu-logo.png`;
+
   return (
     <footer className={`w-full ${wrapperBg}`}>
       <div className="w-full px-4 sm:px-8 lg:px-12 py-10 md:py-12">
@@ -30,21 +33,21 @@ export default function Footer({ T, theme = "dark", onNavigate }) {
           <div className="space-y-3">
             {/* Logo + brand */}
             <div className="flex items-center gap-2">
-              <span className="inline-flex h-9 w-9 items-center justify-center rounded-full bg-black text-white shadow-sm">
+              <span className="inline-flex h-9 w-9 items-center justify-center rounded-full bg-black shadow-sm overflow-hidden">
                 <img
-                  src="/images/pradhu-logo.png"
+                  src={logoSrc}
                   alt="Pradhu Photography logo"
-                  className="h-7 w-auto"
+                  className="h-8 w-8 object-contain"
                   loading="lazy"
                   decoding="async"
                 />
               </span>
-              <p
-                className={`text-xs font-semibold tracking-[0.3em] uppercase ${brandAccent}`}
-              >
-                PRADHU PHOTOGRAPHY
-              </p>
-            </div>
+            <p
+              className={`text-xs font-semibold tracking-[0.3em] uppercase ${brandAccent}`}
+            >
+              PRADHU PHOTOGRAPHY
+            </p>
+          </div>
 
             <p className={`text-sm leading-relaxed ${bodyText}`}>
               Cinematic portraits, editorial stories and real moments across
