@@ -1,0 +1,60 @@
+/* src/styles/fonts.css */
+
+/* ===========================
+   InterDisplay (body font)
+   =========================== */
+
+@font-face {
+  font-family: "InterDisplay";
+  src: url("/fonts/inter/InterDisplay-Regular.woff2") format("woff2");
+  font-weight: 400;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: "InterDisplay";
+  src: url("/fonts/inter/InterDisplay-Medium.woff2") format("woff2");
+  font-weight: 500;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: "InterDisplay";
+  src: url("/fonts/inter/InterDisplay-SemiBold.woff2") format("woff2");
+  font-weight: 600;
+  font-style: normal;
+  font-display: swap;
+}
+
+/* ===========================
+   Playfair Display (headings)
+   =========================== */
+
+@font-face {
+  font-family: "Playfair Display";
+  src: url("/fonts/playfair/PlayfairDisplay-Regular.ttf") format("truetype");
+  font-weight: 400;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: "Playfair Display";
+  src: url("/fonts/playfair/PlayfairDisplay-SemiBold.ttf") format("truetype");
+  font-weight: 600;
+  font-style: normal;
+  font-display: swap;
+}
+
+/* Optional helpers */
+
+:root {
+  --font-sans: "InterDisplay", system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+  --font-heading: "Playfair Display", "InterDisplay", system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", serif;
+}
+
+body {
+  font-family: var(--font-sans);
+}
