@@ -211,7 +211,8 @@ export default function App() {
           <MobileActionFab T={T} />
 
           {/* FOOTER */}
-          <Footer T={T} onNavigate={handleNavigate} />
+<Footer T={T} theme={theme} onNavigate={handleNavigate} />
+
         </div>
       </div>
     </div>
