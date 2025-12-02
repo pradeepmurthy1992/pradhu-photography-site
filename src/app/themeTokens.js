@@ -1,3 +1,4 @@
+// src/app/themeTokens.js
 // Theme tokens hook used across the app
 
 export function useThemeTokens(theme) {
@@ -34,7 +35,8 @@ export function useThemeTokens(theme) {
     navBorder: "border-teal-700",
     navTextStrong: "text-white",
     chipActive: "bg-teal-300 text-[#1c1e26] border-teal-400",
-    chipInactive: "bg-[#2a2d36] border-[#3a3d46] text-neutral-200 hover:bg-[#333640]",
+    chipInactive:
+      "bg-[#2a2d36] border-[#3a3d46] text-neutral-200 hover:bg-[#333640]",
     btnOutline: "border-neutral-600 text-neutral-100 hover:bg-[#333640]",
     sectionAltBg: "bg-[#22242c]",
     panelBg: "bg-[#2a2d36]",
@@ -53,7 +55,16 @@ export function useThemeTokens(theme) {
     cardBorder: "border-[#3a3d46]",
   };
 
-  return theme === "light" ? light : dark;
+  // pick current theme tokens
+  const base = theme === "light" ? light : dark;
+
+  // Wrap in { T: ... } and add a compatibility alias for bodyBg
+  const T = {
+    bodyBg: base.pageBg, // 👈 this is what App.jsx uses
+    ...base,
+  };
+
+  return { T };
 }
 
 export default useThemeTokens;
