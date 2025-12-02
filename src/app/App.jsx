@@ -212,23 +212,24 @@ export default function App() {
  * Route → page mapping.
  */
 function renderRoute(path, { T, theme, setTheme, onNavigate }) {
-  const clean = (path || "/").replace(/\/+$/, "") || "/";
+  let clean = (path || "/").replace(/\/+$/, "") || "/";
 
-    // A reusable container for non-hero content – full-width with nice side padding
+  // Treat "/faq" as home (fallback for old links)
+  if (clean === "/faq") clean = "/";
+
+  // Full-width shell with nice side padding
   const Shell = ({ children }) => (
     <div className="w-full px-4 sm:px-8 lg:px-16 xl:px-24 2xl:px-32">
       {children}
     </div>
   );
 
-
-
   if (clean === "/" || clean === "/home") {
     return (
       <>
-        {/* Hero is FULL WIDTH now */}
+        {/* Hero full width */}
         <Hero T={T} />
-        {/* Rest of home is in a centered container */}
+        {/* Home sections in wide shell */}
         <Shell>
           <section id="home-tiles" className="mt-12">
             <HomeTiles T={T} onNavigate={onNavigate} />
@@ -269,18 +270,7 @@ function renderRoute(path, { T, theme, setTheme, onNavigate }) {
     );
   }
 
-  if (clean === "/faq") {
-    return (
-      <>
-        <Hero T={T} />
-        <Shell>
-          <div className="mt-10">
-            <FaqSection T={T} />
-          </div>
-        </Shell>
-      </>
-    );
-  }
+  // ❌ no separate /faq page anymore
 
   if (clean === "/contact") {
     return (
@@ -313,11 +303,16 @@ function renderRoute(path, { T, theme, setTheme, onNavigate }) {
   );
 }
 
+
 /**
  * Per-route SEO
  */
 function useRouteSeo(path) {
-  const clean = (path || "/").replace(/\/+$/, "") || "/";
+  let clean = (path || "/").replace(/\/+$/, "") || "/";
+
+  // Alias /faq → home for SEO too
+  if (clean === "/faq") clean = "/";
+
   let title = "PRADHU Photography · Pune Portrait & Fashion Photographer";
   let desc =
     "Pradhu Photography – portraits, fashion, editorial, model portfolios and weddings in Pune. Book a cinematic shoot with clear pricing and fast delivery.";
@@ -340,10 +335,6 @@ function useRouteSeo(path) {
     title = "About Pradhu · PRADHU Photography";
     desc =
       "Learn about Pradhu – photographer, gear, experience and the way each shoot is planned.";
-  } else if (clean === "/faq") {
-    title = "FAQ · PRADHU Photography";
-    desc =
-      "Answers to common questions on booking, outfits, reschedules, payment terms and gallery delivery.";
   } else if (clean === "/contact") {
     title = "Contact & Booking · PRADHU Photography";
     desc =
@@ -360,3 +351,4 @@ function useRouteSeo(path) {
 
   usePageMeta(title, desc);
 }
+
