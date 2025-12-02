@@ -43,7 +43,8 @@ export default function Hero() {
 
       {/* Content: full-width with large side paddings (no max-w box) */}
       <div className="relative z-10 w-full px-4 sm:px-8 lg:px-16 xl:px-24 2xl:px-32 py-12 sm:py-16 lg:py-20">
-        <div className="flex flex-col gap-10 xl:flex-row xl:items-end xl:justify-between">
+                <div className="flex min-h-[70vh] flex-col justify-end gap-10 xl:flex-row xl:items-end xl:justify-between">
+
           {/* LEFT: main headline & CTAs */}
           <div className="max-w-3xl space-y-7">
             {/* Removed the small PRADHU PHOTOGRAPHY chip here */}
