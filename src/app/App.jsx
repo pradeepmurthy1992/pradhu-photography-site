@@ -55,17 +55,14 @@ function shouldShowIntro() {
   try {
     const url = new URL(window.location.href);
 
-    // Force intro via query (?intro=1 etc.)
     if (INTRO_FORCE_QUERY && url.searchParams.has(INTRO_FORCE_QUERY)) {
       return true;
     }
 
-    // Force intro via hash (#intro)
     if (INTRO_FORCE_HASH && window.location.hash === INTRO_FORCE_HASH) {
       return true;
     }
 
-    // Remember "seen"
     if (INTRO_REMEMBER) {
       const seen = window.localStorage.getItem("pradhu:introSeen");
       if (seen === "yes") return false;
@@ -104,7 +101,6 @@ export default function App() {
         INTRO_FORCE_HASH &&
         window.location.hash === INTRO_FORCE_HASH
       ) {
-        // If user came via #intro, send them to home afterwards
         setPath("/");
       }
     } catch {
@@ -134,11 +130,16 @@ export default function App() {
     }
   };
 
-  const page = renderRoute(path, { T, theme, setTheme, onNavigate: handleNavigate });
+  const page = renderRoute(path, {
+    T,
+    theme,
+    setTheme,
+    onNavigate: handleNavigate,
+  });
 
   return (
     <div className={`${T.bodyBg} min-h-screen text-sm md:text-base`}>
-      {/* Intro overlay (small opening screen) */}
+      {/* Intro overlay */}
       {showIntro && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/80 backdrop-blur">
           <div className="relative mx-4 flex max-w-4xl flex-col overflow-hidden rounded-3xl border border-emerald-500/40 bg-slate-950/95 shadow-2xl md:flex-row">
@@ -160,12 +161,12 @@ export default function App() {
                 {INTRO_NAME || "Cinematic portraits & fashion stories"}
               </h1>
               <p className="text-sm text-slate-200">
-                A quick intro to my work — portraits, editorials and
-                portfolios shot across Pune, Mumbai, Chennai and Bengaluru.
+                A quick intro to my work — portraits, editorials and portfolios
+                shot across Pune, Mumbai, Chennai and Bengaluru.
               </p>
               <p className="text-xs text-slate-400">
-                Hit “Enter studio” to step into the full website and explore
-                the portfolio, services and booking.
+                Hit “Enter studio” to step into the full website and explore the
+                portfolio, services and booking.
               </p>
               <div className="mt-4 flex flex-wrap gap-3">
                 <button
@@ -193,10 +194,8 @@ export default function App() {
           navItems={NAV_ITEMS}
         />
 
-        {/* MAIN CONTENT */}
-        <main className="max-w-6xl mx-auto px-3 sm:px-4 md:px-6 lg:px-8 pt-20 pb-24">
-          {page}
-        </main>
+        {/* MAIN is now full-width; sections decide their own width */}
+        <main className="pt-20 pb-24">{page}</main>
 
         {/* CTAs */}
         <StickyCTA T={T} />
@@ -215,34 +214,55 @@ export default function App() {
 function renderRoute(path, { T, theme, setTheme, onNavigate }) {
   const clean = (path || "/").replace(/\/+$/, "") || "/";
 
+  // A reusable container for non-hero content
+  const Shell = ({ children }) => (
+    <div className="max-w-6xl mx-auto px-3 sm:px-4 md:px-6 lg:px-8">
+      {children}
+    </div>
+  );
+
   if (clean === "/" || clean === "/home") {
     return (
       <>
+        {/* Hero is FULL WIDTH now */}
         <Hero T={T} />
-        <section id="home-tiles" className="mt-12">
-          <HomeTiles T={T} onNavigate={onNavigate} />
-        </section>
-        <section id="about" className="mt-16">
-          <AboutBlock T={T} />
-        </section>
-        <section id="faq" className="mt-16">
-          <FaqSection T={T} />
-        </section>
+        {/* Rest of home is in a centered container */}
+        <Shell>
+          <section id="home-tiles" className="mt-12">
+            <HomeTiles T={T} onNavigate={onNavigate} />
+          </section>
+          <section id="about" className="mt-16">
+            <AboutBlock T={T} />
+          </section>
+          <section id="faq" className="mt-16">
+            <FaqSection T={T} />
+          </section>
+        </Shell>
       </>
     );
   }
 
-  if (clean === "/services" || clean === "/services-pricing" || clean === "/pricing") {
-    return <ServicesPricingPage T={T} />;
+  if (
+    clean === "/services" ||
+    clean === "/services-pricing" ||
+    clean === "/pricing"
+  ) {
+    return (
+      <Shell>
+        <ServicesPricingPage T={T} />
+      </Shell>
+    );
   }
 
   if (clean === "/about") {
     return (
       <>
         <Hero T={T} />
-        <div className="mt-10">
-          <AboutBlock T={T} />
-        </div>
+        <Shell>
+          <div className="mt-10">
+            <AboutBlock T={T} />
+          </div>
+        </Shell>
       </>
     );
   }
@@ -251,26 +271,44 @@ function renderRoute(path, { T, theme, setTheme, onNavigate }) {
     return (
       <>
         <Hero T={T} />
-        <div className="mt-10">
-          <FaqSection T={T} />
-        </div>
+        <Shell>
+          <div className="mt-10">
+            <FaqSection T={T} />
+          </div>
+        </Shell>
       </>
     );
   }
 
   if (clean === "/contact") {
-    return <ContactPage T={T} />;
+    return (
+      <Shell>
+        <ContactPage T={T} />
+      </Shell>
+    );
   }
 
   if (clean === "/reviews") {
-    return <ReviewsPage T={T} />;
+    return (
+      <Shell>
+        <ReviewsPage T={T} />
+      </Shell>
+    );
   }
 
   if (clean.startsWith("/portfolio")) {
-    return <Portfolio T={T} path={clean} />;
+    return (
+      <Shell>
+        <Portfolio T={T} path={clean} />
+      </Shell>
+    );
   }
 
-  return <NotFound T={T} onNavigate={onNavigate} />;
+  return (
+    <Shell>
+      <NotFound T={T} onNavigate={onNavigate} />
+    </Shell>
+  );
 }
 
 /**
@@ -284,7 +322,11 @@ function useRouteSeo(path) {
 
   if (clean === "/" || clean === "/home") {
     // default
-  } else if (clean === "/services" || clean === "/services-pricing" || clean === "/pricing") {
+  } else if (
+    clean === "/services" ||
+    clean === "/services-pricing" ||
+    clean === "/pricing"
+  ) {
     title = "Services & Pricing · PRADHU Photography";
     desc =
       "Explore shoot packages, pricing, add-ons and booking policies for portrait, fashion and event photography.";
@@ -306,7 +348,8 @@ function useRouteSeo(path) {
       "Send an enquiry, pick a slot and connect via WhatsApp for your next shoot with Pradhu Photography.";
   } else if (clean === "/reviews") {
     title = "Client Reviews · PRADHU Photography";
-    desc = "Hear from clients about their experience shooting with Pradhu Photography.";
+    desc =
+      "Hear from clients about their experience shooting with Pradhu Photography.";
   } else {
     title = "Page Not Found · PRADHU Photography";
     desc =
