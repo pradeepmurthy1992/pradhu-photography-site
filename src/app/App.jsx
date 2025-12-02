@@ -78,7 +78,9 @@ export default function App() {
   const [theme, setTheme] = useState(getInitialTheme);
   const { T } = useThemeTokens(theme);
   const { path, setPath } = useHashRoute();
-  const [showIntro, setShowIntro] = useState(() => shouldShowIntro());
+  // Always start with intro visible for now
+const [showIntro, setShowIntro] = useState(true);
+
 
   // Persist theme
   useEffect(() => {
@@ -90,22 +92,23 @@ export default function App() {
   }, [theme]);
 
   const handleCloseIntro = useCallback(() => {
-    setShowIntro(false);
-    try {
-      if (INTRO_REMEMBER && typeof window !== "undefined") {
-        window.localStorage.setItem("pradhu:introSeen", "yes");
-      }
-      if (
-        typeof window !== "undefined" &&
-        INTRO_FORCE_HASH &&
-        window.location.hash === INTRO_FORCE_HASH
-      ) {
-        setPath("/");
-      }
-    } catch {
-      // ignore
+  // Just hide the intro for this session
+  setShowIntro(false);
+
+  try {
+    // If you're on the forced intro hash, move back to home
+    if (
+      typeof window !== "undefined" &&
+      INTRO_FORCE_HASH &&
+      window.location.hash === INTRO_FORCE_HASH
+    ) {
+      setPath("/");
     }
-  }, [setPath]);
+  } catch {
+    // ignore
+  }
+}, [setPath]);
+
 
   // Optional auto-dismiss of intro
   useEffect(() => {
