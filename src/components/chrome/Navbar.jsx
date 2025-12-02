@@ -28,6 +28,9 @@ export default function Navbar({
   const mobileDrawerBg = isDark ? "bg-black" : "bg-white";
   const mobileDrawerText = isDark ? "text-white" : "text-black";
 
+  // ✅ build logo path with BASE_URL so it works on GitHub Pages
+  const logoSrc = `${import.meta.env.BASE_URL}images/pradhu-logo.png`;
+
   return (
     <header
       className={`sticky top-0 z-40 backdrop-blur border-b ${bgBase} ${borderBase}`}
@@ -39,20 +42,17 @@ export default function Navbar({
           onClick={() => handleNav("/")}
           className="flex items-center gap-2 group"
         >
-          {/* Logo bubble */}
-          <span className="inline-flex h-9 w-9 items-center justify-center rounded-full bg-black text-white shadow-sm">
+          <span className="inline-flex h-8 w-8 items-center justify-center rounded-full bg-black overflow-hidden">
             <img
-              src="/images/pradhu-logo.png"
+              src={logoSrc}
               alt="Pradhu Photography logo"
-              className="h-7 w-auto"
+              className="h-8 w-8 object-cover"
               loading="lazy"
               decoding="async"
             />
           </span>
-
-          {/* Brand text (hidden on very small screens) */}
           <span
-            className={`hidden sm:inline text-sm sm:text-base font-semibold tracking-[0.18em] uppercase ${textBase}`}
+            className={`text-sm sm:text-base font-semibold tracking-[0.18em] uppercase ${textBase}`}
           >
             {brand}
           </span>
