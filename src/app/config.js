@@ -35,7 +35,7 @@ export const CALENDLY_URL = "https://calendly.com/pradhuphotography";
 export const CONTACT_EMAIL = "pradhuphotography@gmail.com";
 
 // Now an array, used in Hero + Footer with .join()
-export const SERVICE_CITIES = ["Pune", "Mumbai", "Chennai", "Bengaluru"];
+export const SERVICE_CITIES = ["Bengaluru", "Chennai", "Pune"];
 
 export const IG_USERNAME = "pradhu_photography";
 export const WHATSAPP_NUMBER = "919322584410";
