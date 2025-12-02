@@ -23,7 +23,7 @@ export default function Footer({ T, theme = "dark", onNavigate }) {
 
   return (
     <footer className={`w-full ${wrapperBg}`}>
-      <div className="mx-auto w-full max-w-7xl px-4 sm:px-8 lg:px-12 py-10 md:py-12">
+      <div className="w-full px-4 sm:px-8 lg:px-12 py-10 md:py-12">
         {/* Top grid */}
         <div className="grid gap-10 md:grid-cols-3 md:gap-12">
           {/* Brand / intro */}
