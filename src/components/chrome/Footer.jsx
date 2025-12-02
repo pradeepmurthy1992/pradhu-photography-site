@@ -13,6 +13,13 @@ export default function Footer({ T, onNavigate }) {
   )}`;
   const igHref = `https://instagram.com/${IG_USERNAME}`;
 
+  // ✅ Always work with an array
+  const cities = Array.isArray(SERVICE_CITIES)
+    ? SERVICE_CITIES
+    : SERVICE_CITIES
+    ? [String(SERVICE_CITIES)]
+    : [];
+
   const go = (e, path) => {
     if (!onNavigate) return;
     e.preventDefault();
@@ -28,7 +35,7 @@ export default function Footer({ T, onNavigate }) {
           </div>
           <p className="mt-2 max-w-md">
             Cinematic portraits, editorial stories and real moments across{" "}
-            {SERVICE_CITIES.join(", ")}.
+            {cities.length > 0 ? cities.join(", ") : "multiple cities"}.
           </p>
           <p className="mt-2">
             <span className="font-semibold text-slate-200">WhatsApp:</span>{" "}
@@ -103,7 +110,8 @@ export default function Footer({ T, onNavigate }) {
           </h3>
           <p>Based in Chennai &amp; Bengaluru.</p>
           <p className="mt-1">
-            Available for travel across {SERVICE_CITIES.join(", ")} and beyond.
+            Available for travel across{" "}
+            {cities.length > 0 ? cities.join(", ") : "India"} and beyond.
           </p>
         </div>
       </div>
