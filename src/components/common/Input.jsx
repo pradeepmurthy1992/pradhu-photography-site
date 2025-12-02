@@ -1,41 +1,42 @@
 // src/components/common/Input.jsx
 import React from "react";
 
-function Input({
+export function Input({
+  T, // kept in signature in case you use it later
   label,
   name,
   type = "text",
-  required = false,
-  as = "input",
-  className = "",
-  ...rest
+  value,
+  onChange,
+  required,
+  placeholder,
 }) {
-  const Field = as === "textarea" ? "textarea" : "input";
-
   return (
-    <label className="block text-sm">
-      {label && (
-        <span className="mb-1.5 inline-block font-medium text-slate-200">
-          {label}
-          {required && <span className="ml-1 text-xs text-emerald-400">*</span>}
-        </span>
-      )}
-      <Field
+    <div>
+      <label
+        htmlFor={name}
+        className="text-sm text-slate-800 dark:text-slate-200"
+      >
+        {label}
+        {required && <span className="text-red-500"> *</span>}
+      </label>
+      <input
+        id={name}
         name={name}
         type={type}
+        value={value}
+        onChange={onChange}
         required={required}
-        className={
-          "w-full rounded-xl border border-slate-700/70 bg-slate-900/70 px-3 py-2 " +
-          "text-sm text-slate-50 placeholder:text-slate-500 " +
-          "shadow-sm outline-none ring-0 focus:border-emerald-400/80 " +
-          "focus:bg-slate-900 focus:shadow-[0_0_0_1px_rgba(45,212,191,0.6)] " +
-          className
-        }
-        {...rest}
+        placeholder={placeholder}
+        className="
+          mt-1 w-full rounded-xl border px-3 py-2 text-sm
+          bg-slate-100 text-slate-900 border-slate-300
+          placeholder:text-slate-500
+          focus:outline-none focus:ring-2 focus:ring-emerald-500/70 focus:border-emerald-500/70
+          dark:bg-slate-800 dark:text-slate-50 dark:border-slate-700
+          dark:placeholder:text-slate-400
+        "
       />
-    </label>
+    </div>
   );
 }
-
-export default Input;
-export { Input };
