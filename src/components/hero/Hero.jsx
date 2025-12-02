@@ -53,15 +53,13 @@ export default function Hero() {
                 id="hero-heading"
                 className="text-balance text-4xl font-semibold tracking-tight text-white sm:text-5xl lg:text-[3.3rem] leading-tight"
               >
-                Cinematic portraits & fashion stories
+                Collect your Treasure
                 <span className="block text-emerald-300">
-                  for brands, models & dreamers.
+                  ONE PIECE at a time.
                 </span>
               </h1>
               <p className="max-w-2xl text-sm text-slate-200 sm:text-base">
-                Editorial-style photoshoots that feel effortless, look timeless,
-                and tell your story in every frame — from model portfolios to
-                pre-weddings and brand campaigns.
+                Editorial-style photoshoots that feel effortless, look timeless & tell your story in every frame.
               </p>
             </div>
 
