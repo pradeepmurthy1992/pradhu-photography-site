@@ -33,10 +33,10 @@ import ContactPage from "@/components/pages/ContactPage";
 import ReviewsPage from "@/components/pages/ReviewsPage";
 import NotFound from "@/components/pages/NotFound";
 
-// Portfolio
+// Portfolio (uses slug from path: "/portfolio", "/portfolio/weddings")
 import Portfolio from "@/features/portfolio/Portfolio";
 
-// SEO
+// Optional SEO per-page (pages themselves may also call usePageMeta)
 import { usePageMeta } from "./seo";
 
 function getInitialTheme() {
@@ -45,7 +45,7 @@ function getInitialTheme() {
   if (stored === "light" || stored === "dark") return stored;
   const prefersDark = window.matchMedia?.("(prefers-color-scheme: dark)")
     .matches;
-  return prefersDark ? "dark" : "dark"; // default to dark either way
+  return prefersDark ? "dark" : "dark"; // default to dark
 }
 
 function shouldShowIntro() {
@@ -78,7 +78,6 @@ export default function App() {
   const [theme, setTheme] = useState(getInitialTheme);
   const { T } = useThemeTokens(theme);
   const { path, setPath } = useHashRoute();
-
   const [showIntro, setShowIntro] = useState(() => shouldShowIntro());
 
   // Persist theme
@@ -182,35 +181,39 @@ export default function App() {
         </div>
       )}
 
-      {/* THEME-AWARE PAGE BACKGROUND, NOW FLEX LAYOUT */}
+      {/* THEME-AWARE PAGE BACKGROUND */}
       <div
-        className={`min-h-screen flex flex-col ${
+        className={`min-h-screen ${
           theme === "dark"
             ? "bg-gradient-to-b from-slate-950 via-slate-950/95 to-slate-950 text-slate-50"
-            : "bg-gradient-to-b from-[#f7f3ec] via-[#f3eee5] to-[#ece6db] text-neutral-900"
+            : // soft, slightly warm light theme (less peachy)
+              "bg-[#f3eee5] bg-[radial-gradient(circle_at_top,_rgba(255,255,255,0.9),_transparent_60%),_radial-gradient(circle_at_bottom,_rgba(0,0,0,0.04),_transparent_65%)] text-neutral-900"
         }`}
       >
-        {/* NAVBAR */}
-        <Navbar
-          T={T}
-          path={path}
-          theme={theme}
-          setTheme={setTheme}
-          onNavigate={handleNavigate}
-          brand={BRAND_NAME || "PRADHU PHOTOGRAPHY"}
-          navItems={NAV_ITEMS}
-        />
+        {/* Flex column so footer sits at the very bottom */}
+        <div className="flex min-h-screen flex-col">
+          {/* NAVBAR */}
+          <Navbar
+            T={T}
+            path={path}
+            theme={theme}
+            setTheme={setTheme}
+            onNavigate={handleNavigate}
+            brand={BRAND_NAME || "PRADHU PHOTOGRAPHY"}
+            navItems={NAV_ITEMS}
+          />
 
-        {/* MAIN grows to fill; footer stays at bottom */}
-        <main className="pt-20 pb-24 flex-1">{page}</main>
+          {/* MAIN */}
+          <main className="flex-1 pt-20 pb-24">{page}</main>
 
-        {/* FOOTER – theme-aware */}
-        <Footer theme={theme} onNavigate={handleNavigate} />
+          {/* CTAs (fixed, but keep them near the bottom in DOM) */}
+          <StickyCTA T={T} />
+          <MobileActionFab T={T} />
+
+          {/* FOOTER */}
+          <Footer T={T} onNavigate={handleNavigate} />
+        </div>
       </div>
-
-      {/* Floating CTAs – kept outside flex so they never push footer up */}
-      <StickyCTA T={T} />
-      <MobileActionFab T={T} />
     </div>
   );
 }
@@ -264,7 +267,6 @@ function renderRoute(path, { T, theme, setTheme, onNavigate }) {
     );
   }
 
-  // We kept /about as a dedicated route (hero + about), but navbar tab is removed
   if (clean === "/about") {
     return (
       <>
@@ -277,6 +279,8 @@ function renderRoute(path, { T, theme, setTheme, onNavigate }) {
       </>
     );
   }
+
+  // No separate /faq page anymore
 
   if (clean === "/contact") {
     return (
