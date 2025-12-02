@@ -22,18 +22,18 @@ import ContactPage from "@/components/pages/ContactPage";
 import ReviewsPage from "@/components/pages/ReviewsPage";
 import NotFound from "@/components/pages/NotFound";
 
-// Portfolio (uses slug from path: "/portfolio", "/portfolio/weddings")
+// Portfolio
 import Portfolio from "@/features/portfolio/Portfolio";
 
-// Optional SEO per-page (pages themselves may also call usePageMeta)
+// SEO
 import { usePageMeta } from "./seo";
 
 function getInitialTheme() {
   if (typeof window === "undefined") return "dark";
   const stored = window.localStorage.getItem("pradhu:theme");
   if (stored === "light" || stored === "dark") return stored;
-  // Prefer OS scheme
-  const prefersDark = window.matchMedia?.("(prefers-color-scheme: dark)").matches;
+  const prefersDark = window.matchMedia?.("(prefers-color-scheme: dark)")
+    .matches;
   return prefersDark ? "dark" : "light";
 }
 
@@ -51,12 +51,11 @@ export default function App() {
     }
   }, [theme]);
 
-  // Basic per-route SEO title/description
+  // Basic per-route SEO
   useRouteSeo(path);
 
   const handleNavigate = (to) => {
     setPath(to);
-    // Smooth scroll to top after routing
     if (typeof window !== "undefined") {
       window.scrollTo({ top: 0, behavior: "smooth" });
     }
@@ -65,8 +64,11 @@ export default function App() {
   const page = renderRoute(path, { T, theme, setTheme, onNavigate: handleNavigate });
 
   return (
-    <div className={`${T.bodyBg} min-h-screen text-sm md:text-base`}>
-      <div className="bg-gradient-to-b from-slate-950 via-slate-950/95 to-slate-950 text-slate-50 min-h-screen">
+    <div
+      className={`${T.bodyBg} ${T.pageText} min-h-screen text-sm md:text-base`}
+    >
+      {/* Use theme tokens for background instead of hard-coded dark gradient */}
+      <div className={`${T.bodyBg} ${T.pageText} min-h-screen`}>
         {/* NAVBAR */}
         <Navbar
           T={T}
@@ -87,28 +89,17 @@ export default function App() {
         <StickyCTA T={T} />
         <MobileActionFab T={T} />
 
-        {/* FOOTER */}
-<Footer T={T} onNavigate={handleNavigate} />
-
+        {/* FOOTER – now uses SPA navigation */}
+        <Footer T={T} onNavigate={handleNavigate} />
       </div>
     </div>
   );
 }
 
 /**
- * Very small route → page mapping.
- * path is like:
- *   "/"
- *   "/services-pricing"
- *   "/portfolio"
- *   "/portfolio/weddings"
- *   "/about"
- *   "/faq"
- *   "/contact"
- *   "/reviews"
+ * Route → page mapping
  */
 function renderRoute(path, { T, theme, setTheme, onNavigate }) {
-  // Normalize (ignore extra slashes)
   const clean = (path || "/").replace(/\/+$/, "") || "/";
 
   if (clean === "/" || clean === "/home") {
@@ -162,18 +153,15 @@ function renderRoute(path, { T, theme, setTheme, onNavigate }) {
     return <ReviewsPage T={T} />;
   }
 
-  // Portfolio and category pages: "/portfolio" or "/portfolio/<slug>"
   if (clean.startsWith("/portfolio")) {
     return <Portfolio T={T} path={clean} />;
   }
 
-  // Fallback: 404
   return <NotFound T={T} onNavigate={onNavigate} />;
 }
 
 /**
- * Attach basic SEO per route.
- * (Your pages can still call usePageMeta internally for finer control.)
+ * Route-based SEO
  */
 function useRouteSeo(path) {
   const clean = (path || "/").replace(/\/+$/, "") || "/";
@@ -182,28 +170,39 @@ function useRouteSeo(path) {
     "Pradhu Photography – portraits, fashion, editorial, model portfolios and weddings in Pune. Book a cinematic shoot with clear pricing and fast delivery.";
 
   if (clean === "/" || clean === "/home") {
-    // default already set
-  } else if (clean === "/services" || clean === "/services-pricing" || clean === "/pricing") {
+    // default
+  } else if (
+    clean === "/services" ||
+    clean === "/services-pricing" ||
+    clean === "/pricing"
+  ) {
     title = "Services & Pricing · PRADHU Photography";
-    desc = "Explore shoot packages, pricing, add-ons and booking policies for portrait, fashion and event photography.";
+    desc =
+      "Explore shoot packages, pricing, add-ons and booking policies for portrait, fashion and event photography.";
   } else if (clean.startsWith("/portfolio")) {
     title = "Portfolio · PRADHU Photography";
-    desc = "Browse curated shoots across categories – fashion, portraits, kids, editorial, couples and more.";
+    desc =
+      "Browse curated shoots across categories – fashion, portraits, kids, editorial, couples and more.";
   } else if (clean === "/about") {
     title = "About Pradhu · PRADHU Photography";
-    desc = "Learn about Pradhu – Pune-based photographer, gear, experience and the way each shoot is planned.";
+    desc =
+      "Learn about Pradhu – Pune-based photographer, gear, experience and the way each shoot is planned.";
   } else if (clean === "/faq") {
     title = "FAQ · PRADHU Photography";
-    desc = "Answers to common questions on booking, outfits, reschedules, payment terms and gallery delivery.";
+    desc =
+      "Answers to common questions on booking, outfits, reschedules, payment terms and gallery delivery.";
   } else if (clean === "/contact") {
     title = "Contact & Booking · PRADHU Photography";
-    desc = "Send an enquiry, pick a slot and connect via WhatsApp for your next shoot with Pradhu Photography.";
+    desc =
+      "Send an enquiry, pick a slot and connect via WhatsApp for your next shoot with Pradhu Photography.";
   } else if (clean === "/reviews") {
     title = "Client Reviews · PRADHU Photography";
-    desc = "Hear from clients about their experience shooting with Pradhu Photography.";
+    desc =
+      "Hear from clients about their experience shooting with Pradhu Photography.";
   } else {
     title = "Page Not Found · PRADHU Photography";
-    desc = "The page you’re looking for is not available. Explore portfolio or contact to book your next shoot.";
+    desc =
+      "The page you’re looking for is not available. Explore portfolio or contact to book your next shoot.";
   }
 
   usePageMeta(title, desc);
