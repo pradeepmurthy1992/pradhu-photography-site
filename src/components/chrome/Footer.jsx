@@ -11,33 +11,37 @@ export default function Footer({ theme = "dark", onNavigate }) {
       : "bg-[#e9e2d5] text-neutral-900 border-t border-neutral-300") +
     " mt-auto";
 
+  const accent = isDark ? "text-emerald-400" : "text-emerald-700";
   const mutedText = isDark ? "text-slate-400" : "text-neutral-600";
   const linkHover = isDark ? "hover:text-emerald-300" : "hover:text-emerald-700";
 
   const year = new Date().getFullYear();
 
-  const navItems = NAV_ITEMS.filter(
-    (item) => item.path !== "/404" // safety
-  );
+  // Use same routes as navbar (minus 404)
+  const navItems = NAV_ITEMS.filter((item) => item.path !== "/404");
 
   return (
     <footer className={wrapper}>
-      <div className="mx-auto w-full max-w-6xl px-4 py-10 sm:px-6 lg:px-8 lg:py-12">
+      {/* Slightly wider band than before */}
+      <div className="mx-auto w-full max-w-7xl px-6 py-10 sm:px-8 lg:px-10 lg:py-12">
         <div className="grid gap-10 md:grid-cols-3">
           {/* Brand / blurb */}
           <div>
-            <h3 className="text-sm font-semibold tracking-[0.25em] uppercase">
-              PRADHU PHOTOGRAPHY
+            <h3 className="text-sm font-semibold tracking-[0.3em] uppercase">
+              <span>PRADHU </span>
+              <span className={accent}>PHOTOGRAPHY</span>
             </h3>
+
             <p className={`mt-4 text-sm leading-relaxed ${mutedText}`}>
               Cinematic portraits, editorial stories and real moments across
               Pune, Mumbai, Chennai & Bengaluru.
             </p>
+
             <div className="mt-4 space-y-1 text-sm">
               <p>
-                WhatsApp:{" "}
+                <span className="font-semibold">WhatsApp:</span>{" "}
                 <a
-                  className={linkHover}
+                  className={`${accent} ${linkHover}`}
                   href="https://wa.me/919322584410"
                   target="_blank"
                   rel="noreferrer"
@@ -46,9 +50,9 @@ export default function Footer({ theme = "dark", onNavigate }) {
                 </a>
               </p>
               <p>
-                Instagram:{" "}
+                <span className="font-semibold">Instagram:</span>{" "}
                 <a
-                  className={linkHover}
+                  className={`${accent} ${linkHover}`}
                   href="https://instagram.com/pradhu_photography"
                   target="_blank"
                   rel="noreferrer"
@@ -61,7 +65,9 @@ export default function Footer({ theme = "dark", onNavigate }) {
 
           {/* Navigate */}
           <div>
-            <h4 className="text-sm font-semibold tracking-[0.2em] uppercase">
+            <h4
+              className={`text-xs font-semibold tracking-[0.25em] uppercase ${accent}`}
+            >
               Navigate
             </h4>
             <ul className="mt-4 space-y-2 text-sm">
@@ -81,7 +87,9 @@ export default function Footer({ theme = "dark", onNavigate }) {
 
           {/* Studio */}
           <div>
-            <h4 className="text-sm font-semibold tracking-[0.2em] uppercase">
+            <h4
+              className={`text-xs font-semibold tracking-[0.25em] uppercase ${accent}`}
+            >
               Studio
             </h4>
             <p className={`mt-4 text-sm leading-relaxed ${mutedText}`}>
@@ -98,7 +106,12 @@ export default function Footer({ theme = "dark", onNavigate }) {
           } ${mutedText} md:flex-row`}
         >
           <p>© {year} Pradhu Photography. All rights reserved.</p>
-          <p>Built with React · Tailwind · GitHub Pages.</p>
+          <p>
+            Built with{" "}
+            <span className={accent}>React</span> ·{" "}
+            <span className={accent}>Tailwind</span> ·{" "}
+            <span className={accent}>GitHub Pages</span>.
+          </p>
         </div>
       </div>
     </footer>
