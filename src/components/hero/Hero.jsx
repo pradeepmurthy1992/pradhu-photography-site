@@ -21,13 +21,13 @@ export default function Hero({ T }) {
     <section
       className="
         relative overflow-hidden
-        -mx-3 sm:-mx-4 md:-mx-6 lg:-mx-8
+        w-full
         min-h-[78vh] md:min-h-[86vh]
         bg-gradient-to-br from-slate-950 via-slate-900 to-slate-950
       "
       aria-labelledby="hero-heading"
     >
-      {/* Background image */}
+      {/* Background image fills full width */}
       {HERO_BG_URL && (
         <div className="pointer-events-none absolute inset-0">
           <img
@@ -41,8 +41,8 @@ export default function Hero({ T }) {
         </div>
       )}
 
-      {/* Content */}
-      <div className="relative z-10 px-4 py-10 sm:px-8 sm:py-14 lg:px-12 lg:py-16 max-w-6xl mx-auto">
+      {/* Content constrained to 6xl, centered */}
+      <div className="relative z-10 max-w-6xl mx-auto px-4 py-10 sm:px-8 sm:py-14 lg:px-12 lg:py-16">
         <div className="flex flex-col gap-10 lg:flex-row lg:items-end lg:justify-between">
           <div className="max-w-xl space-y-6">
             <p className="inline-flex items-center gap-2 rounded-full bg-emerald-500/10 px-3 py-1 text-xs font-semibold uppercase tracking-[0.25em] text-emerald-300">
