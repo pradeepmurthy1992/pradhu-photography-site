@@ -92,7 +92,7 @@ export default function App() {
     return () => window.clearTimeout(id);
   }, [showIntro, handleCloseIntro]);
 
-    // Basic per-route SEO title/description
+  // Basic per-route SEO title/description
   useRouteSeo(path);
 
   // Decide where to hide global CTAs (Home + Contact)
@@ -100,7 +100,6 @@ export default function App() {
   const isHome = cleanPath === "/" || cleanPath === "/home";
   const isContact = cleanPath === "/contact";
   const hideCTAs = isHome || isContact;
-
 
   const handleNavigate = (to) => {
     setPath(to);
@@ -140,8 +139,8 @@ export default function App() {
                 {INTRO_NAME || "Cinematic portraits & fashion stories"}
               </h1>
               <p className="text-sm text-slate-200">
-                Portraits, editorials and portfolios
-                shot across Bengalur,Chennai,Pune,Mumbai and beyond.
+                Portraits, editorials and portfolios shot across Bengaluru,
+                Chennai, Pune, Mumbai and beyond.
               </p>
               <p className="text-xs text-slate-400">
                 Hit “Enter studio” to step into the full website and explore the
@@ -186,8 +185,8 @@ export default function App() {
           <main className="flex-1 pt-20 pb-24">{page}</main>
 
           {/* CTAs (fixed, but keep them near the bottom in DOM) */}
-          <StickyCTA T={T} />
-          <MobileActionFab T={T} />
+          <StickyCTA T={T} hide={hideCTAs} />
+          <MobileActionFab hide={hideCTAs} />
 
           {/* FOOTER */}
           <Footer T={T} theme={theme} onNavigate={handleNavigate} />
