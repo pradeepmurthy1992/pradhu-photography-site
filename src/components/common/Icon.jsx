@@ -14,6 +14,7 @@ const ICONS = {
       />
     </svg>
   ),
+
   grid: (props) => (
     <svg viewBox="0 0 24 24" aria-hidden="true" {...props}>
       <rect
@@ -58,6 +59,7 @@ const ICONS = {
       />
     </svg>
   ),
+
   briefcase: (props) => (
     <svg viewBox="0 0 24 24" aria-hidden="true" {...props}>
       <path
@@ -80,6 +82,7 @@ const ICONS = {
       />
     </svg>
   ),
+
   user: (props) => (
     <svg viewBox="0 0 24 24" aria-hidden="true" {...props}>
       <circle
@@ -98,6 +101,7 @@ const ICONS = {
       />
     </svg>
   ),
+
   mail: (props) => (
     <svg viewBox="0 0 24 24" aria-hidden="true" {...props}>
       <rect
@@ -118,6 +122,7 @@ const ICONS = {
       />
     </svg>
   ),
+
   sun: (props) => (
     <svg viewBox="0 0 24 24" aria-hidden="true" {...props}>
       <circle
@@ -137,11 +142,11 @@ const ICONS = {
       />
     </svg>
   ),
+
   moon: (props) => (
     <svg viewBox="0 0 24 24" aria-hidden="true" {...props}>
       <path
-        d="M19.5 13.5A7.5 7.5 0 0 1 10.5 4
-           6 6 0 1 0 19.5 13.5Z"
+        d="M19.5 13.5A7.5 7.5 0 0 1 10.5 4 6 6 0 1 0 19.5 13.5Z"
         fill="none"
         stroke="currentColor"
         strokeWidth="1.5"
@@ -150,6 +155,7 @@ const ICONS = {
       />
     </svg>
   ),
+
   instagram: (props) => (
     <svg viewBox="0 0 24 24" aria-hidden="true" {...props}>
       <rect
@@ -173,6 +179,7 @@ const ICONS = {
       <circle cx="17" cy="7" r="1" fill="currentColor" />
     </svg>
   ),
+
   phone: (props) => (
     <svg viewBox="0 0 24 24" aria-hidden="true" {...props}>
       <path
@@ -190,6 +197,7 @@ const ICONS = {
       />
     </svg>
   ),
+
   x: (props) => (
     <svg viewBox="0 0 24 24" aria-hidden="true" {...props}>
       <path
@@ -201,12 +209,125 @@ const ICONS = {
       />
     </svg>
   ),
+
+  // NEW ONES USED IN NAVBAR / HERO:
+
+  camera: (props) => (
+    <svg viewBox="0 0 24 24" aria-hidden="true" {...props}>
+      <rect
+        x="3"
+        y="7"
+        width="18"
+        height="12"
+        rx="2"
+        fill="none"
+        stroke="currentColor"
+        strokeWidth="1.5"
+      />
+      <circle
+        cx="12"
+        cy="13"
+        r="3.5"
+        fill="none"
+        stroke="currentColor"
+        strokeWidth="1.5"
+      />
+      <path
+        d="M9 7l1.5-2h3L15 7"
+        fill="none"
+        stroke="currentColor"
+        strokeWidth="1.5"
+        strokeLinecap="round"
+      />
+    </svg>
+  ),
+
+  menu: (props) => (
+    <svg viewBox="0 0 24 24" aria-hidden="true" {...props}>
+      <path
+        d="M4 7h16M4 12h16M4 17h16"
+        fill="none"
+        stroke="currentColor"
+        strokeWidth="1.5"
+        strokeLinecap="round"
+      />
+    </svg>
+  ),
+
+  "chevron-right": (props) => (
+    <svg viewBox="0 0 24 24" aria-hidden="true" {...props}>
+      <path
+        d="M9 6l6 6-6 6"
+        fill="none"
+        stroke="currentColor"
+        strokeWidth="1.5"
+        strokeLinecap="round"
+        strokeLinejoin="round"
+      />
+    </svg>
+  ),
+
+  "map-pin": (props) => (
+    <svg viewBox="0 0 24 24" aria-hidden="true" {...props}>
+      <path
+        d="M12 3.5a6 6 0 0 0-6 6c0 3.5 3.4 7.5 5.2 9.4a1.1 1.1 0 0 0 1.6 0C14.6 17 18 13 18 9.5a6 6 0 0 0-6-6Z"
+        fill="none"
+        stroke="currentColor"
+        strokeWidth="1.5"
+      />
+      <circle
+        cx="12"
+        cy="9.5"
+        r="2"
+        fill="none"
+        stroke="currentColor"
+        strokeWidth="1.5"
+      />
+    </svg>
+  ),
+
+  calendar: (props) => (
+    <svg viewBox="0 0 24 24" aria-hidden="true" {...props}>
+      <rect
+        x="3.5"
+        y="5"
+        width="17"
+        height="15.5"
+        rx="2"
+        fill="none"
+        stroke="currentColor"
+        strokeWidth="1.5"
+      />
+      <path
+        d="M8 3.5v3M16 3.5v3M3.5 9.5h17"
+        fill="none"
+        stroke="currentColor"
+        strokeWidth="1.5"
+        strokeLinecap="round"
+      />
+    </svg>
+  ),
+
+  whatsapp: (props) => (
+    <svg viewBox="0 0 24 24" aria-hidden="true" {...props}>
+      <path
+        d="M12 3.5a8.5 8.5 0 0 0-7.3 12.9L4 21l4.8-0.7A8.5 8.5 0 1 0 12 3.5Z"
+        fill="none"
+        stroke="currentColor"
+        strokeWidth="1.5"
+      />
+      <path
+        d="M9.5 9.2c.2-.4.3-.5.7-.5h.4c.1 0 .3 0 .4.3.1.3.4 1 .4 1.1.1.1.1.3 0 .4-.1.2-.2.3-.4.5-.1.1-.2.2-.1.4.1.2.6 1 1.4 1.6.9.6 1.1.5 1.3.4.2-.1.6-.5.7-.6.2-.1.3-.1.4 0 .1.2.4.9.5 1.1.1.2.1.4 0 .5-.1.1-.4.7-1 1-.5.3-1 .3-1.7.2-.8-.1-1.7-.7-2.4-1.3-.6-.5-1.3-1.4-1.5-2-.2-.6-.2-1 .1-1.4Z"
+        fill="currentColor"
+      />
+    </svg>
+  ),
 };
 
-function Icon({ name, className = "h-5 w-5" }) {
+function Icon({ name, className = "h-5 w-5", size = 20, ...rest }) {
   const Comp = ICONS[name];
   if (!Comp) return null;
-  return <Comp className={className} />;
+  return <Comp className={className} width={size} height={size} {...rest} />;
 }
 
 // ✅ Default + named exports so both styles work:
