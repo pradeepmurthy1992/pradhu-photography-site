@@ -133,8 +133,8 @@ export default function App() {
                 {INTRO_NAME || "Cinematic portraits & fashion stories"}
               </h1>
               <p className="text-sm text-slate-200">
-                A quick intro to my work — portraits, editorials and portfolios
-                shot across Pune, Mumbai, Chennai and Bengaluru.
+                Portraits, editorials and portfolios
+                shot across Bengalur,Chennai,Pune,Mumbai and beyond.
               </p>
               <p className="text-xs text-slate-400">
                 Hit “Enter studio” to step into the full website and explore the
