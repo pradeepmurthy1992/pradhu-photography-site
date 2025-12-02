@@ -117,8 +117,7 @@ export default function Hero() {
                 SHOOT TYPES
               </p>
               <p className="text-xs text-slate-50">
-                Model & actor portfolios · Editorial · Designer lookbooks ·
-                Couple & pre-wedding · Brand campaigns.
+                Portfolios · Editorial · Designer lookbooks · Couple & pre-wedding . Headshots.
               </p>
             </div>
 
@@ -136,7 +135,6 @@ export default function Hero() {
                   See latest work on{" "}
                   <span className="font-semibold">@{IG_USERNAME}</span>
                   <span className="block text-[0.7rem] text-slate-300">
-                    Reels · BTS · before/after edits
                   </span>
                 </span>
               </a>
