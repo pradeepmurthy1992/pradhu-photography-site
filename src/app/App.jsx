@@ -1,7 +1,18 @@
 // src/app/App.jsx
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useCallback } from "react";
 import { useThemeTokens } from "./themeTokens";
-import { NAV_ITEMS, BRAND_NAME } from "./config";
+import {
+  NAV_ITEMS,
+  BRAND_NAME,
+  INTRO_ENABLED,
+  INTRO_REMEMBER,
+  INTRO_AUTO_DISMISS_MS,
+  INTRO_FORCE_QUERY,
+  INTRO_FORCE_HASH,
+  INTRO_BRAND,
+  INTRO_NAME,
+  INTRO_LEFT_IMAGE_URL,
+} from "./config";
 import { useHashRoute } from "@/hooks/useHashRoute";
 
 // Chrome
@@ -22,10 +33,10 @@ import ContactPage from "@/components/pages/ContactPage";
 import ReviewsPage from "@/components/pages/ReviewsPage";
 import NotFound from "@/components/pages/NotFound";
 
-// Portfolio
+// Portfolio (uses slug from path: "/portfolio", "/portfolio/weddings")
 import Portfolio from "@/features/portfolio/Portfolio";
 
-// SEO
+// Optional SEO per-page (pages themselves may also call usePageMeta)
 import { usePageMeta } from "./seo";
 
 function getInitialTheme() {
@@ -34,13 +45,44 @@ function getInitialTheme() {
   if (stored === "light" || stored === "dark") return stored;
   const prefersDark = window.matchMedia?.("(prefers-color-scheme: dark)")
     .matches;
-  return prefersDark ? "dark" : "light";
+  return prefersDark ? "dark" : "dark"; // default to dark
+}
+
+function shouldShowIntro() {
+  if (!INTRO_ENABLED) return false;
+  if (typeof window === "undefined") return true;
+
+  try {
+    const url = new URL(window.location.href);
+
+    // Force intro via query (?intro=1 etc.)
+    if (INTRO_FORCE_QUERY && url.searchParams.has(INTRO_FORCE_QUERY)) {
+      return true;
+    }
+
+    // Force intro via hash (#intro)
+    if (INTRO_FORCE_HASH && window.location.hash === INTRO_FORCE_HASH) {
+      return true;
+    }
+
+    // Remember "seen"
+    if (INTRO_REMEMBER) {
+      const seen = window.localStorage.getItem("pradhu:introSeen");
+      if (seen === "yes") return false;
+    }
+  } catch {
+    // ignore
+  }
+
+  return true;
 }
 
 export default function App() {
   const [theme, setTheme] = useState(getInitialTheme);
   const { T } = useThemeTokens(theme);
   const { path, setPath } = useHashRoute();
+
+  const [showIntro, setShowIntro] = useState(() => shouldShowIntro());
 
   // Persist theme
   useEffect(() => {
@@ -51,7 +93,38 @@ export default function App() {
     }
   }, [theme]);
 
-  // Basic per-route SEO
+  const handleCloseIntro = useCallback(() => {
+    setShowIntro(false);
+    try {
+      if (INTRO_REMEMBER && typeof window !== "undefined") {
+        window.localStorage.setItem("pradhu:introSeen", "yes");
+      }
+      if (
+        typeof window !== "undefined" &&
+        INTRO_FORCE_HASH &&
+        window.location.hash === INTRO_FORCE_HASH
+      ) {
+        // If user came via #intro, send them to home afterwards
+        setPath("/");
+      }
+    } catch {
+      // ignore
+    }
+  }, [setPath]);
+
+  // Optional auto-dismiss of intro
+  useEffect(() => {
+    if (!showIntro || !INTRO_AUTO_DISMISS_MS) return;
+    if (typeof window === "undefined") return;
+
+    const id = window.setTimeout(() => {
+      handleCloseIntro();
+    }, INTRO_AUTO_DISMISS_MS);
+
+    return () => window.clearTimeout(id);
+  }, [showIntro, handleCloseIntro]);
+
+  // Basic per-route SEO title/description
   useRouteSeo(path);
 
   const handleNavigate = (to) => {
@@ -64,11 +137,51 @@ export default function App() {
   const page = renderRoute(path, { T, theme, setTheme, onNavigate: handleNavigate });
 
   return (
-    <div
-      className={`${T.bodyBg} ${T.pageText} min-h-screen text-sm md:text-base`}
-    >
-      {/* Use theme tokens for background instead of hard-coded dark gradient */}
-      <div className={`${T.bodyBg} ${T.pageText} min-h-screen`}>
+    <div className={`${T.bodyBg} min-h-screen text-sm md:text-base`}>
+      {/* Intro overlay (small opening screen) */}
+      {showIntro && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/80 backdrop-blur">
+          <div className="relative mx-4 flex max-w-4xl flex-col overflow-hidden rounded-3xl border border-emerald-500/40 bg-slate-950/95 shadow-2xl md:flex-row">
+            {INTRO_LEFT_IMAGE_URL && (
+              <div className="relative hidden w-1/2 md:block">
+                <img
+                  src={INTRO_LEFT_IMAGE_URL}
+                  alt="Pradhu intro"
+                  className="h-full w-full object-cover"
+                />
+                <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/20 to-transparent" />
+              </div>
+            )}
+            <div className="flex flex-1 flex-col gap-4 p-6 sm:p-8">
+              <p className="text-xs font-semibold uppercase tracking-[0.3em] text-emerald-300">
+                {INTRO_BRAND || "PRADHU PHOTOGRAPHY"}
+              </p>
+              <h1 className="text-2xl font-semibold text-white sm:text-3xl">
+                {INTRO_NAME || "Cinematic portraits & fashion stories"}
+              </h1>
+              <p className="text-sm text-slate-200">
+                A quick intro to my work — portraits, editorials and
+                portfolios shot across Pune, Mumbai, Chennai and Bengaluru.
+              </p>
+              <p className="text-xs text-slate-400">
+                Hit “Enter studio” to step into the full website and explore
+                the portfolio, services and booking.
+              </p>
+              <div className="mt-4 flex flex-wrap gap-3">
+                <button
+                  type="button"
+                  onClick={handleCloseIntro}
+                  className="inline-flex items-center justify-center rounded-full bg-emerald-500 px-6 py-2.5 text-xs font-semibold uppercase tracking-[0.2em] text-white shadow-md shadow-emerald-500/40 hover:bg-emerald-400"
+                >
+                  Enter studio
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
+
+      <div className="bg-gradient-to-b from-slate-950 via-slate-950/95 to-slate-950 text-slate-50 min-h-screen">
         {/* NAVBAR */}
         <Navbar
           T={T}
@@ -89,7 +202,7 @@ export default function App() {
         <StickyCTA T={T} />
         <MobileActionFab T={T} />
 
-        {/* FOOTER – now uses SPA navigation */}
+        {/* FOOTER */}
         <Footer T={T} onNavigate={handleNavigate} />
       </div>
     </div>
@@ -97,7 +210,7 @@ export default function App() {
 }
 
 /**
- * Route → page mapping
+ * Route → page mapping.
  */
 function renderRoute(path, { T, theme, setTheme, onNavigate }) {
   const clean = (path || "/").replace(/\/+$/, "") || "/";
@@ -105,7 +218,7 @@ function renderRoute(path, { T, theme, setTheme, onNavigate }) {
   if (clean === "/" || clean === "/home") {
     return (
       <>
-        <Hero T={T} onNavigate={onNavigate} />
+        <Hero T={T} />
         <section id="home-tiles" className="mt-12">
           <HomeTiles T={T} onNavigate={onNavigate} />
         </section>
@@ -126,7 +239,7 @@ function renderRoute(path, { T, theme, setTheme, onNavigate }) {
   if (clean === "/about") {
     return (
       <>
-        <Hero T={T} onNavigate={onNavigate} compact />
+        <Hero T={T} />
         <div className="mt-10">
           <AboutBlock T={T} />
         </div>
@@ -137,7 +250,7 @@ function renderRoute(path, { T, theme, setTheme, onNavigate }) {
   if (clean === "/faq") {
     return (
       <>
-        <Hero T={T} onNavigate={onNavigate} compact />
+        <Hero T={T} />
         <div className="mt-10">
           <FaqSection T={T} />
         </div>
@@ -161,7 +274,7 @@ function renderRoute(path, { T, theme, setTheme, onNavigate }) {
 }
 
 /**
- * Route-based SEO
+ * Per-route SEO
  */
 function useRouteSeo(path) {
   const clean = (path || "/").replace(/\/+$/, "") || "/";
@@ -171,11 +284,7 @@ function useRouteSeo(path) {
 
   if (clean === "/" || clean === "/home") {
     // default
-  } else if (
-    clean === "/services" ||
-    clean === "/services-pricing" ||
-    clean === "/pricing"
-  ) {
+  } else if (clean === "/services" || clean === "/services-pricing" || clean === "/pricing") {
     title = "Services & Pricing · PRADHU Photography";
     desc =
       "Explore shoot packages, pricing, add-ons and booking policies for portrait, fashion and event photography.";
@@ -186,7 +295,7 @@ function useRouteSeo(path) {
   } else if (clean === "/about") {
     title = "About Pradhu · PRADHU Photography";
     desc =
-      "Learn about Pradhu – Pune-based photographer, gear, experience and the way each shoot is planned.";
+      "Learn about Pradhu – photographer, gear, experience and the way each shoot is planned.";
   } else if (clean === "/faq") {
     title = "FAQ · PRADHU Photography";
     desc =
@@ -197,8 +306,7 @@ function useRouteSeo(path) {
       "Send an enquiry, pick a slot and connect via WhatsApp for your next shoot with Pradhu Photography.";
   } else if (clean === "/reviews") {
     title = "Client Reviews · PRADHU Photography";
-    desc =
-      "Hear from clients about their experience shooting with Pradhu Photography.";
+    desc = "Hear from clients about their experience shooting with Pradhu Photography.";
   } else {
     title = "Page Not Found · PRADHU Photography";
     desc =
