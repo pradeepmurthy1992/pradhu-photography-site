@@ -4,54 +4,58 @@ import React from "react";
 export default function Footer({ T, theme = "dark", onNavigate }) {
   const isDark = theme === "dark";
 
-  const footerBg = isDark
-    ? "bg-slate-950/98 border-t border-slate-800"
-    : "bg-[#ece3d7] border-t border-[#d6c7b4]";
+  const wrapperBg = isDark
+    ? "bg-slate-950 border-t border-slate-900/80"
+    : "bg-[#e5ddcf] border-t border-[rgba(15,23,42,0.06)]";
 
-  const headingText = isDark ? "text-slate-200" : "text-[#2b3236]";
-  const bodyText = isDark ? "text-slate-400" : "text-[#5e5245]";
-  const subtleText = isDark ? "text-slate-500" : "text-[#8a7b68]";
-  const brandAccent = "text-emerald-400";
+  const brandAccent = isDark ? "text-emerald-300" : "text-emerald-700";
+  const headingText = isDark ? "text-slate-100" : "text-[rgba(15,23,42,0.86)]";
+  const bodyText = isDark ? "text-slate-300" : "text-[rgba(15,23,42,0.78)]";
+  const mutedText = isDark ? "text-slate-400" : "text-[rgba(15,23,42,0.55)]";
+  const linkText = isDark
+    ? "text-emerald-300 hover:text-emerald-200"
+    : "text-emerald-700 hover:text-emerald-600";
 
-  const linkBase =
-    "cursor-pointer transition-colors hover:text-emerald-400";
+  const handleNav = (hash) => {
+    if (!onNavigate) return;
+    onNavigate(hash);
+  };
 
   return (
-    <footer className={`w-full ${footerBg} text-sm`}>
-      <div className="mx-auto flex w-full max-w-6xl flex-col gap-10 px-4 py-10 sm:px-6 md:px-8 lg:px-10">
-        {/* Top row: 3 columns */}
-        <div className="grid gap-10 md:grid-cols-3">
-          {/* Brand / blurb */}
-          <div className="flex flex-col gap-3">
-            <h2
-              className={`tracking-[0.25em] text-[11px] uppercase ${brandAccent}`}
+    <footer className={`w-full ${wrapperBg}`}>
+      <div className="mx-auto w-full max-w-7xl px-4 sm:px-8 lg:px-12 py-10 md:py-12">
+        {/* Top grid */}
+        <div className="grid gap-10 md:grid-cols-3 md:gap-12">
+          {/* Brand / intro */}
+          <div className="space-y-3">
+            <p
+              className={`text-xs font-semibold tracking-[0.3em] uppercase ${brandAccent}`}
             >
               PRADHU PHOTOGRAPHY
-            </h2>
-            <p className={bodyText}>
-              Cinematic portraits, editorial stories and real moments
-              across Pune, Mumbai, Chennai &amp; Bengaluru.
             </p>
-
-            <div className="mt-2 space-y-1">
+            <p className={`text-sm leading-relaxed ${bodyText}`}>
+              Cinematic portraits, editorial stories and real moments across
+              Pune, Mumbai, Chennai &amp; Bengaluru.
+            </p>
+            <div className="space-y-1 text-sm">
               <p className={bodyText}>
-                <span className={headingText}>WhatsApp:</span>{" "}
+                <span className="font-semibold">WhatsApp:</span>{" "}
                 <a
                   href="https://wa.me/919332584410"
                   target="_blank"
                   rel="noreferrer"
-                  className="underline underline-offset-2 hover:text-emerald-400"
+                  className={linkText}
                 >
                   +91 93325 84410
                 </a>
               </p>
               <p className={bodyText}>
-                <span className={headingText}>Instagram:</span>{" "}
+                <span className="font-semibold">Instagram:</span>{" "}
                 <a
-                  href="https://instagram.com/pradhu_photography"
+                  href="https://www.instagram.com/pradhu_photography"
                   target="_blank"
                   rel="noreferrer"
-                  className="underline underline-offset-2 hover:text-emerald-400"
+                  className={linkText}
                 >
                   @pradhu_photography
                 </a>
@@ -59,60 +63,60 @@ export default function Footer({ T, theme = "dark", onNavigate }) {
             </div>
           </div>
 
-          {/* Navigate */}
-          <div className="flex flex-col gap-3">
-            <h3
-              className={`text-xs font-semibold tracking-[0.25em] uppercase ${headingText}`}
+          {/* Navigation */}
+          <div className="space-y-3">
+            <p
+              className={`text-xs font-semibold tracking-[0.3em] uppercase ${headingText}`}
             >
-              Navigate
-            </h3>
-            <nav className={`flex flex-col gap-1.5 ${bodyText}`}>
+              NAVIGATE
+            </p>
+            <nav className={`flex flex-col gap-1 text-sm ${bodyText}`}>
               <button
                 type="button"
-                onClick={() => onNavigate("/")}
-                className={linkBase}
+                onClick={() => handleNav("/")}
+                className="text-left hover:opacity-90"
               >
                 Home
               </button>
               <button
                 type="button"
-                onClick={() => onNavigate("/portfolio")}
-                className={linkBase}
+                onClick={() => handleNav("/portfolio")}
+                className="text-left hover:opacity-90"
               >
                 Portfolio
               </button>
               <button
                 type="button"
-                onClick={() => onNavigate("/services")}
-                className={linkBase}
+                onClick={() => handleNav("/services")}
+                className="text-left hover:opacity-90"
               >
                 Services &amp; Pricing
               </button>
               <button
                 type="button"
-                onClick={() => onNavigate("/reviews")}
-                className={linkBase}
+                onClick={() => handleNav("/reviews")}
+                className="text-left hover:opacity-90"
               >
                 Reviews
               </button>
               <button
                 type="button"
-                onClick={() => onNavigate("/contact")}
-                className={linkBase}
+                onClick={() => handleNav("/contact")}
+                className="text-left hover:opacity-90"
               >
                 Contact
               </button>
             </nav>
           </div>
 
-          {/* Studio */}
-          <div className="flex flex-col gap-3 md:items-end md:text-right">
-            <h3
-              className={`text-xs font-semibold tracking-[0.25em] uppercase ${headingText}`}
+          {/* Studio / location */}
+          <div className="space-y-3">
+            <p
+              className={`text-xs font-semibold tracking-[0.3em] uppercase ${headingText}`}
             >
-              Studio
-            </h3>
-            <p className={bodyText}>
+              STUDIO
+            </p>
+            <p className={`text-sm leading-relaxed ${bodyText}`}>
               Based in Chennai &amp; Bengaluru. Available for travel across
               Pune, Mumbai, Chennai, Bengaluru and beyond.
             </p>
@@ -120,18 +124,42 @@ export default function Footer({ T, theme = "dark", onNavigate }) {
         </div>
 
         {/* Divider */}
-        <div className={`h-px w-full bg-gradient-to-r from-transparent via-slate-600/30 to-transparent`} />
+        <div className={`mt-8 border-t ${isDark ? "border-slate-800/80" : "border-[rgba(15,23,42,0.08)]"}`} />
 
         {/* Bottom row */}
-        <div className="flex flex-col items-center justify-between gap-3 pb-2 text-[11px] sm:flex-row">
-          <p className={subtleText}>
+        <div className="mt-4 flex flex-col items-start justify-between gap-2 text-xs md:flex-row md:items-center">
+          <p className={mutedText}>
             © 2025 Pradhu Photography. All rights reserved.
           </p>
-          <p className={subtleText}>
+          <p className={mutedText}>
             Built with{" "}
-            <span className={brandAccent}>React</span>,{" "}
-            <span className={brandAccent}>Tailwind</span> &amp;{" "}
-            <span className={brandAccent}>GitHub Pages</span>.
+            <a
+              href="https://react.dev"
+              target="_blank"
+              rel="noreferrer"
+              className={linkText}
+            >
+              React
+            </a>{" "}
+            ·{" "}
+            <a
+              href="https://tailwindcss.com"
+              target="_blank"
+              rel="noreferrer"
+              className={linkText}
+            >
+              Tailwind
+            </a>{" "}
+            ·{" "}
+            <a
+              href="https://pages.github.com"
+              target="_blank"
+              rel="noreferrer"
+              className={linkText}
+            >
+              GitHub Pages
+            </a>
+            .
           </p>
         </div>
       </div>
