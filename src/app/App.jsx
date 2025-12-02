@@ -2,17 +2,14 @@
 import React, { useEffect, useState, useCallback } from "react";
 import { useThemeTokens } from "./themeTokens";
 import {
-  NAV_ITEMS,
   BRAND_NAME,
-  INTRO_ENABLED,
-  INTRO_REMEMBER,
   INTRO_AUTO_DISMISS_MS,
-  INTRO_FORCE_QUERY,
   INTRO_FORCE_HASH,
   INTRO_BRAND,
   INTRO_NAME,
   INTRO_LEFT_IMAGE_URL,
 } from "./config";
+
 import { useHashRoute } from "@/hooks/useHashRoute";
 
 // Chrome
@@ -48,39 +45,13 @@ function getInitialTheme() {
   return prefersDark ? "dark" : "dark"; // default to dark
 }
 
-function shouldShowIntro() {
-  if (!INTRO_ENABLED) return false;
-  if (typeof window === "undefined") return true;
-
-  try {
-    const url = new URL(window.location.href);
-
-    if (INTRO_FORCE_QUERY && url.searchParams.has(INTRO_FORCE_QUERY)) {
-      return true;
-    }
-
-    if (INTRO_FORCE_HASH && window.location.hash === INTRO_FORCE_HASH) {
-      return true;
-    }
-
-    if (INTRO_REMEMBER) {
-      const seen = window.localStorage.getItem("pradhu:introSeen");
-      if (seen === "yes") return false;
-    }
-  } catch {
-    // ignore
-  }
-
-  return true;
-}
-
 export default function App() {
   const [theme, setTheme] = useState(getInitialTheme);
   const { T } = useThemeTokens(theme);
   const { path, setPath } = useHashRoute();
-  // Always start with intro visible for now
-const [showIntro, setShowIntro] = useState(true);
 
+  // Always show intro on refresh (for now)
+  const [showIntro, setShowIntro] = useState(true);
 
   // Persist theme
   useEffect(() => {
@@ -92,23 +63,22 @@ const [showIntro, setShowIntro] = useState(true);
   }, [theme]);
 
   const handleCloseIntro = useCallback(() => {
-  // Just hide the intro for this session
-  setShowIntro(false);
+    // Just hide the intro for this session
+    setShowIntro(false);
 
-  try {
-    // If you're on the forced intro hash, move back to home
-    if (
-      typeof window !== "undefined" &&
-      INTRO_FORCE_HASH &&
-      window.location.hash === INTRO_FORCE_HASH
-    ) {
-      setPath("/");
+    try {
+      // If you're on the forced intro hash, move back to home
+      if (
+        typeof window !== "undefined" &&
+        INTRO_FORCE_HASH &&
+        window.location.hash === INTRO_FORCE_HASH
+      ) {
+        setPath("/");
+      }
+    } catch {
+      // ignore
     }
-  } catch {
-    // ignore
-  }
-}, [setPath]);
-
+  }, [setPath]);
 
   // Optional auto-dismiss of intro
   useEffect(() => {
@@ -189,7 +159,7 @@ const [showIntro, setShowIntro] = useState(true);
         className={`min-h-screen ${
           theme === "dark"
             ? "bg-gradient-to-b from-slate-950 via-slate-950/95 to-slate-950 text-slate-50"
-            : // soft, slightly warm light theme (less peachy)
+            : // soft, slightly warm light theme
               "bg-[#f3eee5] bg-[radial-gradient(circle_at_top,_rgba(255,255,255,0.9),_transparent_60%),_radial-gradient(circle_at_bottom,_rgba(0,0,0,0.04),_transparent_65%)] text-neutral-900"
         }`}
       >
@@ -203,7 +173,6 @@ const [showIntro, setShowIntro] = useState(true);
             setTheme={setTheme}
             onNavigate={handleNavigate}
             brand={BRAND_NAME || "PRADHU PHOTOGRAPHY"}
-            navItems={NAV_ITEMS}
           />
 
           {/* MAIN */}
@@ -214,8 +183,7 @@ const [showIntro, setShowIntro] = useState(true);
           <MobileActionFab T={T} />
 
           {/* FOOTER */}
-<Footer T={T} theme={theme} onNavigate={handleNavigate} />
-
+          <Footer T={T} theme={theme} onNavigate={handleNavigate} />
         </div>
       </div>
     </div>
