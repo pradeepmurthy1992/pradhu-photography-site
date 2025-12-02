@@ -92,8 +92,15 @@ export default function App() {
     return () => window.clearTimeout(id);
   }, [showIntro, handleCloseIntro]);
 
-  // Basic per-route SEO title/description
+    // Basic per-route SEO title/description
   useRouteSeo(path);
+
+  // Decide where to hide global CTAs (Home + Contact)
+  const cleanPath = (path || "/").replace(/\/+$/, "") || "/";
+  const isHome = cleanPath === "/" || cleanPath === "/home";
+  const isContact = cleanPath === "/contact";
+  const hideCTAs = isHome || isContact;
+
 
   const handleNavigate = (to) => {
     setPath(to);
