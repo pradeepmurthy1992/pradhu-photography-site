@@ -2,6 +2,7 @@
 import HomeTiles from "@/components/pages/HomeTiles";
 import ServicesPricingPage from "@/components/pages/ServicesPricingPage";
 import AboutBlock from "@/components/pages/AboutBlock";
+import FaqSection from "@/components/pages/FaqSection";
 import ContactPage from "@/components/pages/ContactPage";
 import ReviewsPage from "@/components/pages/ReviewsPage";
 import Portfolio from "@/features/portfolio/Portfolio";
@@ -23,12 +24,18 @@ export const ROUTES = [
     label: "Services & Pricing",
     component: ServicesPricingPage,
   },
+  // Kept for old links, but hidden from navbar
   {
     path: "/about",
     label: "About",
     component: AboutBlock,
   },
-  // 🚫 FAQ route removed – FAQ lives only on Home now
+  // Kept for old links, but FAQ content now lives on Home
+  {
+    path: "/faq",
+    label: "FAQ",
+    component: FaqSection,
+  },
   {
     path: "/reviews",
     label: "Reviews",
@@ -46,4 +53,7 @@ export const ROUTES = [
   },
 ];
 
-export const NAV_ITEMS = ROUTES.filter((r) => r.path !== "/404");
+// 👇 Navbar items: hide 404, FAQ and About tabs
+export const NAV_ITEMS = ROUTES.filter(
+  (r) => !["/404", "/faq", "/about"].includes(r.path)
+);
