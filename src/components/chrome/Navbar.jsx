@@ -39,11 +39,20 @@ export default function Navbar({
           onClick={() => handleNav("/")}
           className="flex items-center gap-2 group"
         >
-          <span className="inline-flex h-8 w-8 items-center justify-center rounded-full border border-emerald-400/50 bg-emerald-500/10 text-emerald-400">
-            <Icon name="camera" size={18} />
+          {/* Logo bubble */}
+          <span className="inline-flex h-9 w-9 items-center justify-center rounded-full bg-black text-white shadow-sm">
+            <img
+              src="/images/pradhu-logo.png"
+              alt="Pradhu Photography logo"
+              className="h-7 w-auto"
+              loading="lazy"
+              decoding="async"
+            />
           </span>
+
+          {/* Brand text (hidden on very small screens) */}
           <span
-            className={`text-sm sm:text-base font-semibold tracking-[0.18em] uppercase ${textBase}`}
+            className={`hidden sm:inline text-sm sm:text-base font-semibold tracking-[0.18em] uppercase ${textBase}`}
           >
             {brand}
           </span>
