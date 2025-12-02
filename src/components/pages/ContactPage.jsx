@@ -61,21 +61,25 @@ export default function ContactPage({ T }) {
     if (!form.phone.trim()) missing.push("Phone");
     if (form.date && form.date < minDateStr)
       missing.push(`Preferred Date (≥ ${fmtHuman(minDateStr)})`);
-    if (missing.length)
+
+    if (missing.length) {
       return setNote({
         kind: "error",
         text: `Please fill: ${missing.join(", ")}`,
       });
-    if (!isValidEmail(form.email))
+    }
+    if (!isValidEmail(form.email)) {
       return setNote({
         kind: "error",
         text: "Enter a valid email address.",
       });
-    if (!isValidINPhone(form.phone))
+    }
+    if (!isValidINPhone(form.phone)) {
       return setNote({
         kind: "error",
         text: "Enter a valid Indian mobile.",
       });
+    }
 
     setSubmitting(true);
     try {
@@ -124,17 +128,18 @@ export default function ContactPage({ T }) {
     }
   };
 
-  // ---------- FORCED FIELD STYLES (dark text in light mode) ----------
-  const baseFieldClasses =
-    "mt-1 w-full rounded-xl border px-3 py-2 text-sm " +
-    "text-neutral-900 placeholder:text-neutral-600 " + // light theme text
-    "dark:text-slate-50 dark:placeholder:text-slate-400 " + // dark theme text
-    "bg-white/90 dark:bg-slate-900/70 " +
-    "border-neutral-300 dark:border-slate-700 " +
-    "focus:outline-none focus:ring-2 focus:ring-emerald-500/70 focus:border-emerald-500/70";
+  // ===== Shared classes for labels + fields =====
+  const labelClass =
+    "text-sm font-semibold text-neutral-900 dark:text-slate-50";
 
-  const labelClasses = "text-sm text-slate-900 dark:text-slate-100";
-  // -------------------------------------------------------------
+  const fieldClass =
+    "mt-1 w-full rounded-xl border px-3 py-2 text-sm " +
+    // light theme
+    "bg-slate-100 text-neutral-900 placeholder:text-neutral-600 border-neutral-300 " +
+    // dark theme
+    "dark:bg-slate-800 dark:text-slate-50 dark:placeholder:text-slate-300 dark:border-slate-600 " +
+    // focus
+    "focus:outline-none focus:ring-2 focus:ring-emerald-500/70 focus:border-emerald-500/70";
 
   return (
     <section className="py-6" id="contact">
@@ -158,7 +163,7 @@ export default function ContactPage({ T }) {
         <div className="grid grid-cols-1 gap-4">
           {/* Name */}
           <div>
-            <label className={labelClasses}>
+            <label className={labelClass}>
               Name <span className="text-red-500">*</span>
             </label>
             <input
@@ -167,13 +172,13 @@ export default function ContactPage({ T }) {
               value={form.name}
               onChange={onChange}
               required
-              className={baseFieldClasses}
+              className={fieldClass}
             />
           </div>
 
           {/* Email */}
           <div>
-            <label className={labelClasses}>
+            <label className={labelClass}>
               Email <span className="text-red-500">*</span>
             </label>
             <input
@@ -182,13 +187,13 @@ export default function ContactPage({ T }) {
               value={form.email}
               onChange={onChange}
               required
-              className={baseFieldClasses}
+              className={fieldClass}
             />
           </div>
 
           {/* Phone */}
           <div>
-            <label className={labelClasses}>
+            <label className={labelClass}>
               Phone <span className="text-red-500">*</span>
             </label>
             <input
@@ -198,13 +203,13 @@ export default function ContactPage({ T }) {
               onChange={onChange}
               required
               placeholder="+91-XXXXXXXXXX"
-              className={baseFieldClasses}
+              className={fieldClass}
             />
           </div>
 
           {/* Preferred date */}
           <div>
-            <label className={labelClasses}>Preferred Date</label>
+            <label className={labelClass}>Preferred Date</label>
             <input
               name="date"
               type="date"
@@ -223,7 +228,7 @@ export default function ContactPage({ T }) {
                 }
                 setForm({ ...form, date: v });
               }}
-              className={`${baseFieldClasses} cursor-pointer`}
+              className={`${fieldClass} cursor-pointer`}
             />
             <p className="text-xs opacity-70 mt-1">
               Earliest selectable: {fmtHuman(minDateStr)}
@@ -232,13 +237,13 @@ export default function ContactPage({ T }) {
 
           {/* Message */}
           <div>
-            <label className={labelClasses}>Message</label>
+            <label className={labelClass}>Message</label>
             <textarea
               name="message"
               value={form.message}
               onChange={onChange}
               rows={5}
-              className={baseFieldClasses}
+              className={fieldClass}
               placeholder="Shoot location, timings, concept, references, usage (personal/commercial), etc."
             />
           </div>
@@ -246,10 +251,10 @@ export default function ContactPage({ T }) {
           {/* Service & City */}
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
             <div>
-              <label className={labelClasses}>Service</label>
+              <label className={labelClass}>Service</label>
               <select
                 name="service"
-                className={baseFieldClasses}
+                className={fieldClass}
                 value={form.service}
                 onChange={onChange}
               >
@@ -263,10 +268,10 @@ export default function ContactPage({ T }) {
               </select>
             </div>
             <div>
-              <label className={labelClasses}>City</label>
+              <label className={labelClass}>City</label>
               <select
                 name="city"
-                className={baseFieldClasses}
+                className={fieldClass}
                 value={form.city}
                 onChange={onChange}
               >
@@ -284,7 +289,7 @@ export default function ContactPage({ T }) {
             <button
               type="submit"
               disabled={submitting}
-              className="rounded-xl bg-neutral-900 text-white px-4 py-2 font-medium hover:opacity-90 disabled:opacity-60"
+              className="rounded-xl bg-neutral-900 text-white px-4 py-2 font-semibold hover:opacity-90 disabled:opacity-60"
             >
               {submitting ? "Submitting…" : "Send Enquiry"}
             </button>
@@ -308,7 +313,7 @@ export default function ContactPage({ T }) {
                 href={whatsCTA}
                 target="_blank"
                 rel="noreferrer"
-                className="inline-flex items-center gap-2 rounded-xl border px-3 py-2 text-sm hover:bg-neutral-50 dark:hover:bg-slate-800"
+                className="inline-flex items-center gap-2 rounded-xl border px-3 py-2 text-sm font-medium hover:bg-neutral-50 dark:hover:bg-slate-800"
               >
                 Continue on WhatsApp
               </a>
