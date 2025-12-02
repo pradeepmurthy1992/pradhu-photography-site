@@ -3,7 +3,6 @@ import React, { useMemo, useState } from "react";
 import { usePageMeta } from "@/app/seo";
 import { SHEET_WEB_APP, WHATSAPP_NUMBER } from "@/app/config";
 import AboutBlock from "./AboutBlock";
-import { Input } from "@/components/common/Input";
 
 export default function ContactPage({ T }) {
   usePageMeta(
@@ -62,21 +61,25 @@ export default function ContactPage({ T }) {
     if (!form.phone.trim()) missing.push("Phone");
     if (form.date && form.date < minDateStr)
       missing.push(`Preferred Date (≥ ${fmtHuman(minDateStr)})`);
-    if (missing.length)
+
+    if (missing.length) {
       return setNote({
         kind: "error",
         text: `Please fill: ${missing.join(", ")}`,
       });
-    if (!isValidEmail(form.email))
+    }
+    if (!isValidEmail(form.email)) {
       return setNote({
         kind: "error",
         text: "Enter a valid email address.",
       });
-    if (!isValidINPhone(form.phone))
+    }
+    if (!isValidINPhone(form.phone)) {
       return setNote({
         kind: "error",
         text: "Enter a valid Indian mobile.",
       });
+    }
 
     setSubmitting(true);
     try {
@@ -125,11 +128,17 @@ export default function ContactPage({ T }) {
     }
   };
 
+  // shared classes so light mode is always light inputs + dark text
+  const fieldClasses =
+    "mt-1 w-full rounded-xl border px-3 py-2 text-sm " +
+    "bg-slate-100 text-slate-900 border-slate-300 placeholder:text-slate-500 " +
+    "focus:outline-none focus:ring-2 focus:ring-emerald-500/70 focus:border-emerald-500/70 " +
+    "dark:bg-slate-900 dark:text-slate-50 dark:border-slate-700 dark:placeholder:text-slate-400";
+
+  const labelClasses = "text-sm text-slate-800 dark:text-slate-200";
+
   return (
-    <section
-      className="py-6 text-slate-900 dark:text-slate-50"
-      id="contact"
-    >
+    <section className="py-6 text-slate-900 dark:text-slate-50" id="contact">
       <h1
         className={`text-4xl md:text-5xl font-['Playfair_Display'] uppercase tracking-[0.08em] ${T.navTextStrong}`}
       >
@@ -148,41 +157,61 @@ export default function ContactPage({ T }) {
         className={`mt-4 rounded-2xl border p-6 shadow-sm ${T.panelBg} ${T.panelBorder}`}
       >
         <div className="grid grid-cols-1 gap-4">
-          {/* Shared inputs */}
-          <Input
-            T={T}
-            label="Name"
-            name="name"
-            value={form.name}
-            onChange={onChange}
-            required
-          />
-          <Input
-            T={T}
-            label="Email"
-            name="email"
-            type="email"
-            value={form.email}
-            onChange={onChange}
-            required
-          />
-          <Input
-            T={T}
-            label="Phone"
-            name="phone"
-            type="tel"
-            value={form.phone}
-            onChange={onChange}
-            required
-            placeholder="+91-XXXXXXXXXX"
-          />
-
-          {/* Preferred Date */}
+          {/* Name */}
           <div>
-            <label className="text-sm text-slate-800 dark:text-slate-200">
+            <label htmlFor="name" className={labelClasses}>
+              Name<span className="text-red-500"> *</span>
+            </label>
+            <input
+              id="name"
+              name="name"
+              value={form.name}
+              onChange={onChange}
+              className={fieldClasses}
+              required
+            />
+          </div>
+
+          {/* Email */}
+          <div>
+            <label htmlFor="email" className={labelClasses}>
+              Email<span className="text-red-500"> *</span>
+            </label>
+            <input
+              id="email"
+              name="email"
+              type="email"
+              value={form.email}
+              onChange={onChange}
+              className={fieldClasses}
+              required
+            />
+          </div>
+
+          {/* Phone */}
+          <div>
+            <label htmlFor="phone" className={labelClasses}>
+              Phone<span className="text-red-500"> *</span>
+            </label>
+            <input
+              id="phone"
+              name="phone"
+              type="tel"
+              value={form.phone}
+              onChange={onChange}
+              placeholder="+91-XXXXXXXXXX"
+              className={fieldClasses}
+              required
+            />
+          </div>
+
+          {/* Preferred date */}
+          <div>
+            <label htmlFor="date" className={labelClasses}>
               Preferred Date
             </label>
             <input
+              id="date"
               name="date"
               type="date"
               min={minDateStr}
@@ -195,21 +224,12 @@ export default function ContactPage({ T }) {
                   v = minDateStr;
                   setNote({
                     kind: "info",
-                    text: `Earliest available date is ${fmtHuman(
-                      minDateStr
-                    )}.`,
+                    text: `Earliest available date is ${fmtHuman(minDateStr)}.`,
                   });
                 }
                 setForm({ ...form, date: v });
               }}
-              className="
-                mt-1 w-full rounded-xl border px-3 py-2 text-sm
-                bg-slate-100 text-slate-900 border-slate-300
-                placeholder:text-slate-500
-                focus:outline-none focus:ring-2 focus:ring-emerald-500/70 focus:border-emerald-500/70
-                dark:bg-slate-800 dark:text-slate-50 dark:border-slate-700
-                dark:placeholder:text-slate-400
-              "
+              className={fieldClasses}
             />
             <p className="mt-1 text-xs opacity-70">
               Earliest selectable: {fmtHuman(minDateStr)}
@@ -218,22 +238,16 @@ export default function ContactPage({ T }) {
 
           {/* Message */}
           <div>
-            <label className="text-sm text-slate-800 dark:text-slate-200">
+            <label htmlFor="message" className={labelClasses}>
               Message
             </label>
             <textarea
+              id="message"
               name="message"
+              rows={5}
               value={form.message}
               onChange={onChange}
-              rows={5}
-              className="
-                mt-1 w-full rounded-xl border px-3 py-2 text-sm
-                bg-slate-100 text-slate-900 border-slate-300
-                placeholder:text-slate-500
-                focus:outline-none focus:ring-2 focus:ring-emerald-500/70 focus:border-emerald-500/70
-                dark:bg-slate-800 dark:text-slate-50 dark:border-slate-700
-                dark:placeholder:text-slate-400
-              "
+              className={fieldClasses}
               placeholder="Shoot location, timings, concept, references, usage (personal/commercial), etc."
             />
           </div>
@@ -241,49 +255,36 @@ export default function ContactPage({ T }) {
           {/* Service + City */}
           <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
             <div>
-              <label className="text-sm text-slate-800 dark:text-slate-200">
+              <label htmlFor="service" className={labelClasses}>
                 Service
               </label>
               <select
+                id="service"
                 name="service"
-                className="
-                  mt-1 w-full rounded-xl border px-3 py-2 text-sm
-                  bg-slate-100 text-slate-900 border-slate-300
-                  focus:outline-none focus:ring-2 focus:ring-emerald-500/70 focus:border-emerald-500/70
-                  dark:bg-slate-800 dark:text-slate-50 dark:border-slate-700
-                "
                 value={form.service}
                 onChange={onChange}
+                className={fieldClasses}
               >
-                {[
-                  "Portraits",
-                  "Fashion",
-                  "Candids",
-                  "Street",
-                  "Events",
-                  "Other",
-                ].map((s) => (
-                  <option key={s} value={s}>
-                    {s}
-                  </option>
-                ))}
+                {["Portraits", "Fashion", "Candids", "Street", "Events", "Other"].map(
+                  (s) => (
+                    <option key={s} value={s}>
+                      {s}
+                    </option>
+                  )
+                )}
               </select>
             </div>
 
             <div>
-              <label className="text-sm text-slate-800 dark:text-slate-200">
+              <label htmlFor="city" className={labelClasses}>
                 City
               </label>
               <select
+                id="city"
                 name="city"
-                className="
-                  mt-1 w-full rounded-xl border px-3 py-2 text-sm
-                  bg-slate-100 text-slate-900 border-slate-300
-                  focus:outline-none focus:ring-2 focus:ring-emerald-500/70 focus:border-emerald-500/70
-                  dark:bg-slate-800 dark:text-slate-50 dark:border-slate-700
-                "
                 value={form.city}
                 onChange={onChange}
+                className={fieldClasses}
               >
                 <option>Pune</option>
                 <option>Mumbai</option>
@@ -299,10 +300,7 @@ export default function ContactPage({ T }) {
             <button
               type="submit"
               disabled={submitting}
-              className="
-                rounded-xl bg-neutral-900 px-4 py-2 font-medium text-white
-                hover:opacity-90 disabled:opacity-60
-              "
+              className="rounded-xl bg-neutral-900 px-4 py-2 font-medium text-white hover:opacity-90 disabled:opacity-60"
             >
               {submitting ? "Submitting…" : "Send Enquiry"}
             </button>
@@ -326,12 +324,7 @@ export default function ContactPage({ T }) {
                 href={whatsCTA}
                 target="_blank"
                 rel="noreferrer"
-                className="
-                  inline-flex items-center gap-2 rounded-xl border
-                  px-3 py-2 text-sm
-                  border-neutral-300 text-neutral-900 hover:bg-neutral-50
-                  dark:border-slate-600 dark:text-slate-50 dark:hover:bg-slate-800/70
-                "
+                className="inline-flex items-center gap-2 rounded-xl border border-neutral-300 px-3 py-2 text-sm text-neutral-900 hover:bg-neutral-50 dark:border-slate-600 dark:text-slate-50 dark:hover:bg-slate-800/70"
               >
                 Continue on WhatsApp
               </a>
