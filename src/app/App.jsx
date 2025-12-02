@@ -33,10 +33,10 @@ import ContactPage from "@/components/pages/ContactPage";
 import ReviewsPage from "@/components/pages/ReviewsPage";
 import NotFound from "@/components/pages/NotFound";
 
-// Portfolio (uses slug from path: "/portfolio", "/portfolio/weddings")
+// Portfolio
 import Portfolio from "@/features/portfolio/Portfolio";
 
-// Optional SEO per-page (pages themselves may also call usePageMeta)
+// SEO
 import { usePageMeta } from "./seo";
 
 function getInitialTheme() {
@@ -45,7 +45,7 @@ function getInitialTheme() {
   if (stored === "light" || stored === "dark") return stored;
   const prefersDark = window.matchMedia?.("(prefers-color-scheme: dark)")
     .matches;
-  return prefersDark ? "dark" : "dark"; // default to dark
+  return prefersDark ? "dark" : "dark"; // default to dark either way
 }
 
 function shouldShowIntro() {
@@ -182,16 +182,14 @@ export default function App() {
         </div>
       )}
 
-      {/* THEME-AWARE PAGE BACKGROUND */}
+      {/* THEME-AWARE PAGE BACKGROUND, NOW FLEX LAYOUT */}
       <div
-  className={`min-h-screen ${
-    theme === "dark"
-      ? "bg-gradient-to-b from-slate-950 via-slate-950/95 to-slate-950 text-slate-50"
-           : "bg-gradient-to-b from-[#f7f5f1] via-[#eee9e2] to-[#e5ded4] text-neutral-900"
-
-  }`}
->
-
+        className={`min-h-screen flex flex-col ${
+          theme === "dark"
+            ? "bg-gradient-to-b from-slate-950 via-slate-950/95 to-slate-950 text-slate-50"
+            : "bg-gradient-to-b from-[#f7f3ec] via-[#f3eee5] to-[#ece6db] text-neutral-900"
+        }`}
+      >
         {/* NAVBAR */}
         <Navbar
           T={T}
@@ -203,16 +201,16 @@ export default function App() {
           navItems={NAV_ITEMS}
         />
 
-        {/* MAIN */}
-        <main className="pt-20 pb-24">{page}</main>
+        {/* MAIN grows to fill; footer stays at bottom */}
+        <main className="pt-20 pb-24 flex-1">{page}</main>
 
-        {/* CTAs */}
-        <StickyCTA T={T} />
-        <MobileActionFab T={T} />
-
-        {/* FOOTER */}
-        <Footer T={T} onNavigate={handleNavigate} />
+        {/* FOOTER – theme-aware */}
+        <Footer theme={theme} onNavigate={handleNavigate} />
       </div>
+
+      {/* Floating CTAs – kept outside flex so they never push footer up */}
+      <StickyCTA T={T} />
+      <MobileActionFab T={T} />
     </div>
   );
 }
@@ -226,7 +224,7 @@ function renderRoute(path, { T, theme, setTheme, onNavigate }) {
   // Treat "/faq" as home (fallback for old links)
   if (clean === "/faq") clean = "/";
 
-  // Full-width shell with nice side padding
+  // Full-width shell with side padding (wider layout)
   const Shell = ({ children }) => (
     <div className="w-full px-4 sm:px-8 lg:px-16 xl:px-24 2xl:px-32">
       {children}
@@ -266,17 +264,14 @@ function renderRoute(path, { T, theme, setTheme, onNavigate }) {
     );
   }
 
+  // We kept /about as a dedicated route (hero + about), but navbar tab is removed
   if (clean === "/about") {
-    // legacy /about – keep it working, but you’re mostly using home
     return (
       <>
         <Hero T={T} />
         <Shell>
           <div className="mt-10">
             <AboutBlock T={T} />
-            <div className="mt-16">
-              <FaqSection T={T} />
-            </div>
           </div>
         </Shell>
       </>
@@ -320,7 +315,7 @@ function renderRoute(path, { T, theme, setTheme, onNavigate }) {
 function useRouteSeo(path) {
   let clean = (path || "/").replace(/\/+$/, "") || "/";
 
-  // Alias /faq → home for SEO too
+  // Alias /faq → home for SEO as well
   if (clean === "/faq") clean = "/";
 
   let title = "PRADHU Photography · Pune Portrait & Fashion Photographer";
