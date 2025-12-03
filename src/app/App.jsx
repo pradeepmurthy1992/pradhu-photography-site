@@ -33,6 +33,9 @@ import NotFound from "@/components/pages/NotFound";
 // Portfolio (uses slug from path: "/portfolio", "/portfolio/weddings")
 import Portfolio from "@/features/portfolio/Portfolio";
 
+// Cinematic intro
+import CinematicIntro from "@/components/intro/CinematicIntro";
+
 // Optional SEO per-page (pages themselves may also call usePageMeta)
 import { usePageMeta } from "./seo";
 
@@ -50,8 +53,10 @@ export default function App() {
   const { T } = useThemeTokens(theme);
   const { path, setPath } = useHashRoute();
 
-  // Always show intro on refresh (for now)
+  // Step 1: text intro (always on refresh for now)
   const [showIntro, setShowIntro] = useState(true);
+  // Step 2: cinematic overlay (after text intro)
+  const [showCinematicIntro, setShowCinematicIntro] = useState(false);
 
   // Persist theme
   useEffect(() => {
@@ -63,11 +68,13 @@ export default function App() {
   }, [theme]);
 
   const handleCloseIntro = useCallback(() => {
-    // Just hide the intro for this session
+    // 1) hide text intro
     setShowIntro(false);
+    // 2) show cinematic overlay
+    setShowCinematicIntro(true);
 
     try {
-      // If you're on the forced intro hash, move back to home
+      // If you're on a forced intro hash, move back to home
       if (
         typeof window !== "undefined" &&
         INTRO_FORCE_HASH &&
@@ -80,7 +87,7 @@ export default function App() {
     }
   }, [setPath]);
 
-  // Optional auto-dismiss of intro
+  // Optional auto-dismiss of text intro
   useEffect(() => {
     if (!showIntro || !INTRO_AUTO_DISMISS_MS) return;
     if (typeof window === "undefined") return;
@@ -117,7 +124,7 @@ export default function App() {
 
   return (
     <div className="min-h-screen text-sm md:text-base">
-      {/* Intro overlay */}
+      {/* Text intro overlay (step 1) */}
       {showIntro && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/80 backdrop-blur">
           <div className="relative mx-4 flex max-w-4xl flex-col overflow-hidden rounded-3xl border border-emerald-500/40 bg-slate-950/95 shadow-2xl md:flex-row">
@@ -160,6 +167,11 @@ export default function App() {
         </div>
       )}
 
+      {/* Cinematic overlay (step 2) */}
+      {showCinematicIntro && (
+        <CinematicIntro onDone={() => setShowCinematicIntro(false)} />
+      )}
+
       {/* THEME-AWARE PAGE BACKGROUND */}
       <div
         className={`min-h-screen ${
@@ -184,7 +196,7 @@ export default function App() {
           {/* MAIN */}
           <main className="flex-1 pt-20 pb-24">{page}</main>
 
-          {/* CTAs (fixed, but keep them near the bottom in DOM) */}
+          {/* CTAs (fixed, hidden on home + contact) */}
           <StickyCTA T={T} hide={hideCTAs} />
           <MobileActionFab hide={hideCTAs} />
 
