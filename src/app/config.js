@@ -1,5 +1,14 @@
 // src/app/config.js
 
+// Fallback list, used only if GitHub cover detection fails.
+// You can keep or tweak these paths to match your repo.
+export const CINEMATIC_IMAGES_FALLBACK = [
+  "/images/portfolio/covers/fashion-cover.jpg",
+  "/images/portfolio/covers/editorial-cover.jpg",
+  "/images/portfolio/covers/portrait-cover.jpg",
+  "/images/portfolio/covers/couple-cover.jpg",
+];
+
 // ===== Brand =====
 export const BRAND_NAME = "PRADHU Photography";
 
