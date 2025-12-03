@@ -33,9 +33,6 @@ import NotFound from "@/components/pages/NotFound";
 // Portfolio (uses slug from path: "/portfolio", "/portfolio/weddings")
 import Portfolio from "@/features/portfolio/Portfolio";
 
-// Cinematic intro
-import CinematicIntro from "@/components/intro/CinematicIntro";
-
 // Optional SEO per-page (pages themselves may also call usePageMeta)
 import { usePageMeta } from "./seo";
 
@@ -53,10 +50,8 @@ export default function App() {
   const { T } = useThemeTokens(theme);
   const { path, setPath } = useHashRoute();
 
-  // Step 1: text intro (always on refresh for now)
+  // Always show intro on refresh (for now)
   const [showIntro, setShowIntro] = useState(true);
-  // Step 2: cinematic overlay (after text intro)
-  const [showCinematicIntro, setShowCinematicIntro] = useState(false);
 
   // Persist theme
   useEffect(() => {
@@ -68,13 +63,11 @@ export default function App() {
   }, [theme]);
 
   const handleCloseIntro = useCallback(() => {
-    // 1) hide text intro
+    // Just hide the intro for this session
     setShowIntro(false);
-    // 2) show cinematic overlay
-    setShowCinematicIntro(true);
 
     try {
-      // If you're on a forced intro hash, move back to home
+      // If you're on the forced intro hash, move back to home
       if (
         typeof window !== "undefined" &&
         INTRO_FORCE_HASH &&
@@ -87,7 +80,7 @@ export default function App() {
     }
   }, [setPath]);
 
-  // Optional auto-dismiss of text intro
+  // Optional auto-dismiss of intro
   useEffect(() => {
     if (!showIntro || !INTRO_AUTO_DISMISS_MS) return;
     if (typeof window === "undefined") return;
@@ -124,7 +117,7 @@ export default function App() {
 
   return (
     <div className="min-h-screen text-sm md:text-base">
-      {/* Text intro overlay (step 1) */}
+      {/* Intro overlay (simple, no cinematic) */}
       {showIntro && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/80 backdrop-blur">
           <div className="relative mx-4 flex max-w-4xl flex-col overflow-hidden rounded-3xl border border-emerald-500/40 bg-slate-950/95 shadow-2xl md:flex-row">
@@ -146,8 +139,8 @@ export default function App() {
                 {INTRO_NAME || "Cinematic portraits & fashion stories"}
               </h1>
               <p className="text-sm text-slate-200">
-                Portraits, editorials and portfolios shot across Bengaluru,
-                Chennai, Pune, Mumbai and beyond.
+                Portraits, editorials and portfolios
+                shot across Bengalur,Chennai,Pune,Mumbai and beyond.
               </p>
               <p className="text-xs text-slate-400">
                 Hit “Enter studio” to step into the full website and explore the
@@ -165,11 +158,6 @@ export default function App() {
             </div>
           </div>
         </div>
-      )}
-
-      {/* Cinematic overlay (step 2) */}
-      {showCinematicIntro && (
-        <CinematicIntro onDone={() => setShowCinematicIntro(false)} />
       )}
 
       {/* THEME-AWARE PAGE BACKGROUND */}
@@ -196,7 +184,7 @@ export default function App() {
           {/* MAIN */}
           <main className="flex-1 pt-20 pb-24">{page}</main>
 
-          {/* CTAs (fixed, hidden on home + contact) */}
+          {/* CTAs (fixed, but keep them near the bottom in DOM) */}
           <StickyCTA T={T} hide={hideCTAs} />
           <MobileActionFab hide={hideCTAs} />
 
