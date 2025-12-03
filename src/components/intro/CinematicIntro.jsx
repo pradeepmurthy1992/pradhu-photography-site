@@ -1,20 +1,45 @@
 // src/components/intro/CinematicIntro.jsx
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useMemo, useState } from "react";
 import { useCinematicCovers } from "@/features/portfolio/useCinematicCovers";
 import { CINEMATIC_IMAGES_FALLBACK } from "@/app/config";
 
-const DISPLAY_MS = 1800; // ~1.8s per image → snappier & cinematic
+const DISPLAY_MS = 1800; // ~1.8s per focused image
 
 export default function CinematicIntro({ onDone }) {
   const { covers, loading } = useCinematicCovers();
 
-  // If dynamic covers available, use them; else fall back to config list
+  // Use dynamic covers if available, else fallback from config
   const images =
     (covers && covers.length ? covers : CINEMATIC_IMAGES_FALLBACK) || [];
 
   const [idx, setIdx] = useState(0);
 
-  // Advance frames
+  // Precompute random meta for background floating images
+  const bgMeta = useMemo(() => {
+    if (!images.length) return [];
+    const unique = Array.from(new Set(images)); // avoid duplicates
+    return unique.slice(0, 7).map((src) => ({
+      src,
+      top: 20 + Math.random() * 55, // 20–75% of height
+      left: 10 + Math.random() * 80, // 10–90% of width
+      size: 22 + Math.random() * 18, // 22–40 vw
+      opacity: 0.18 + Math.random() * 0.22,
+      duration: 8000 + Math.random() * 5000, // 8–13s float
+      delay: Math.random() * 4000, // staggered
+    }));
+  }, [images]);
+
+  // Lock page scroll while overlay is active
+  useEffect(() => {
+    if (typeof document === "undefined") return;
+    const prev = document.body.style.overflow;
+    document.body.style.overflow = "hidden";
+    return () => {
+      document.body.style.overflow = prev;
+    };
+  }, []);
+
+  // Advance focused image
   useEffect(() => {
     if (!images.length) return;
 
@@ -25,14 +50,14 @@ export default function CinematicIntro({ onDone }) {
     return () => window.clearInterval(id);
   }, [images]);
 
-  // Auto-close after a few frames
+  // Auto-close after a short reel
   useEffect(() => {
     if (!images.length) {
-      const id = window.setTimeout(() => onDone && onDone(), 800);
+      const id = window.setTimeout(() => onDone && onDone(), 900);
       return () => window.clearTimeout(id);
     }
 
-    const framesToShow = Math.min(images.length, 5); // show up to 5 frames
+    const framesToShow = Math.min(images.length, 5); // up to 5 key frames
     const total = framesToShow * DISPLAY_MS + 1200;
 
     const id = window.setTimeout(() => {
@@ -45,9 +70,7 @@ export default function CinematicIntro({ onDone }) {
   if (!images.length && loading) {
     return (
       <div className="fixed inset-0 z-[60] flex items-center justify-center bg-black">
-        <p className="text-xs tracking-[0.3em] uppercase text-slate-400">
-          Loading gallery…
-        </p>
+        {/* No visible text requested, so keep this visually empty */}
       </div>
     );
   }
@@ -55,63 +78,50 @@ export default function CinematicIntro({ onDone }) {
   const current = images[idx] || images[0];
 
   return (
-    <div className="fixed inset-0 z-[60] bg-black flex flex-col cinematic-root">
-      {/* Main visual area */}
-      <div className="relative flex-1 flex items-center justify-center cinematic-frame">
-        {/* Soft background glow */}
+    <div
+      className="fixed inset-0 z-[60] bg-black cinematic-root"
+      aria-hidden="true"
+    >
+      <div className="relative h-full w-full flex items-center justify-center cinematic-frame">
+        {/* Soft dark gradient background */}
         <div className="absolute inset-0 bg-[radial-gradient(circle_at_center,_rgba(15,23,42,0.9),_black)]" />
 
-        {/* Top & bottom letterbox (cinema bars) */}
+        {/* Cinema bars */}
         <div className="cinematic-bars" aria-hidden="true" />
 
+        {/* Blurry floating background images */}
+        {bgMeta.map((m, i) => (
+          <img
+            key={`${m.src}-${i}`}
+            src={m.src}
+            alt=""
+            className="cinematic-bg-img"
+            style={{
+              top: `${m.top}%`,
+              left: `${m.left}%`,
+              width: `${m.size}vw`,
+              opacity: m.opacity,
+              animationDuration: `${m.duration}ms`,
+              animationDelay: `${m.delay}ms`,
+            }}
+          />
+        ))}
+
+        {/* Focused main image */}
         {current && (
           <img
             key={current}
             src={current}
-            alt="Cinematic preview"
+            alt=""
             className="
               cinematic-image
               max-h-[72vh] max-w-[92vw]
               object-cover
-              rounded-[2rem]
+              rounded-[2.2rem]
               shadow-2xl shadow-black/80
             "
           />
         )}
-
-        {/* Tiny tag in top-left */}
-        <div className="absolute left-6 top-6 sm:left-10 sm:top-8 text-[0.65rem] uppercase tracking-[0.35em] text-slate-300/80">
-          PRADHU REEL · 01
-        </div>
-      </div>
-
-      {/* Bottom copy & button */}
-      <div className="relative z-10 w-full px-6 pb-10 pt-4 sm:px-12 sm:pb-14 sm:pt-6 lg:px-20 lg:pb-20">
-        <div className="max-w-3xl">
-          <p className="text-[0.7rem] font-semibold uppercase tracking-[0.4em] text-emerald-300">
-            Pradhu Photography
-          </p>
-          <h2 className="mt-3 text-2xl sm:text-3xl lg:text-4xl font-semibold text-white">
-            A quick cinematic glimpse before you enter.
-          </h2>
-          <p className="mt-2 max-w-xl text-sm text-slate-200">
-            Frames from fashion, portraits and couples — playing as a teaser
-            before you step into the full site.
-          </p>
-
-          <div className="mt-5 flex flex-wrap gap-3 items-center">
-            <button
-              type="button"
-              onClick={onDone}
-              className="inline-flex items-center justify-center rounded-full bg-emerald-500 px-6 py-2.5 text-xs font-semibold uppercase tracking-[0.2em] text-white shadow-md shadow-emerald-500/40 hover:bg-emerald-400"
-            >
-              Enter site
-            </button>
-            <span className="text-[0.7rem] uppercase tracking-[0.26em] text-slate-400">
-              Auto-continue in a moment…
-            </span>
-          </div>
-        </div>
       </div>
     </div>
   );
