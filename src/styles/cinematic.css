@@ -119,10 +119,10 @@
 /* ===== Cinematic overlay look & feel ===== */
 
 .cinematic-root {
-  /* subtle film grain overlay using noise-ish gradient */
   position: relative;
 }
 
+/* Subtle noise / glow layer */
 .cinematic-root::before {
   content: "";
   pointer-events: none;
@@ -130,18 +130,18 @@
   inset: 0;
   opacity: 0.25;
   mix-blend-mode: soft-light;
-  background-image: radial-gradient(circle at 0 0, #ffffff11 0, transparent 40%),
+  background-image:
+    radial-gradient(circle at 0 0, #ffffff11 0, transparent 40%),
     radial-gradient(circle at 100% 0, #ffffff0d 0, transparent 45%),
     radial-gradient(circle at 0 100%, #00000022 0, transparent 50%);
 }
 
-/* Container for the main image */
 .cinematic-frame {
   position: relative;
   overflow: hidden;
 }
 
-/* Black cinema bars at top and bottom */
+/* Top & bottom black bars (cinema look) */
 .cinematic-bars::before,
 .cinematic-bars::after {
   content: "";
@@ -149,7 +149,7 @@
   left: 0;
   right: 0;
   height: 9vh;
-  background: radial-gradient(circle at center, #020617, #000);
+  background: radial-gradient(circle at center, #020617, #000000);
   z-index: 5;
 }
 
@@ -161,7 +161,32 @@
   bottom: 0;
 }
 
-/* Image animation: fade-in + Ken Burns zoom */
+/* Blurred floating background thumbnails */
+.cinematic-bg-img {
+  position: absolute;
+  transform: translate(-50%, -50%);
+  object-fit: cover;
+  border-radius: 1.6rem;
+  filter: blur(8px);
+  pointer-events: none;
+  animation-name: pradhu-cine-float;
+  animation-timing-function: ease-in-out;
+  animation-iteration-count: infinite;
+  animation-direction: alternate;
+}
+
+@keyframes pradhu-cine-float {
+  from {
+    transform: translate(-50%, -50%) scale(1);
+    filter: blur(8px);
+  }
+  to {
+    transform: translate(-46%, -54%) scale(1.05);
+    filter: blur(10px);
+  }
+}
+
+/* Focused image: fade + Ken Burns zoom */
 .cinematic-image {
   opacity: 0;
   animation: pradhu-cine-frame 1800ms ease-out forwards;
@@ -177,4 +202,3 @@
     transform: scale(1.12) translate3d(-1%, -1%, 0);
   }
 }
-
