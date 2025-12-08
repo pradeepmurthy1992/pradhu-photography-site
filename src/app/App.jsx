@@ -8,6 +8,7 @@ import {
   INTRO_BRAND,
   INTRO_NAME,
   INTRO_LEFT_IMAGE_URL,
+  INTRO_REMEMBER,
 } from "./config";
 
 import { useHashRoute } from "@/hooks/useHashRoute";
@@ -45,13 +46,29 @@ function getInitialTheme() {
   return prefersDark ? "dark" : "dark"; // default to dark
 }
 
+// Decide if we should show intro on first load
+function shouldShowIntro() {
+  // If you ever want to disable entirely
+  if (!INTRO_REMEMBER) return true;
+
+  if (typeof window === "undefined") return true;
+
+  try {
+    const seen = window.localStorage.getItem("pradhu:introSeen");
+    // Show only if we have NOT marked it as seen
+    return seen !== "yes";
+  } catch {
+    return true;
+  }
+}
+
 export default function App() {
   const [theme, setTheme] = useState(getInitialTheme);
   const { T } = useThemeTokens(theme);
   const { path, setPath } = useHashRoute();
 
-  // Always show intro on refresh (for now)
-  const [showIntro, setShowIntro] = useState(true);
+  // Intro shows only until user closes it once in this browser
+  const [showIntro, setShowIntro] = useState(shouldShowIntro);
 
   // Persist theme
   useEffect(() => {
@@ -63,10 +80,15 @@ export default function App() {
   }, [theme]);
 
   const handleCloseIntro = useCallback(() => {
-    // Just hide the intro for this session
+    // Hide intro for current view
     setShowIntro(false);
 
     try {
+      // Remember that intro was seen in this browser
+      if (INTRO_REMEMBER && typeof window !== "undefined") {
+        window.localStorage.setItem("pradhu:introSeen", "yes");
+      }
+
       // If you're on the forced intro hash, move back to home
       if (
         typeof window !== "undefined" &&
@@ -117,7 +139,7 @@ export default function App() {
 
   return (
     <div className="min-h-screen text-sm md:text-base">
-      {/* Intro overlay (simple, no cinematic) */}
+      {/* Intro overlay */}
       {showIntro && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/80 backdrop-blur">
           <div className="relative mx-4 flex max-w-4xl flex-col overflow-hidden rounded-3xl border border-emerald-500/40 bg-slate-950/95 shadow-2xl md:flex-row">
@@ -139,8 +161,8 @@ export default function App() {
                 {INTRO_NAME || "Cinematic portraits & fashion stories"}
               </h1>
               <p className="text-sm text-slate-200">
-                Portraits, editorials and portfolios
-                shot across Bengalur,Chennai,Pune,Mumbai and beyond.
+                Portraits, editorials and portfolios shot across Bengaluru,
+                Chennai, Pune, Mumbai and beyond.
               </p>
               <p className="text-xs text-slate-400">
                 Hit “Enter studio” to step into the full website and explore the
@@ -257,8 +279,6 @@ function renderRoute(path, { T, theme, setTheme, onNavigate }) {
       </>
     );
   }
-
-  // No separate /faq page anymore
 
   if (clean === "/contact") {
     return (
