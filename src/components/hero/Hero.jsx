@@ -5,7 +5,7 @@ import {
   WHATSAPP_NUMBER,
   IG_USERNAME,
 } from "@/app/config";
-import { Icon } from "@/components/common/Icon";
+import Icon from "@/components/common/Icon";
 
 function buildWhatsAppUrl() {
   if (!WHATSAPP_NUMBER) return null;
@@ -22,7 +22,6 @@ export default function Hero() {
       className="
         relative overflow-hidden
         w-full
-        min-h-[80vh]
         bg-gradient-to-br from-slate-950 via-slate-900 to-slate-950
       "
       aria-labelledby="hero-heading"
@@ -41,9 +40,19 @@ export default function Hero() {
         </div>
       )}
 
-      {/* Content: full-width with large side paddings (no max-w box) */}
-      <div className="relative z-10 w-full px-4 sm:px-8 lg:px-16 xl:px-24 2xl:px-32 py-12 sm:py-16 lg:py-20">
-        <div className="flex flex-col gap-10 xl:flex-row xl:items-end xl:justify-between">
+      {/* Content wrapper pinned near bottom */}
+      <div
+        className="
+          relative z-10
+          w-full
+          min-h-[82vh]
+          flex items-end
+          px-4 sm:px-8 lg:px-16 xl:px-24 2xl:px-32
+          pt-24 sm:pt-28 lg:pt-32
+          pb-10 sm:pb-12 lg:pb-16
+        "
+      >
+        <div className="flex w-full flex-col gap-10 xl:flex-row xl:items-end xl:justify-between">
           {/* LEFT: main headline & CTAs */}
           <div className="max-w-3xl space-y-7">
             <div className="space-y-4">
@@ -58,7 +67,7 @@ export default function Hero() {
               </h1>
               <p className="max-w-2xl text-sm text-slate-200 sm:text-base">
                 Editorial-style photoshoots that feel effortless, look timeless
-                & tell your story in every frame.
+                &amp; tell your story in every frame.
               </p>
             </div>
 
@@ -109,14 +118,14 @@ export default function Hero() {
           </div>
 
           {/* RIGHT: shoot types + IG card */}
-          <div className="flex flex-col gap-4 text-sm text-slate-100 sm:flex-row sm:items-end xl:flex-col xl:text-right max-w-lg xl:max-w-md">
+          <div className="flex max-w-lg flex-col gap-4 text-sm text-slate-100 sm:flex-row sm:items-end xl:flex-col xl:text-right xl:max-w-md">
             <div className="space-y-2 rounded-2xl border border-white/10 bg-black/30 px-4 py-3 backdrop-blur">
               <p className="text-[0.7rem] font-semibold uppercase tracking-[0.22em] text-slate-400">
                 SHOOT TYPES
               </p>
               <p className="text-xs text-slate-50">
-                Model & actor portfolios · Editorial · Designer lookbooks ·
-                Couple & pre-wedding · Brand campaigns.
+                Model &amp; actor portfolios · Editorial · Designer lookbooks ·
+                Couple &amp; pre-wedding · Brand campaigns.
               </p>
             </div>
 
@@ -144,7 +153,7 @@ export default function Hero() {
 
         {/* Mobile FAB row (WhatsApp + Call) */}
         {waUrl && (
-          <div className="mt-6 flex items-center justify-between gap-3 sm:hidden">
+          <div className="mt-6 flex w-full items-center justify-between gap-3 sm:hidden">
             <a
               href={waUrl}
               target="_blank"
