@@ -5,7 +5,7 @@ import {
   WHATSAPP_NUMBER,
   IG_USERNAME,
 } from "@/app/config";
-import Icon from "@/components/common/Icon";
+import { Icon } from "@/components/common/Icon";
 
 function buildWhatsAppUrl() {
   if (!WHATSAPP_NUMBER) return null;
@@ -43,12 +43,9 @@ export default function Hero() {
 
       {/* Content: full-width with large side paddings (no max-w box) */}
       <div className="relative z-10 w-full px-4 sm:px-8 lg:px-16 xl:px-24 2xl:px-32 py-12 sm:py-16 lg:py-20">
-                <div className="flex min-h-[70vh] flex-col justify-end gap-10 xl:flex-row xl:items-end xl:justify-between">
-
+        <div className="flex flex-col gap-10 xl:flex-row xl:items-end xl:justify-between">
           {/* LEFT: main headline & CTAs */}
           <div className="max-w-3xl space-y-7">
-            {/* Removed the small PRADHU PHOTOGRAPHY chip here */}
-
             <div className="space-y-4">
               <h1
                 id="hero-heading"
@@ -60,7 +57,8 @@ export default function Hero() {
                 </span>
               </h1>
               <p className="max-w-2xl text-sm text-slate-200 sm:text-base">
-                Editorial-style photoshoots that feel effortless, look timeless & tell your story in every frame.
+                Editorial-style photoshoots that feel effortless, look timeless
+                & tell your story in every frame.
               </p>
             </div>
 
@@ -117,7 +115,8 @@ export default function Hero() {
                 SHOOT TYPES
               </p>
               <p className="text-xs text-slate-50">
-                Portfolios · Editorial · Designer lookbooks · Couple & pre-wedding . Headshots.
+                Model & actor portfolios · Editorial · Designer lookbooks ·
+                Couple & pre-wedding · Brand campaigns.
               </p>
             </div>
 
@@ -135,6 +134,7 @@ export default function Hero() {
                   See latest work on{" "}
                   <span className="font-semibold">@{IG_USERNAME}</span>
                   <span className="block text-[0.7rem] text-slate-300">
+                    Reels · BTS · before/after edits
                   </span>
                 </span>
               </a>
