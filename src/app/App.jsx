@@ -144,13 +144,28 @@ export default function App() {
   }, [showIntro, handleCloseIntro]);
 
   // Basic per-route SEO title/description
-  useRouteSeo(path);
+useRouteSeo(path);
 
-  // Decide where to hide global CTAs (Home + Contact)
-  const cleanPath = (path || "/").replace(/\/+$/, "") || "/";
-  const isHome = cleanPath === "/" || cleanPath === "/home";
-  const isContact = cleanPath === "/contact";
-  const hideCTAs = isHome || isContact;
+// Normalize path for CTAs & analytics
+const cleanPath = (path || "/").replace(/\/+$/, "") || "/";
+
+// --- Google Analytics: clean page names ---
+
+// Initialize GA once
+useEffect(() => {
+  initAnalytics();
+}, []);
+
+// Track a page view whenever cleanPath changes
+useEffect(() => {
+  trackPageView(cleanPath);
+}, [cleanPath]);
+
+// Decide where to hide global CTAs (Home + Contact)
+const isHome = cleanPath === "/" || cleanPath === "/home";
+const isContact = cleanPath === "/contact";
+const hideCTAs = isHome || isContact;
+
 
   const handleNavigate = (to) => {
     setPath(to);
