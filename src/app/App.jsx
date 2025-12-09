@@ -1,6 +1,8 @@
 // src/app/App.jsx
 import React, { useEffect, useState, useCallback } from "react";
 import { useThemeTokens } from "./themeTokens";
+import { initAnalytics, trackPageView } from "@/utils/analytics";
+
 import {
   BRAND_NAME,
   INTRO_AUTO_DISMISS_MS,
@@ -66,6 +68,33 @@ export default function App() {
   const [theme, setTheme] = useState(getInitialTheme);
   const { T } = useThemeTokens(theme);
   const { path, setPath } = useHashRoute();
+
+    // --- Google Analytics: init on first load, track on route change ---
+
+  // Run once when the app first loads
+  useEffect(() => {
+    // Start GA connection
+    initAnalytics();
+
+    // Send initial page view (includes hash)
+    const initialPath =
+      window.location.pathname +
+      window.location.search +
+      window.location.hash;
+
+    trackPageView(initialPath);
+  }, []);
+
+  // Run every time the route/path changes
+  useEffect(() => {
+    const pathFull =
+      window.location.pathname +
+      window.location.search +
+      window.location.hash;
+
+    trackPageView(pathFull);
+  }, [path]);
+
 
   // Intro shows only until user closes it once in this browser
   const [showIntro, setShowIntro] = useState(shouldShowIntro);
