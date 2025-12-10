@@ -22,6 +22,7 @@ export default function Hero() {
       className="
         relative overflow-hidden
         w-full
+        min-h-[80vh]
         bg-gradient-to-br from-slate-950 via-slate-900 to-slate-950
       "
       aria-labelledby="hero-heading"
@@ -40,19 +41,9 @@ export default function Hero() {
         </div>
       )}
 
-      {/* Content wrapper pinned near bottom */}
-      <div
-        className="
-          relative z-10
-          w-full
-          min-h-[82vh]
-          flex items-end
-          px-4 sm:px-8 lg:px-16 xl:px-24 2xl:px-32
-          pt-24 sm:pt-28 lg:pt-32
-          pb-10 sm:pb-12 lg:pb-16
-        "
-      >
-        <div className="flex w-full flex-col gap-10 xl:flex-row xl:items-end xl:justify-between">
+      {/* Content: full-width with large side paddings (no max-w box) */}
+      <div className="relative z-10 w-full px-4 sm:px-8 lg:px-16 xl:px-24 2xl:px-32 py-10 sm:py-16 lg:py-20">
+        <div className="flex flex-col gap-8 md:gap-10 xl:flex-row xl:items-end xl:justify-between">
           {/* LEFT: main headline & CTAs */}
           <div className="max-w-3xl space-y-7">
             <div className="space-y-4">
@@ -115,10 +106,43 @@ export default function Hero() {
                 <span>View Portfolio</span>
               </a>
             </div>
+
+            {/* Mobile: compact shoot types + IG info */}
+            <div className="mt-4 space-y-3 text-xs text-slate-200 sm:hidden">
+              <div>
+                <p className="text-[0.7rem] font-semibold uppercase tracking-[0.22em] text-slate-400">
+                  SHOOT TYPES
+                </p>
+                <p className="mt-1 text-[0.78rem] leading-relaxed">
+                  Model &amp; actor portfolios · Editorial · Designer lookbooks
+                  · Couple &amp; pre-wedding · Brand campaigns.
+                </p>
+              </div>
+
+              {IG_USERNAME && (
+                <a
+                  href={`https://instagram.com/${IG_USERNAME}`}
+                  target="_blank"
+                  rel="noreferrer"
+                  className="inline-flex items-center gap-2 rounded-2xl border border-pink-500/40 bg-black/40 px-3 py-2 text-[0.78rem] font-medium text-slate-50 hover:bg-pink-500/10"
+                >
+                  <span className="inline-flex h-7 w-7 items-center justify-center rounded-full bg-gradient-to-tr from-yellow-400 via-pink-500 to-purple-600">
+                    <Icon name="instagram" size={14} />
+                  </span>
+                  <span className="text-left leading-snug">
+                    Latest work on{" "}
+                    <span className="font-semibold">@{IG_USERNAME}</span>
+                    <span className="block text-[0.7rem] text-slate-300">
+                      Reels · BTS · before/after edits
+                    </span>
+                  </span>
+                </a>
+              )}
+            </div>
           </div>
 
-          {/* RIGHT: shoot types + IG card */}
-          <div className="flex max-w-lg flex-col gap-4 text-sm text-slate-100 sm:flex-row sm:items-end xl:flex-col xl:text-right xl:max-w-md">
+          {/* RIGHT: shoot types + IG card (desktop / tablet only) */}
+          <div className="hidden md:flex flex-col gap-4 text-sm text-slate-100 md:flex-row md:items-end xl:flex-col xl:text-right max-w-lg xl:max-w-md">
             <div className="space-y-2 rounded-2xl border border-white/10 bg-black/30 px-4 py-3 backdrop-blur">
               <p className="text-[0.7rem] font-semibold uppercase tracking-[0.22em] text-slate-400">
                 SHOOT TYPES
@@ -153,7 +177,7 @@ export default function Hero() {
 
         {/* Mobile FAB row (WhatsApp + Call) */}
         {waUrl && (
-          <div className="mt-6 flex w-full items-center justify-between gap-3 sm:hidden">
+          <div className="mt-6 flex items-center justify-between gap-3 sm:hidden">
             <a
               href={waUrl}
               target="_blank"
