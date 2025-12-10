@@ -148,7 +148,7 @@ export default function Hero() {
         "
       >
         {/* inner row like before */}
-        <div className="flex w-full flex-col gap-10 xl:flex-row xl:items-end xl:justify-between">
+        <div className="flex w-full flex-col gap-10 lg:flex-row lg:items-end lg:justify-between">
           {/* LEFT: headline + text + desktop CTAs */}
           <div className="max-w-3xl space-y-7">
             <div className="space-y-4">
@@ -211,7 +211,7 @@ export default function Hero() {
           </div>
 
           {/* RIGHT: shoot types + IG card (bottom/right) */}
-          <div className="flex flex-col gap-4 text-sm text-slate-100 sm:flex-row sm:items-end xl:flex-col xl:text-right max-w-lg xl:max-w-md">
+          <div className="flex flex-col gap-4 text-sm text-slate-100 lg:w-[360px] lg:ml-auto lg:text-right">
             <div className="space-y-2 rounded-2xl border border-white/10 bg-black/30 px-4 py-3 backdrop-blur">
               <p className="text-[0.7rem] font-semibold uppercase tracking-[0.22em] text-slate-400">
                 SHOOT TYPES
