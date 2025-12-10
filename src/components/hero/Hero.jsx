@@ -134,16 +134,25 @@ export default function Hero() {
 
       {/* ==========================
           DESKTOP/TABLET (≥ md)
-          Original layout restored
+          ORIGINAL LAYOUT, BOTTOM-ALIGNED
           ========================== */}
-      <div className="relative z-10 hidden w-full px-4 sm:px-8 lg:px-16 xl:px-24 2xl:px-32 py-12 sm:py-16 lg:py-20 md:block">
-        <div className="flex flex-col gap-10 xl:flex-row xl:items-end xl:justify-between">
+      <div
+        className="
+          relative z-10
+          hidden md:flex
+          w-full
+          min-h-[80vh]
+          items-end
+          px-4 sm:px-8 lg:px-16 xl:px-24 2xl:px-32
+          pt-8 pb-16
+        "
+      >
+        {/* inner row like before */}
+        <div className="flex w-full flex-col gap-10 xl:flex-row xl:items-end xl:justify-between">
           {/* LEFT: headline + text + desktop CTAs */}
           <div className="max-w-3xl space-y-7">
             <div className="space-y-4">
-              <h1
-                className="text-balance text-4xl font-semibold tracking-tight text-white sm:text-5xl lg:text-[3.3rem] leading-tight"
-              >
+              <h1 className="text-balance text-4xl font-semibold tracking-tight text-white sm:text-5xl lg:text-[3.3rem] leading-tight">
                 Collect your Treasure
                 <span className="block text-emerald-300">
                   ONE PIECE at a time.
@@ -201,7 +210,7 @@ export default function Hero() {
             </div>
           </div>
 
-          {/* RIGHT: shoot types + IG card (original desktop layout) */}
+          {/* RIGHT: shoot types + IG card (bottom/right) */}
           <div className="flex flex-col gap-4 text-sm text-slate-100 sm:flex-row sm:items-end xl:flex-col xl:text-right max-w-lg xl:max-w-md">
             <div className="space-y-2 rounded-2xl border border-white/10 bg-black/30 px-4 py-3 backdrop-blur">
               <p className="text-[0.7rem] font-semibold uppercase tracking-[0.22em] text-slate-400">
