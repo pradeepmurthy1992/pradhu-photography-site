@@ -27,7 +27,7 @@ export default function Hero() {
       "
       aria-labelledby="hero-heading"
     >
-      {/* Background image fills full width */}
+      {/* Background image (shared) */}
       {HERO_BG_URL && (
         <div className="pointer-events-none absolute inset-0">
           <img
@@ -41,14 +41,107 @@ export default function Hero() {
         </div>
       )}
 
-      {/* Content: full-width with large side paddings (no max-w box) */}
-      <div className="relative z-10 w-full px-4 sm:px-8 lg:px-16 xl:px-24 2xl:px-32 py-10 sm:py-16 lg:py-20">
-        <div className="flex flex-col gap-8 md:gap-10 xl:flex-row xl:items-end xl:justify-between">
-          {/* LEFT: main headline & CTAs */}
+      {/* =======================
+          MOBILE LAYOUT  (< md)
+          ======================= */}
+      <div className="relative z-10 w-full px-4 py-10 md:hidden">
+        <div className="space-y-6">
+          <header className="space-y-4">
+            <h1
+              id="hero-heading"
+              className="text-balance text-4xl font-semibold tracking-tight text-white sm:text-5xl leading-tight"
+            >
+              Collect your Treasure
+              <span className="block text-emerald-300">
+                ONE PIECE at a time.
+              </span>
+            </h1>
+            <p className="text-sm text-slate-200">
+              Editorial-style photoshoots that feel effortless, look timeless
+              &amp; tell your story in every frame.
+            </p>
+          </header>
+
+          {/* Cities */}
+          {Array.isArray(SERVICE_CITIES) && SERVICE_CITIES.length > 0 && (
+            <p className="flex flex-wrap items-center gap-2 text-xs text-slate-300">
+              <Icon name="map-pin" size={14} />
+              <span className="uppercase tracking-[0.22em] text-slate-400">
+                BASED IN
+              </span>
+              <span className="font-medium text-slate-100">
+                {SERVICE_CITIES.join(" · ")}
+              </span>
+              <span className="text-slate-400">· Available to travel</span>
+            </p>
+          )}
+
+          {/* Shoot types (compact) */}
+          <div className="space-y-1 text-xs text-slate-200">
+            <p className="text-[0.7rem] font-semibold uppercase tracking-[0.22em] text-slate-400">
+              SHOOT TYPES
+            </p>
+            <p className="text-[0.78rem] leading-relaxed">
+              Model &amp; actor portfolios · Editorial · Designer lookbooks ·
+              Couple &amp; pre-wedding · Brand campaigns.
+            </p>
+          </div>
+
+          {/* IG pill */}
+          {IG_USERNAME && (
+            <a
+              href={`https://instagram.com/${IG_USERNAME}`}
+              target="_blank"
+              rel="noreferrer"
+              className="inline-flex items-center gap-2 rounded-2xl border border-pink-500/40 bg-black/40 px-3 py-2 text-[0.78rem] font-medium text-slate-50 hover:bg-pink-500/10"
+            >
+              <span className="inline-flex h-7 w-7 items-center justify-center rounded-full bg-gradient-to-tr from-yellow-400 via-pink-500 to-purple-600">
+                <Icon name="instagram" size={14} />
+              </span>
+              <span className="text-left leading-snug">
+                Latest work on{" "}
+                <span className="font-semibold">@{IG_USERNAME}</span>
+                <span className="block text-[0.7rem] text-slate-300">
+                  Reels · BTS · before/after edits
+                </span>
+              </span>
+            </a>
+          )}
+
+          {/* Big WhatsApp + Call row */}
+          {waUrl && (
+            <div className="mt-4 flex items-center justify-between gap-3">
+              <a
+                href={waUrl}
+                target="_blank"
+                rel="noreferrer"
+                className="inline-flex flex-1 items-center justify-center gap-2 rounded-full bg-emerald-500 px-4 py-2.5 text-xs font-semibold uppercase tracking-[0.2em] text-white shadow-md shadow-emerald-500/40"
+              >
+                <Icon name="whatsapp" size={16} />
+                <span>WhatsApp</span>
+              </a>
+              <a
+                href="tel:+91XXXXXXXXXX"
+                className="inline-flex h-11 w-11 items-center justify-center rounded-full border border-emerald-400/70 bg-black/60 text-emerald-200"
+                aria-label="Call"
+              >
+                <Icon name="phone" size={18} />
+              </a>
+            </div>
+          )}
+        </div>
+      </div>
+
+      {/* ==========================
+          DESKTOP/TABLET (≥ md)
+          Original layout restored
+          ========================== */}
+      <div className="relative z-10 hidden w-full px-4 sm:px-8 lg:px-16 xl:px-24 2xl:px-32 py-12 sm:py-16 lg:py-20 md:block">
+        <div className="flex flex-col gap-10 xl:flex-row xl:items-end xl:justify-between">
+          {/* LEFT: headline + text + desktop CTAs */}
           <div className="max-w-3xl space-y-7">
             <div className="space-y-4">
               <h1
-                id="hero-heading"
                 className="text-balance text-4xl font-semibold tracking-tight text-white sm:text-5xl lg:text-[3.3rem] leading-tight"
               >
                 Collect your Treasure
@@ -76,7 +169,7 @@ export default function Hero() {
               </p>
             )}
 
-            {/* Desktop CTAs */}
+            {/* Desktop CTAs (3 buttons row) */}
             <div className="hidden gap-3 pt-2 sm:flex">
               <a
                 href="#/contact"
@@ -106,43 +199,10 @@ export default function Hero() {
                 <span>View Portfolio</span>
               </a>
             </div>
-
-            {/* Mobile: compact shoot types + IG info */}
-            <div className="mt-4 space-y-3 text-xs text-slate-200 sm:hidden">
-              <div>
-                <p className="text-[0.7rem] font-semibold uppercase tracking-[0.22em] text-slate-400">
-                  SHOOT TYPES
-                </p>
-                <p className="mt-1 text-[0.78rem] leading-relaxed">
-                  Model &amp; actor portfolios · Editorial · Designer lookbooks
-                  · Couple &amp; pre-wedding · Brand campaigns.
-                </p>
-              </div>
-
-              {IG_USERNAME && (
-                <a
-                  href={`https://instagram.com/${IG_USERNAME}`}
-                  target="_blank"
-                  rel="noreferrer"
-                  className="inline-flex items-center gap-2 rounded-2xl border border-pink-500/40 bg-black/40 px-3 py-2 text-[0.78rem] font-medium text-slate-50 hover:bg-pink-500/10"
-                >
-                  <span className="inline-flex h-7 w-7 items-center justify-center rounded-full bg-gradient-to-tr from-yellow-400 via-pink-500 to-purple-600">
-                    <Icon name="instagram" size={14} />
-                  </span>
-                  <span className="text-left leading-snug">
-                    Latest work on{" "}
-                    <span className="font-semibold">@{IG_USERNAME}</span>
-                    <span className="block text-[0.7rem] text-slate-300">
-                      Reels · BTS · before/after edits
-                    </span>
-                  </span>
-                </a>
-              )}
-            </div>
           </div>
 
-          {/* RIGHT: shoot types + IG card (desktop / tablet only) */}
-          <div className="hidden md:flex flex-col gap-4 text-sm text-slate-100 md:flex-row md:items-end xl:flex-col xl:text-right max-w-lg xl:max-w-md">
+          {/* RIGHT: shoot types + IG card (original desktop layout) */}
+          <div className="flex flex-col gap-4 text-sm text-slate-100 sm:flex-row sm:items-end xl:flex-col xl:text-right max-w-lg xl:max-w-md">
             <div className="space-y-2 rounded-2xl border border-white/10 bg-black/30 px-4 py-3 backdrop-blur">
               <p className="text-[0.7rem] font-semibold uppercase tracking-[0.22em] text-slate-400">
                 SHOOT TYPES
@@ -174,28 +234,6 @@ export default function Hero() {
             )}
           </div>
         </div>
-
-        {/* Mobile FAB row (WhatsApp + Call) */}
-        {waUrl && (
-          <div className="mt-6 flex items-center justify-between gap-3 sm:hidden">
-            <a
-              href={waUrl}
-              target="_blank"
-              rel="noreferrer"
-              className="inline-flex flex-1 items-center justify-center gap-2 rounded-full bg-emerald-500 px-4 py-2.5 text-xs font-semibold uppercase tracking-[0.2em] text-white shadow-md shadow-emerald-500/40"
-            >
-              <Icon name="whatsapp" size={16} />
-              <span>WhatsApp</span>
-            </a>
-            <a
-              href="tel:+91XXXXXXXXXX"
-              className="inline-flex h-11 w-11 items-center justify-center rounded-full border border-emerald-400/70 bg-black/60 text-emerald-200"
-              aria-label="Call"
-            >
-              <Icon name="phone" size={18} />
-            </a>
-          </div>
-        )}
       </div>
     </section>
   );
