@@ -16,7 +16,7 @@ export default function ContactPage({ T, theme }) {
     email: "",
     phone: "",
     service: "Portraits",
-    city: "Pune",
+    city: "Bengaluru",
     date: "",
     message: "",
   });
@@ -114,7 +114,7 @@ export default function ContactPage({ T, theme }) {
         email: "",
         phone: "",
         service: "Portraits",
-        city: "Pune",
+        city: "Bengaluru",
         date: "",
         message: "",
       });
