@@ -1,0 +1,4 @@
+User-agent: *
+Allow: /
+
+Sitemap: https://pradhuphotography.in/sitemap.xml
