@@ -178,7 +178,7 @@ export default function App() {
               </h1>
               <p className="text-sm text-slate-200">
                 Portraits, editorials and portfolios shot across Bengaluru,
-                Chennai, Pune, Mumbai and beyond.
+                Chennai, Bengaluru, Pune, Mumbai and beyond.
               </p>
               <p className="text-xs text-slate-400">
                 Hit “Enter studio” to step into the full website and explore the
@@ -336,7 +336,7 @@ function useRouteSeo(path) {
   // Alias /faq → home for SEO as well
   if (clean === "/faq") clean = "/";
 
-  let title = "PRADHU Photography · Pune Portrait & Fashion Photographer";
+  let title = "PRADHU Photography · Bengaluru Portrait & Fashion Photographer";
   let desc =
     "Pradhu Photography – portraits, fashion, editorial, model portfolios and weddings in Pune. Book a cinematic shoot with clear pricing and fast delivery.";
 
