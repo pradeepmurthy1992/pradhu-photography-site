@@ -14,6 +14,8 @@ import {
 } from "./config";
 
 import { useHashRoute } from "@/hooks/useHashRoute";
+import { useRouteSeo } from "@/hooks/useRouteSeo";
+
 
 // Chrome
 import Navbar from "@/components/chrome/Navbar";
@@ -69,6 +71,8 @@ export default function App() {
   const { T } = useThemeTokens(theme);
   const { path, setPath } = useHashRoute();
 
+    // Update SEO (title + description) whenever path changes
+  useRouteSeo(path);
     // --- Google Analytics: init on first load, track on route change ---
 
   // Run once when the app first loads
