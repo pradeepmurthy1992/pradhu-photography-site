@@ -14,7 +14,7 @@ import {
 } from "./config";
 
 import { useHashRoute } from "@/hooks/useHashRoute";
-import { useRouteSeo } from "@/hooks/useRouteSeo";
+
 
 
 // Chrome
@@ -71,33 +71,29 @@ export default function App() {
   const { T } = useThemeTokens(theme);
   const { path, setPath } = useHashRoute();
 
-    // Update SEO (title + description) whenever path changes
+  // Basic per-route SEO title/description
   useRouteSeo(path);
-    // --- Google Analytics: init on first load, track on route change ---
 
-  // Run once when the app first loads
+  // Normalize path for CTAs & analytics
+  const cleanPath = (path || "/").replace(/\/+$/, "") || "/";
+
+  // --- Google Analytics: init + page views using clean paths ---
+
+  // Initialize GA once
   useEffect(() => {
-    // Start GA connection
     initAnalytics();
-
-    // Send initial page view (includes hash)
-    const initialPath =
-      window.location.pathname +
-      window.location.search +
-      window.location.hash;
-
-    trackPageView(initialPath);
   }, []);
 
-  // Run every time the route/path changes
+  // Track a page view whenever cleanPath changes
   useEffect(() => {
-    const pathFull =
-      window.location.pathname +
-      window.location.search +
-      window.location.hash;
+    trackPageView(cleanPath);
+  }, [cleanPath]);
 
-    trackPageView(pathFull);
-  }, [path]);
+  // Decide where to hide global CTAs (Home + Contact)
+  const isHome = cleanPath === "/" || cleanPath === "/home";
+  const isContact = cleanPath === "/contact";
+  const hideCTAs = isHome || isContact;
+
 
 
   // Intro shows only until user closes it once in this browser
