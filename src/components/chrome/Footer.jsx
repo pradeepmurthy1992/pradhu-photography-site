@@ -51,7 +51,7 @@ export default function Footer({ T, theme = "dark", onNavigate }) {
 
             <p className={`text-sm leading-relaxed ${bodyText}`}>
               Cinematic portraits, editorial stories and real moments across
-              Pune, Mumbai, Chennai &amp; Bengaluru.
+              Bengaluru, Chennai, Pune &amp; Mumbai.
             </p>
             <div className="space-y-1 text-sm">
               <p className={bodyText}>
@@ -134,7 +134,7 @@ export default function Footer({ T, theme = "dark", onNavigate }) {
             </p>
             <p className={`text-sm leading-relaxed ${bodyText}`}>
               Based in Chennai &amp; Bengaluru. Available for travel across
-              Pune, Mumbai, Chennai, Bengaluru and beyond.
+              Bengaluru, Chennai, Pune & Mumbai.
             </p>
           </div>
         </div>
