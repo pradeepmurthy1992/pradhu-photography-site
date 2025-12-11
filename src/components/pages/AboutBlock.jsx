@@ -31,7 +31,7 @@ export default function AboutBlock({ T = {} }) {
         </p>
         <p>
           <span className="font-semibold">Base cities:</span>{" "}
-          Pune · Mumbai · Chennai · Bengaluru (available to travel)
+          Bengaluru · Chennai · Mumbai · Pune (available to travel)
         </p>
       </div>
 
