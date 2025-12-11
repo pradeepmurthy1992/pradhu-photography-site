@@ -15,8 +15,6 @@ import {
 
 import { useHashRoute } from "@/hooks/useHashRoute";
 
-
-
 // Chrome
 import Navbar from "@/components/chrome/Navbar";
 import Footer from "@/components/chrome/Footer";
@@ -94,8 +92,6 @@ export default function App() {
   const isContact = cleanPath === "/contact";
   const hideCTAs = isHome || isContact;
 
-
-
   // Intro shows only until user closes it once in this browser
   const [showIntro, setShowIntro] = useState(shouldShowIntro);
 
@@ -142,30 +138,6 @@ export default function App() {
 
     return () => window.clearTimeout(id);
   }, [showIntro, handleCloseIntro]);
-
-  // Basic per-route SEO title/description
-useRouteSeo(path);
-
-// Normalize path for CTAs & analytics
-const cleanPath = (path || "/").replace(/\/+$/, "") || "/";
-
-// --- Google Analytics: clean page names ---
-
-// Initialize GA once
-useEffect(() => {
-  initAnalytics();
-}, []);
-
-// Track a page view whenever cleanPath changes
-useEffect(() => {
-  trackPageView(cleanPath);
-}, [cleanPath]);
-
-// Decide where to hide global CTAs (Home + Contact)
-const isHome = cleanPath === "/" || cleanPath === "/home";
-const isContact = cleanPath === "/contact";
-const hideCTAs = isHome || isContact;
-
 
   const handleNavigate = (to) => {
     setPath(to);
