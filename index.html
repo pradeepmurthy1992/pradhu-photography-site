@@ -1,83 +1,82 @@
 <!DOCTYPE html>
 <html lang="en">
   <head>
-    <meta charset="UTF-8" />
-    <meta
-      name="viewport"
-      content="width=device-width, initial-scale=1.0, viewport-fit=cover"
-    />
-    <meta name="theme-color" content="#000000" />
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  
+  <!-- Basic SEO -->
+  <title>Pradhu Photography | Fashion, Portrait & Model Portfolio</title>
+  <meta
+    name="description"
+    content="Pradhu Photography – fashion, portrait and model portfolio photographer. Clean, cinematic images for models, designers and brands. Book your next shoot today."
+  />
+  <meta
+    name="keywords"
+    content="Pradhu Photography, fashion photographer, model portfolio, editorial photography, portrait photographer"
+  />
+  <meta name="author" content="Pradhu Photography" />
+  <link rel="canonical" href="https://pradhuphotography.in/" />
 
-    <title>Pradhu Photography</title>
-    <meta
-      name="description"
-      content="Pradhu Photography — Fashion · Portraits · Candids · Portfolio · Professional Headshots · Events."
-    />
+  <!-- Favicon (adjust paths if needed) -->
+  <link rel="icon" type="image/png" href="/favicon.png" />
 
-    <!-- Open Graph (for Facebook / LinkedIn / WhatsApp) -->
-    <meta property="og:title" content="Pradhu Photography" />
-    <meta
-      property="og:description"
-      content="Fashion · Portraits · Candids · Portfolio · Professional Headshots · Events."
-    />
-    <meta
-      property="og:image"
-      content="https://pradeepmurthy1992.github.io/pradhu-site-test/baseimg/02.jpg"
-    />
-    <meta
-      property="og:url"
-      content="https://pradeepmurthy1992.github.io/pradhu-site-test/"
-    />
-    <meta property="og:type" content="website" />
+  <!-- Open Graph / Social share -->
+  <meta property="og:type" content="website" />
+  <meta property="og:site_name" content="Pradhu Photography" />
+  <meta
+    property="og:title"
+    content="Pradhu Photography | Fashion, Portrait & Model Portfolio"
+  />
+  <meta
+    property="og:description"
+    content="Cinematic fashion and portrait photography. Explore the portfolio and book your next shoot."
+  />
+  <meta property="og:url" content="https://pradhuphotography.in/" />
+  <meta
+    property="og:image"
+    content="https://pradhuphotography.in/og-cover.jpg"
+  />
 
-    <!-- Twitter Cards -->
-    <meta name="twitter:card" content="summary_large_image" />
-    <meta name="twitter:title" content="Pradhu Photography" />
-    <meta
-      name="twitter:description"
-      content="Fashion · Portraits · Candids · Portfolio · Professional Headshots · Events."
-    />
-    <meta
-      name="twitter:image"
-      content="https://pradeepmurthy1992.github.io/pradhu-site-test/baseimg/02.jpg"
-    />
+  <!-- Twitter Card -->
+  <meta name="twitter:card" content="summary_large_image" />
+  <meta name="twitter:title" content="Pradhu Photography" />
+  <meta
+    name="twitter:description"
+    content="Fashion, portrait & editorial photography."
+  />
+  <meta
+    name="twitter:image"
+    content="https://pradhuphotography.in/og-cover.jpg"
+  />
 
-    <!-- Preconnect for performance -->
-    <link rel="preconnect" href="https://raw.githubusercontent.com" />
-    <link rel="preconnect" href="https://fonts.googleapis.com" />
-    <link
-      rel="preconnect"
-      href="https://fonts.gstatic.com"
-      crossorigin="anonymous"
-    />
+  <!-- (Optional) Google Search Console verification tag goes here later -->
+  <!-- <meta name="google-site-verification" content="PASTE_CODE_FROM_SEARCH_CONSOLE" /> -->
 
-    <!-- Fonts (loaded dynamically in HeadFonts.jsx too) -->
-    <link
-      href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Playfair+Display:wght@600;700;800;900&display=swap"
-      rel="stylesheet"
-    />
+  <!-- Local Business structured data (fill your real city/phone/email) -->
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "LocalBusiness",
+    "name": "Pradhu Photography",
+    "image": "https://pradhuphotography.in/og-cover.jpg",
+    "url": "https://pradhuphotography.in/",
+    "telephone": "+91-XXXXXXXXXX",
+    "address": {
+      "@type": "PostalAddress",
+      "addressLocality": "Your City",
+      "addressRegion": "Your State",
+      "addressCountry": "IN"
+    },
+    "sameAs": [
+      "https://www.instagram.com/pradhu_photography"
+    ]
+  }
+  </script>
 
-    <!-- Tailwind + global styles -->
-    <link rel="stylesheet" href="/src/styles/globals.css" />
-    <link rel="stylesheet" href="/src/styles/cinematic.css" />
+  <!-- Vite entry point (already present in your file, keep it) -->
+  <script type="module" src="/src/main.jsx"></script>
+</head>
 
-    <!-- Vite injects JS bundle -->
-    <script type="module" src="/src/main.jsx"></script>
-
-    <!-- Google Analytics (optional; replace G-XXXXXXX with your GA4 ID) -->
-    <script
-      async
-      src="https://www.googletagmanager.com/gtag/js?id=G-XXXXXXX"
-    ></script>
-    <script>
-      window.dataLayer = window.dataLayer || [];
-      function gtag() {
-        dataLayer.push(arguments);
-      }
-      gtag("js", new Date());
-      gtag("config", "G-XXXXXXX");
-    </script>
-  </head>
   <body class="antialiased">
     <div id="root"></div>
   </body>
