@@ -1,11 +1,13 @@
 // src/hooks/useRouteSeo.js
 import { useEffect } from "react";
 
+// We will map your SPA paths to nice SEO titles + descriptions.
+// Note: here we use "home", "portfolio", "services", "contact" as keys.
 const SEO_CONFIG = {
   home: {
     title: "Pradhu Photography | Fashion, Portrait & Model Portfolio",
     description:
-      "Cinematic fashion and portrait photography. Explore the latest model portfolios, editorial shoots and personal projects.",
+      "Cinematic fashion and portrait photography. Explore model portfolios, editorial shoots and personal projects.",
   },
   portfolio: {
     title: "Portfolio | Pradhu Photography",
@@ -15,7 +17,7 @@ const SEO_CONFIG = {
   services: {
     title: "Services & Packages | Pradhu Photography",
     description:
-      "Choose from fashion, portrait, model portfolio and brand shoots. Transparent pricing and custom packages available.",
+      "Fashion, portrait, model portfolio and brand shoots. Transparent pricing and custom packages available.",
   },
   contact: {
     title: "Book a Shoot | Pradhu Photography",
@@ -24,14 +26,29 @@ const SEO_CONFIG = {
   },
 };
 
-export function useRouteSeo(routeKey) {
+// This hook expects the *path* string your router already has, e.g.
+// "/", "/portfolio", "/services", "/contact"
+export function useRouteSeo(path) {
   useEffect(() => {
+    // 1) Decide which "route key" this path belongs to
+    let routeKey = "home";
+
+    if (!path || path === "/" || path === "#/" || path === "#") {
+      routeKey = "home";
+    } else if (path.startsWith("/portfolio") || path.startsWith("#/portfolio")) {
+      routeKey = "portfolio";
+    } else if (path.startsWith("/services") || path.startsWith("#/services")) {
+      routeKey = "services";
+    } else if (path.startsWith("/contact") || path.startsWith("#/contact")) {
+      routeKey = "contact";
+    }
+
     const cfg = SEO_CONFIG[routeKey] || SEO_CONFIG.home;
 
-    // Update <title>
+    // 2) Update <title>
     document.title = cfg.title;
 
-    // Update meta description
+    // 3) Update <meta name="description">
     let metaDesc = document.querySelector('meta[name="description"]');
     if (!metaDesc) {
       metaDesc = document.createElement("meta");
@@ -39,5 +56,5 @@ export function useRouteSeo(routeKey) {
       document.head.appendChild(metaDesc);
     }
     metaDesc.setAttribute("content", cfg.description);
-  }, [routeKey]);
+  }, [path]);
 }
