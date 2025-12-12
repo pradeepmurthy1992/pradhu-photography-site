@@ -26,15 +26,6 @@ export default function PortfolioLanding({
   const anyImages = states.some((s) => (s.images?.length || 0) > 0);
   const showMediaBanner = allLoaded && !anyImages;
 
-  // ---- Tap detection for snap carousels (fixes "first click only centers")
-  const tapRef = useRef({ down: false, x: 0, y: 0 });
-  const TAP_MOVE_PX = 10;
-
-  const allLoadedRef = useRef(false);
-  useEffect(() => {
-    allLoadedRef.current = allLoaded;
-  }, [allLoaded]);
-
   // Center the initial category card
   useEffect(() => {
     if (!trackRef.current) return;
@@ -88,52 +79,17 @@ export default function PortfolioLanding({
     };
   }, []);
 
-  const scrollToIdx = (idx, behavior = "smooth") => {
+  const scrollToIdx = (idx) => {
     const clamped = Math.min(cats.length - 1, Math.max(0, idx));
     const el = trackRef.current?.querySelector(`[data-idx="${clamped}"]`);
     el?.scrollIntoView({
-      behavior,
+      behavior: "smooth",
       inline: "center",
       block: "nearest",
     });
   };
 
   const go = (dir) => scrollToIdx(active + dir);
-
-  // ✅ Open immediately, but centering happens as a side-effect (does not require an extra click)
-  const openCatOneClick = (idx, label) => {
-    setActive(idx);
-    requestAnimationFrame(() => scrollToIdx(idx, "smooth"));
-    openCat(label);
-  };
-
-  // ---- Pointer handlers (tap vs swipe)
-  const onCardPointerDown = (e) => {
-    // only left-click for mouse
-    if (e.pointerType === "mouse" && e.button !== 0) return;
-    tapRef.current.down = true;
-    tapRef.current.x = e.clientX;
-    tapRef.current.y = e.clientY;
-  };
-
-  const onCardPointerCancel = () => {
-    tapRef.current.down = false;
-  };
-
-  const onCardPointerUp = (e, idx, label) => {
-    if (!tapRef.current.down) return;
-    tapRef.current.down = false;
-
-    const dx = e.clientX - tapRef.current.x;
-    const dy = e.clientY - tapRef.current.y;
-    const moved = Math.hypot(dx, dy);
-
-    // If user swiped/dragged (to scroll the carousel), don't open.
-    if (moved > TAP_MOVE_PX) return;
-
-    openCatOneClick(idx, label);
-    trackEvent("portfolio_card_open", { category: label });
-  };
 
   // Edge-hover logic for arrows
   const EDGE_ZONE = 88;
@@ -250,6 +206,7 @@ export default function PortfolioLanding({
         <div
           ref={trackRef}
           className="
+            touch-pan-x
             flex gap-3 sm:gap-4 md:gap-5 overflow-x-auto px-2 sm:px-3 md:px-4
             snap-x snap-mandatory
             [scrollbar-width:none] [&::-webkit-scrollbar]:hidden
@@ -259,6 +216,7 @@ export default function PortfolioLanding({
           aria-label="Category cards"
           tabIndex={0}
         >
+          {/* left spacer so first card can center nicely */}
           <div
             className="flex-shrink-0 w-[6%] sm:w-[10%] md:w-[14%]"
             aria-hidden="true"
@@ -282,20 +240,17 @@ export default function PortfolioLanding({
               >
                 <button
                   type="button"
-                  // ✅ Replace click with tap-detection pointers (fixes snap stealing the click)
-                  onPointerDown={onCardPointerDown}
-                  onPointerUp={(e) => onCardPointerUp(e, i, c.label)}
-                  onPointerCancel={onCardPointerCancel}
-                  onPointerLeave={onCardPointerCancel}
-                  // ✅ Keyboard support still opens (Enter / Space)
-                  onKeyDown={(e) => {
-                    if (e.key === "Enter" || e.key === " ") {
-                      e.preventDefault();
-                      openCatOneClick(i, c.label);
-                      trackEvent("portfolio_card_open", { category: c.label });
-                    }
+                  // ✅ Critical: stop mouse-click focus from triggering snap-centering first
+                  // (touch/drag unaffected)
+                  onPointerDown={(e) => {
+                    if (e.pointerType === "mouse") e.preventDefault();
+                  }}
+                  onClick={() => {
+                    openCat(c.label);
+                    trackEvent("portfolio_card_open", { category: c.label });
                   }}
                   className={[
+                    "touch-pan-x",
                     "group block w-full rounded-2xl overflow-hidden border shadow-sm transition-transform duration-200",
                     isActive ? "ring-2 ring-white/80" : "",
                     T.cardBorder,
@@ -334,6 +289,7 @@ export default function PortfolioLanding({
             );
           })}
 
+          {/* right spacer so last card can center nicely */}
           <div
             className="flex-shrink-0 w-[6%] sm:w-[10%] md:w-[14%]"
             aria-hidden="true"
