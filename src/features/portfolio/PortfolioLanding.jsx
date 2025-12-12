@@ -6,6 +6,9 @@ import { trackEvent } from "@/app/track";
 const SHOW_ARROW_NAV = true;
 const SHOW_CHIP_BAR = true;
 
+// IMPORTANT: keep the same key you already use in the app (based on our earlier logic)
+const LAST_CAT_KEY = "pradhu:lastCat";
+
 export default function PortfolioLanding({
   T,
   cats,
@@ -26,7 +29,7 @@ export default function PortfolioLanding({
   const anyImages = states.some((s) => (s.images?.length || 0) > 0);
   const showMediaBanner = allLoaded && !anyImages;
 
-  // Center the initial category card
+  // Center the initial category card (this is your "return to all categories -> last one centered" behavior)
   useEffect(() => {
     if (!trackRef.current) return;
     const idx = Math.min(cats.length - 1, Math.max(0, initialIdx));
@@ -79,17 +82,35 @@ export default function PortfolioLanding({
     };
   }, []);
 
-  const scrollToIdx = (idx) => {
+  const scrollToIdx = (idx, behavior = "smooth") => {
     const clamped = Math.min(cats.length - 1, Math.max(0, idx));
     const el = trackRef.current?.querySelector(`[data-idx="${clamped}"]`);
     el?.scrollIntoView({
-      behavior: "smooth",
+      behavior,
       inline: "center",
       block: "nearest",
     });
   };
 
   const go = (dir) => scrollToIdx(active + dir);
+
+  // ✅ NEW: 1-click open, but also center/focus in the background (no extra click required)
+  const openCatOneClick = (idx, label) => {
+    // (A) Remember last opened category for "return & center" logic elsewhere
+    try {
+      sessionStorage.setItem(LAST_CAT_KEY, label);
+    } catch {
+      // ignore
+    }
+
+    // (B) Background focus/center (pure UX, should NOT block navigation)
+    setActive(idx);
+    // let this happen async so it never "steals" the click behavior
+    requestAnimationFrame(() => scrollToIdx(idx, "smooth"));
+
+    // (C) Open immediately on the first click
+    openCat(label);
+  };
 
   // Edge-hover logic for arrows
   const EDGE_ZONE = 88;
@@ -134,7 +155,6 @@ export default function PortfolioLanding({
           className="mb-3 px-4 sm:px-6 md:px-8 overflow-x-auto [scrollbar-width:none] [&::-webkit-scrollbar]:hidden"
         >
           <ul className="flex gap-2 items-center">
-            {/* tiny spacers so first/last chip aren’t stuck to the edge */}
             <li className="flex-shrink-0 w-1" aria-hidden="true" />
             {cats.map((c, i) => {
               const isActive = i === active;
@@ -218,18 +238,13 @@ export default function PortfolioLanding({
           aria-label="Category cards"
           tabIndex={0}
         >
-          {/* left spacer so first card can center nicely */}
           <div
             className="flex-shrink-0 w-[6%] sm:w-[10%] md:w-[14%]"
             aria-hidden="true"
           />
 
           {cats.map((c, i) => {
-            const st = states[i] || {
-              images: [],
-              loading: true,
-              error: "",
-            };
+            const st = states[i] || { images: [], loading: true, error: "" };
             const cover = pickCoverForCategory(st.images, c.label);
             const [rx, ry, s] = hoverIdx === i ? [4, -4, 1.02] : [0, 0, 1];
             const isActive = i === active;
@@ -247,7 +262,8 @@ export default function PortfolioLanding({
                 <button
                   type="button"
                   onClick={() => {
-                    openCat(c.label);
+                    // ✅ Single click opens category + background center
+                    openCatOneClick(i, c.label);
                     trackEvent("portfolio_card_open", { category: c.label });
                   }}
                   className={[
@@ -288,7 +304,6 @@ export default function PortfolioLanding({
             );
           })}
 
-          {/* right spacer so last card can center nicely */}
           <div
             className="flex-shrink-0 w-[6%] sm:w-[10%] md:w-[14%]"
             aria-hidden="true"
