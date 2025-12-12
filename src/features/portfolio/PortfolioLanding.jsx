@@ -6,6 +6,12 @@ import { trackEvent } from "@/app/track";
 const SHOW_ARROW_NAV = true;
 const SHOW_CHIP_BAR = true;
 
+// tap threshold for mobile (so swipe doesn't open)
+const TAP_MOVE_PX = 12;
+
+// guard window for duplicate opens (mousedown + click, etc.)
+const OPEN_GUARD_MS = 450;
+
 export default function PortfolioLanding({
   T,
   cats,
@@ -25,6 +31,39 @@ export default function PortfolioLanding({
   const allLoaded = states.every((s) => !s.loading);
   const anyImages = states.some((s) => (s.images?.length || 0) > 0);
   const showMediaBanner = allLoaded && !anyImages;
+
+  // touch start position to distinguish tap vs swipe
+  const touchStartRef = useRef({ x: 0, y: 0 });
+
+  // avoid double-open when multiple events fire
+  const openGuardRef = useRef({ label: "", ts: 0 });
+
+  const scrollToIdx = (idx, behavior = "smooth") => {
+    const clamped = Math.min(cats.length - 1, Math.max(0, idx));
+    const el = trackRef.current?.querySelector(`[data-idx="${clamped}"]`);
+    el?.scrollIntoView({
+      behavior,
+      inline: "center",
+      block: "nearest",
+    });
+  };
+
+  const guardedOpen = (idx, label) => {
+    const now = Date.now();
+    const prev = openGuardRef.current;
+
+    if (prev.label === label && now - prev.ts < OPEN_GUARD_MS) return;
+
+    openGuardRef.current = { label, ts: now };
+
+    // keep UI consistent (optional, but nice)
+    setActive(idx);
+    requestAnimationFrame(() => scrollToIdx(idx, "smooth"));
+
+    // open immediately
+    openCat(label);
+    trackEvent("portfolio_card_open", { category: label });
+  };
 
   // Center the initial category card
   useEffect(() => {
@@ -78,16 +117,6 @@ export default function PortfolioLanding({
       window.removeEventListener("resize", update);
     };
   }, []);
-
-  const scrollToIdx = (idx) => {
-    const clamped = Math.min(cats.length - 1, Math.max(0, idx));
-    const el = trackRef.current?.querySelector(`[data-idx="${clamped}"]`);
-    el?.scrollIntoView({
-      behavior: "smooth",
-      inline: "center",
-      block: "nearest",
-    });
-  };
 
   const go = (dir) => scrollToIdx(active + dir);
 
@@ -216,7 +245,6 @@ export default function PortfolioLanding({
           aria-label="Category cards"
           tabIndex={0}
         >
-          {/* left spacer so first card can center nicely */}
           <div
             className="flex-shrink-0 w-[6%] sm:w-[10%] md:w-[14%]"
             aria-hidden="true"
@@ -238,35 +266,56 @@ export default function PortfolioLanding({
                 onFocus={() => setHoverIdx(i)}
                 onBlur={() => setHoverIdx(-1)}
               >
-               <button
-  type="button"
+                <button
+                  type="button"
+                  className={[
+                    "touch-pan-x",
+                    "group block w-full rounded-2xl overflow-hidden border shadow-sm transition-transform duration-200",
+                    isActive ? "ring-2 ring-white/80" : "",
+                    T.cardBorder,
+                    T.cardBg,
+                  ].join(" ")}
+                  style={{
+                    transform: `perspective(900px) rotateX(${rx}deg) rotateY(${ry}deg) scale(${s})`,
+                  }}
+                  aria-label={`Open ${c.label}`}
 
-  // ✅ add this line EXACTLY here
-  onMouseDownCapture={(e) => e.preventDefault()}
+                  // ✅ Desktop: open on mouse down (before snap steals the click)
+                  onMouseDown={(e) => {
+                    if (e.button !== 0) return; // left button only
+                    e.preventDefault();
+                    guardedOpen(i, c.label);
+                  }}
 
-  // keep this as well
-  onPointerDown={(e) => {
-    if (e.pointerType === "mouse") e.preventDefault();
-  }}
+                  // ✅ Mobile: record touch start
+                  onTouchStart={(e) => {
+                    const t = e.touches?.[0];
+                    if (!t) return;
+                    touchStartRef.current = { x: t.clientX, y: t.clientY };
+                  }}
 
-  onClick={() => {
-    openCat(c.label);
-    trackEvent("portfolio_card_open", { category: c.label });
-  }}
+                  // ✅ Mobile: open only if it was a tap (not a swipe)
+                  onTouchEnd={(e) => {
+                    const t = e.changedTouches?.[0];
+                    if (!t) return;
+                    const dx = t.clientX - touchStartRef.current.x;
+                    const dy = t.clientY - touchStartRef.current.y;
+                    const moved = Math.hypot(dx, dy);
+                    if (moved > TAP_MOVE_PX) return;
+                    guardedOpen(i, c.label);
+                  }}
 
-  className={[
-    "touch-pan-x",
-    "group block w-full rounded-2xl overflow-hidden border shadow-sm transition-transform duration-200",
-    isActive ? "ring-2 ring-white/80" : "",
-    T.cardBorder,
-    T.cardBg,
-  ].join(" ")}
-  style={{
-    transform: `perspective(900px) rotateX(${rx}deg) rotateY(${ry}deg) scale(${s})`,
-  }}
-  aria-label={`Open ${c.label}`}
->
+                  // ✅ Keyboard accessibility
+                  onKeyDown={(e) => {
+                    if (e.key === "Enter" || e.key === " ") {
+                      e.preventDefault();
+                      guardedOpen(i, c.label);
+                    }
+                  }}
 
+                  // ✅ Fallback (some assistive tech triggers click)
+                  onClick={() => guardedOpen(i, c.label)}
+                >
                   <div className="aspect-[3/4] relative">
                     {cover ? (
                       <img
@@ -295,7 +344,6 @@ export default function PortfolioLanding({
             );
           })}
 
-          {/* right spacer so last card can center nicely */}
           <div
             className="flex-shrink-0 w-[6%] sm:w-[10%] md:w-[14%]"
             aria-hidden="true"
