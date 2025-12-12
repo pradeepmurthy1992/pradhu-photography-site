@@ -6,9 +6,6 @@ import { trackEvent } from "@/app/track";
 const SHOW_ARROW_NAV = true;
 const SHOW_CHIP_BAR = true;
 
-// IMPORTANT: keep the same key you already use in the app (based on our earlier logic)
-const LAST_CAT_KEY = "pradhu:lastCat";
-
 export default function PortfolioLanding({
   T,
   cats,
@@ -29,7 +26,16 @@ export default function PortfolioLanding({
   const anyImages = states.some((s) => (s.images?.length || 0) > 0);
   const showMediaBanner = allLoaded && !anyImages;
 
-  // Center the initial category card (this is your "return to all categories -> last one centered" behavior)
+  // ---- Tap detection for snap carousels (fixes "first click only centers")
+  const tapRef = useRef({ down: false, x: 0, y: 0 });
+  const TAP_MOVE_PX = 10;
+
+  const allLoadedRef = useRef(false);
+  useEffect(() => {
+    allLoadedRef.current = allLoaded;
+  }, [allLoaded]);
+
+  // Center the initial category card
   useEffect(() => {
     if (!trackRef.current) return;
     const idx = Math.min(cats.length - 1, Math.max(0, initialIdx));
@@ -94,22 +100,39 @@ export default function PortfolioLanding({
 
   const go = (dir) => scrollToIdx(active + dir);
 
-  // ✅ NEW: 1-click open, but also center/focus in the background (no extra click required)
+  // ✅ Open immediately, but centering happens as a side-effect (does not require an extra click)
   const openCatOneClick = (idx, label) => {
-    // (A) Remember last opened category for "return & center" logic elsewhere
-    try {
-      sessionStorage.setItem(LAST_CAT_KEY, label);
-    } catch {
-      // ignore
-    }
-
-    // (B) Background focus/center (pure UX, should NOT block navigation)
     setActive(idx);
-    // let this happen async so it never "steals" the click behavior
     requestAnimationFrame(() => scrollToIdx(idx, "smooth"));
-
-    // (C) Open immediately on the first click
     openCat(label);
+  };
+
+  // ---- Pointer handlers (tap vs swipe)
+  const onCardPointerDown = (e) => {
+    // only left-click for mouse
+    if (e.pointerType === "mouse" && e.button !== 0) return;
+    tapRef.current.down = true;
+    tapRef.current.x = e.clientX;
+    tapRef.current.y = e.clientY;
+  };
+
+  const onCardPointerCancel = () => {
+    tapRef.current.down = false;
+  };
+
+  const onCardPointerUp = (e, idx, label) => {
+    if (!tapRef.current.down) return;
+    tapRef.current.down = false;
+
+    const dx = e.clientX - tapRef.current.x;
+    const dy = e.clientY - tapRef.current.y;
+    const moved = Math.hypot(dx, dy);
+
+    // If user swiped/dragged (to scroll the carousel), don't open.
+    if (moved > TAP_MOVE_PX) return;
+
+    openCatOneClick(idx, label);
+    trackEvent("portfolio_card_open", { category: label });
   };
 
   // Edge-hover logic for arrows
@@ -161,16 +184,14 @@ export default function PortfolioLanding({
               return (
                 <li key={`chip-${c.label}`}>
                   <button
-                    onClick={() => scrollToIdx(i)}
+                    onClick={() => {
+                      scrollToIdx(i);
+                      trackEvent("portfolio_chip_click", { category: c.label });
+                    }}
                     className={`px-3 py-1.5 rounded-2xl border text-sm transition shadow-sm ${
                       isActive ? T.chipActive : T.chipInactive
                     }`}
                     aria-current={isActive ? "true" : undefined}
-                    onMouseDown={() =>
-                      trackEvent("portfolio_chip_click", {
-                        category: c.label,
-                      })
-                    }
                   >
                     {c.label}
                   </button>
@@ -261,10 +282,18 @@ export default function PortfolioLanding({
               >
                 <button
                   type="button"
-                  onClick={() => {
-                    // ✅ Single click opens category + background center
-                    openCatOneClick(i, c.label);
-                    trackEvent("portfolio_card_open", { category: c.label });
+                  // ✅ Replace click with tap-detection pointers (fixes snap stealing the click)
+                  onPointerDown={onCardPointerDown}
+                  onPointerUp={(e) => onCardPointerUp(e, i, c.label)}
+                  onPointerCancel={onCardPointerCancel}
+                  onPointerLeave={onCardPointerCancel}
+                  // ✅ Keyboard support still opens (Enter / Space)
+                  onKeyDown={(e) => {
+                    if (e.key === "Enter" || e.key === " ") {
+                      e.preventDefault();
+                      openCatOneClick(i, c.label);
+                      trackEvent("portfolio_card_open", { category: c.label });
+                    }
                   }}
                   className={[
                     "group block w-full rounded-2xl overflow-hidden border shadow-sm transition-transform duration-200",
@@ -285,6 +314,7 @@ export default function PortfolioLanding({
                         className="absolute inset-0 h-full w-full object-cover transition-transform duration-500 group-hover:scale-[1.04]"
                         loading="lazy"
                         decoding="async"
+                        draggable={false}
                       />
                     ) : (
                       <div className="absolute inset-0 bg-neutral-600/30" />
