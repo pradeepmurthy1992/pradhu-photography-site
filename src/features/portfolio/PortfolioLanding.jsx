@@ -6,21 +6,30 @@ import { trackEvent } from "@/app/track";
 const SHOW_ARROW_NAV = true;
 const SHOW_CHIP_BAR = true;
 
-const TAP_MOVE_PX = 12; // swipe vs tap threshold
-const OPEN_GUARD_MS = 500; // prevent double-open
+const TAP_MOVE_PX = 12;
+const OPEN_GUARD_MS = 500;
 
-export default function PortfolioLanding({
-  T,
-  cats,
-  states,
-  openCat,
-  initialIdx = 0,
-}) {
+// toggle debug by adding ?debugPortfolio=1
+function isDebug() {
+  if (typeof window === "undefined") return false;
+  try {
+    return new URL(window.location.href).searchParams.get("debugPortfolio") === "1";
+  } catch {
+    return false;
+  }
+}
+
+export default function PortfolioLanding({ T, cats, states, openCat, initialIdx = 0 }) {
+  const DEBUG = isDebug();
+  const BUILD_TAG = "PORTF-LANDING-SNAPFIX-2025-12-12A";
+
   const [hoverIdx, setHoverIdx] = useState(-1);
   const [active, setActive] = useState(0);
   const [canLeft, setCanLeft] = useState(false);
   const [canRight, setCanRight] = useState(false);
   const [edge, setEdge] = useState(null);
+
+  const [dbg, setDbg] = useState("");
 
   const trackRef = useRef(null);
   const wrapRef = useRef(null);
@@ -29,28 +38,39 @@ export default function PortfolioLanding({
   const anyImages = states.some((s) => (s.images?.length || 0) > 0);
   const showMediaBanner = allLoaded && !anyImages;
 
-  // press state (track-level)
-  const pressRef = useRef({
-    active: false,
-    moved: false,
-    idx: -1,
-    startX: 0,
-    startY: 0,
-    waitingForSnap: false,
-  });
+  const pressRef = useRef({ active: false, moved: false, startX: 0, startY: 0, idx: -1 });
 
-  // scroll-snap settle timer
-  const settleTimerRef = useRef(null);
-
-  // open guard
-  const openGuardRef = useRef({ label: "", ts: 0 });
-
-  const clearSettleTimer = () => {
-    if (settleTimerRef.current) {
-      clearTimeout(settleTimerRef.current);
-      settleTimerRef.current = null;
+  // snap disable/restore
+  const snapRef = useRef({ disabled: false, prev: "" });
+  const snapRestoreTimer = useRef(null);
+  const clearSnapTimer = () => {
+    if (snapRestoreTimer.current) {
+      clearTimeout(snapRestoreTimer.current);
+      snapRestoreTimer.current = null;
     }
   };
+
+  const disableSnapNow = () => {
+    const root = trackRef.current;
+    if (!root || snapRef.current.disabled) return;
+    snapRef.current.prev = root.style.scrollSnapType || "";
+    root.style.scrollSnapType = "none";
+    snapRef.current.disabled = true;
+    if (DEBUG) setDbg((s) => s + " | snapOff");
+  };
+
+  const restoreSnapSoon = () => {
+    clearSnapTimer();
+    snapRestoreTimer.current = setTimeout(() => {
+      const root = trackRef.current;
+      if (!root || !snapRef.current.disabled) return;
+      root.style.scrollSnapType = snapRef.current.prev || "";
+      snapRef.current.disabled = false;
+      if (DEBUG) setDbg((s) => s + " | snapOn");
+    }, 120); // small delay allows inertia scroll to finish
+  };
+
+  const openGuardRef = useRef({ label: "", ts: 0 });
 
   const scrollToIdx = (idx, behavior = "smooth") => {
     const clamped = Math.min(cats.length - 1, Math.max(0, idx));
@@ -67,10 +87,10 @@ export default function PortfolioLanding({
     if (prev.label === c.label && now - prev.ts < OPEN_GUARD_MS) return;
     openGuardRef.current = { label: c.label, ts: now };
 
-    // keep UI consistent + do the "center" as a side effect
     setActive(idx);
     requestAnimationFrame(() => scrollToIdx(idx, "smooth"));
 
+    if (DEBUG) setDbg((s) => s + ` | OPEN(${idx}:${c.label})`);
     openCat(c.label);
     trackEvent("portfolio_card_open", { category: c.label });
   };
@@ -84,18 +104,6 @@ export default function PortfolioLanding({
     return Number.isFinite(idx) ? idx : -1;
   };
 
-  const armOpenAfterSnap = () => {
-    // Called on every scroll while waiting; opens after scroll settles.
-    clearSettleTimer();
-    settleTimerRef.current = setTimeout(() => {
-      const p = pressRef.current;
-      if (p.waitingForSnap && !p.moved && p.idx >= 0) {
-        p.waitingForSnap = false;
-        guardedOpenByIdx(p.idx);
-      }
-    }, 140);
-  };
-
   // Center the initial category card
   useEffect(() => {
     if (!trackRef.current) return;
@@ -103,15 +111,11 @@ export default function PortfolioLanding({
     setActive(idx);
     requestAnimationFrame(() => {
       const el = trackRef.current?.querySelector(`[data-idx="${idx}"]`);
-      el?.scrollIntoView({
-        behavior: "auto",
-        inline: "center",
-        block: "nearest",
-      });
+      el?.scrollIntoView({ behavior: "auto", inline: "center", block: "nearest" });
     });
   }, [initialIdx, cats.length]);
 
-  // Track which card is centered & arrows; also drives "open after snap"
+  // Track which card is centered & arrows
   useEffect(() => {
     const root = trackRef.current;
     if (!root) return;
@@ -132,25 +136,23 @@ export default function PortfolioLanding({
           best = i;
         }
       });
+
       setActive(best);
 
       const sl = root.scrollLeft;
       const max = root.scrollWidth - root.clientWidth;
       setCanLeft(sl > 8);
       setCanRight(sl < max - 8);
-
-      // ✅ if snap is happening due to the first tap being "canceled",
-      // we wait for scroll to settle and then open automatically.
-      if (pressRef.current.waitingForSnap) armOpenAfterSnap();
     };
 
     update();
     root.addEventListener("scroll", update, { passive: true });
     window.addEventListener("resize", update, { passive: true });
+
     return () => {
       root.removeEventListener("scroll", update);
       window.removeEventListener("resize", update);
-      clearSettleTimer();
+      clearSnapTimer();
     };
   }, []);
 
@@ -172,19 +174,16 @@ export default function PortfolioLanding({
   const showLeft = SHOW_ARROW_NAV && edge === "left" && canLeft;
   const showRight = SHOW_ARROW_NAV && edge === "right" && canRight;
 
-  // ===== Track-level gesture handling (works for mouse + touch)
+  // ===== THE CORE: disable snap during press so the click isn't cancelled
   const onTrackPointerDownCapture = (e) => {
-    // left click only for mouse
     if (e.pointerType === "mouse" && e.button !== 0) return;
 
-    const idx = idxFromPoint(e.clientX, e.clientY);
+    disableSnapNow();
 
-    pressRef.current.active = true;
-    pressRef.current.moved = false;
-    pressRef.current.waitingForSnap = false;
-    pressRef.current.idx = idx;
-    pressRef.current.startX = e.clientX;
-    pressRef.current.startY = e.clientY;
+    const idx = idxFromPoint(e.clientX, e.clientY);
+    pressRef.current = { active: true, moved: false, startX: e.clientX, startY: e.clientY, idx };
+
+    if (DEBUG) setDbg(`${BUILD_TAG} | down idx=${idx}`);
   };
 
   const onTrackPointerMoveCapture = (e) => {
@@ -195,10 +194,9 @@ export default function PortfolioLanding({
     const dy = e.clientY - p.startY;
     const moved = Math.hypot(dx, dy) > TAP_MOVE_PX;
 
-    if (moved) {
+    if (moved && !p.moved) {
       p.moved = true;
-      p.waitingForSnap = false;
-      clearSettleTimer();
+      if (DEBUG) setDbg((s) => s + " | moved");
     }
   };
 
@@ -207,10 +205,16 @@ export default function PortfolioLanding({
     if (!p.active) return;
     p.active = false;
 
-    if (p.moved) return;
+    // restore snap after interaction
+    restoreSnapSoon();
 
-    // normal case: we got a valid "tap/click"
+    if (p.moved) {
+      if (DEBUG) setDbg((s) => s + " | up(no open)");
+      return;
+    }
+
     const idx = idxFromPoint(e.clientX, e.clientY);
+    if (DEBUG) setDbg((s) => s + ` | up idx=${idx}`);
     if (idx >= 0) guardedOpenByIdx(idx);
   };
 
@@ -218,34 +222,32 @@ export default function PortfolioLanding({
     const p = pressRef.current;
     if (!p.active) return;
     p.active = false;
+    restoreSnapSoon();
 
-    // If it was a swipe, don't open.
-    if (p.moved) return;
-
-    // ✅ This is the core: snap/scroll stole the click → open after snap settles.
-    if (p.idx >= 0) {
-      p.waitingForSnap = true;
-      armOpenAfterSnap();
-    }
+    if (DEBUG) setDbg((s) => s + " | cancel");
+    // If cancel happens, do nothing: this is usually because scroll took over.
+    // Snap is off during press, so cancel should reduce drastically.
   };
 
   return (
     <section id="portfolio" className="py-2">
       <header className="mb-4">
-        <h2
-          className={`text-4xl md:text-5xl font-['Playfair_Display'] uppercase tracking-[0.08em] ${T.navTextStrong}`}
-        >
+        <h2 className={`text-4xl md:text-5xl font-['Playfair_Display'] uppercase tracking-[0.08em] ${T.navTextStrong}`}>
           Portfolio
         </h2>
-        <p className={`mt-2 ${T.muted}`}>
-          Hover near the edges for arrows, or use chips to jump.
-        </p>
+        <p className={`mt-2 ${T.muted}`}>Hover near the edges for arrows, or use chips to jump.</p>
+
+        {DEBUG && (
+          <div className="mt-2 text-[11px] opacity-70">
+            {BUILD_TAG} — {dbg}
+          </div>
+        )}
 
         {showMediaBanner && (
           <div className="mt-3 rounded-xl border border-amber-300 bg-amber-50 text-amber-900 text-sm p-3">
-            Couldn’t load images right now. If this is a new deploy, ensure
-            your <span className="font-medium">manifest.json</span> contains
-            category paths, or try a refresh (<code>?refresh=1</code>).
+            Couldn’t load images right now. If this is a new deploy, ensure your{" "}
+            <span className="font-medium">manifest.json</span> contains category paths, or try a refresh (
+            <code>?refresh=1</code>).
           </div>
         )}
       </header>
@@ -281,12 +283,7 @@ export default function PortfolioLanding({
         </nav>
       )}
 
-      <div
-        ref={wrapRef}
-        className="relative"
-        onMouseMove={onPointerMoveEdge}
-        onMouseLeave={onPointerLeaveEdge}
-      >
+      <div ref={wrapRef} className="relative" onMouseMove={onPointerMoveEdge} onMouseLeave={onPointerLeaveEdge}>
         {SHOW_ARROW_NAV && (
           <>
             <button
@@ -296,9 +293,7 @@ export default function PortfolioLanding({
                 "pointer-events-auto absolute left-2 md:left-3 top-1/2 -translate-y-1/2",
                 "h-9 w-9 md:h-10 md:w-10 rounded-full border grid place-items-center transition",
                 "backdrop-blur-sm text-white",
-                showLeft
-                  ? "bg-black/40 hover:bg-black/55 border-white/20 opacity-100"
-                  : "opacity-0 pointer-events-none",
+                showLeft ? "bg-black/40 hover:bg-black/55 border-white/20 opacity-100" : "opacity-0 pointer-events-none",
               ].join(" ")}
               aria-label="Previous category"
               style={{ zIndex: 5 }}
@@ -313,9 +308,7 @@ export default function PortfolioLanding({
                 "pointer-events-auto absolute right-2 md:right-3 top-1/2 -translate-y-1/2",
                 "h-9 w-9 md:h-10 md:w-10 rounded-full border grid place-items-center transition",
                 "backdrop-blur-sm text-white",
-                showRight
-                  ? "bg-black/40 hover:bg-black/55 border-white/20 opacity-100"
-                  : "opacity-0 pointer-events-none",
+                showRight ? "bg-black/40 hover:bg-black/55 border-white/20 opacity-100" : "opacity-0 pointer-events-none",
               ].join(" ")}
               aria-label="Next category"
               style={{ zIndex: 5 }}
@@ -342,10 +335,7 @@ export default function PortfolioLanding({
           onPointerUpCapture={onTrackPointerUpCapture}
           onPointerCancel={onTrackPointerCancel}
         >
-          <div
-            className="flex-shrink-0 w-[6%] sm:w-[10%] md:w-[14%]"
-            aria-hidden="true"
-          />
+          <div className="flex-shrink-0 w-[6%] sm:w-[10%] md:w-[14%]" aria-hidden="true" />
 
           {cats.map((c, i) => {
             const st = states[i] || { images: [], loading: true, error: "" };
@@ -365,7 +355,6 @@ export default function PortfolioLanding({
               >
                 <button
                   type="button"
-                  // No click handler here — handled at track level (fixes snap-cancel)
                   onKeyDown={(e) => {
                     if (e.key === "Enter" || e.key === " ") {
                       e.preventDefault();
@@ -379,9 +368,7 @@ export default function PortfolioLanding({
                     T.cardBorder,
                     T.cardBg,
                   ].join(" ")}
-                  style={{
-                    transform: `perspective(900px) rotateX(${rx}deg) rotateY(${ry}deg) scale(${s})`,
-                  }}
+                  style={{ transform: `perspective(900px) rotateX(${rx}deg) rotateY(${ry}deg) scale(${s})` }}
                   aria-label={`Open ${c.label}`}
                 >
                   <div className="aspect-[3/4] relative">
@@ -412,10 +399,7 @@ export default function PortfolioLanding({
             );
           })}
 
-          <div
-            className="flex-shrink-0 w-[6%] sm:w-[10%] md:w-[14%]"
-            aria-hidden="true"
-          />
+          <div className="flex-shrink-0 w-[6%] sm:w-[10%] md:w-[14%]" aria-hidden="true" />
         </div>
       </div>
     </section>
