@@ -238,29 +238,35 @@ export default function PortfolioLanding({
                 onFocus={() => setHoverIdx(i)}
                 onBlur={() => setHoverIdx(-1)}
               >
-                <button
-                  type="button"
-                  // ✅ Critical: stop mouse-click focus from triggering snap-centering first
-                  // (touch/drag unaffected)
-                  onPointerDown={(e) => {
-                    if (e.pointerType === "mouse") e.preventDefault();
-                  }}
-                  onClick={() => {
-                    openCat(c.label);
-                    trackEvent("portfolio_card_open", { category: c.label });
-                  }}
-                  className={[
-                    "touch-pan-x",
-                    "group block w-full rounded-2xl overflow-hidden border shadow-sm transition-transform duration-200",
-                    isActive ? "ring-2 ring-white/80" : "",
-                    T.cardBorder,
-                    T.cardBg,
-                  ].join(" ")}
-                  style={{
-                    transform: `perspective(900px) rotateX(${rx}deg) rotateY(${ry}deg) scale(${s})`,
-                  }}
-                  aria-label={`Open ${c.label}`}
-                >
+               <button
+  type="button"
+
+  // ✅ add this line EXACTLY here
+  onMouseDownCapture={(e) => e.preventDefault()}
+
+  // keep this as well
+  onPointerDown={(e) => {
+    if (e.pointerType === "mouse") e.preventDefault();
+  }}
+
+  onClick={() => {
+    openCat(c.label);
+    trackEvent("portfolio_card_open", { category: c.label });
+  }}
+
+  className={[
+    "touch-pan-x",
+    "group block w-full rounded-2xl overflow-hidden border shadow-sm transition-transform duration-200",
+    isActive ? "ring-2 ring-white/80" : "",
+    T.cardBorder,
+    T.cardBg,
+  ].join(" ")}
+  style={{
+    transform: `perspective(900px) rotateX(${rx}deg) rotateY(${ry}deg) scale(${s})`,
+  }}
+  aria-label={`Open ${c.label}`}
+>
+
                   <div className="aspect-[3/4] relative">
                     {cover ? (
                       <img
