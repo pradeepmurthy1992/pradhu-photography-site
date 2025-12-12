@@ -6,11 +6,8 @@ import { trackEvent } from "@/app/track";
 const SHOW_ARROW_NAV = true;
 const SHOW_CHIP_BAR = true;
 
-// tap threshold for mobile (so swipe doesn't open)
-const TAP_MOVE_PX = 12;
-
-// guard window for duplicate opens (mousedown + click, etc.)
-const OPEN_GUARD_MS = 450;
+const TAP_MOVE_PX = 12;         // swipe vs tap threshold
+const OPEN_GUARD_MS = 500;      // prevent double-open from multiple events
 
 export default function PortfolioLanding({
   T,
@@ -32,37 +29,40 @@ export default function PortfolioLanding({
   const anyImages = states.some((s) => (s.images?.length || 0) > 0);
   const showMediaBanner = allLoaded && !anyImages;
 
-  // touch start position to distinguish tap vs swipe
-  const touchStartRef = useRef({ x: 0, y: 0 });
-
-  // avoid double-open when multiple events fire
+  // gesture tracking (track-level)
+  const gestureRef = useRef({ down: false, x: 0, y: 0 });
   const openGuardRef = useRef({ label: "", ts: 0 });
 
   const scrollToIdx = (idx, behavior = "smooth") => {
     const clamped = Math.min(cats.length - 1, Math.max(0, idx));
     const el = trackRef.current?.querySelector(`[data-idx="${clamped}"]`);
-    el?.scrollIntoView({
-      behavior,
-      inline: "center",
-      block: "nearest",
-    });
+    el?.scrollIntoView({ behavior, inline: "center", block: "nearest" });
   };
 
-  const guardedOpen = (idx, label) => {
+  const guardedOpenByIdx = (idx) => {
+    const c = cats[idx];
+    if (!c) return;
+
     const now = Date.now();
     const prev = openGuardRef.current;
+    if (prev.label === c.label && now - prev.ts < OPEN_GUARD_MS) return;
+    openGuardRef.current = { label: c.label, ts: now };
 
-    if (prev.label === label && now - prev.ts < OPEN_GUARD_MS) return;
-
-    openGuardRef.current = { label, ts: now };
-
-    // keep UI consistent (optional, but nice)
+    // keep last/active behavior same
     setActive(idx);
     requestAnimationFrame(() => scrollToIdx(idx, "smooth"));
 
-    // open immediately
-    openCat(label);
-    trackEvent("portfolio_card_open", { category: label });
+    openCat(c.label);
+    trackEvent("portfolio_card_open", { category: c.label });
+  };
+
+  const idxFromPoint = (clientX, clientY) => {
+    if (typeof document === "undefined") return -1;
+    const el = document.elementFromPoint(clientX, clientY);
+    const card = el?.closest?.("[data-idx]");
+    const raw = card?.getAttribute?.("data-idx");
+    const idx = raw != null ? Number(raw) : -1;
+    return Number.isFinite(idx) ? idx : -1;
   };
 
   // Center the initial category card
@@ -72,11 +72,7 @@ export default function PortfolioLanding({
     setActive(idx);
     requestAnimationFrame(() => {
       const el = trackRef.current?.querySelector(`[data-idx="${idx}"]`);
-      el?.scrollIntoView({
-        behavior: "auto",
-        inline: "center",
-        block: "nearest",
-      });
+      el?.scrollIntoView({ behavior: "auto", inline: "center", block: "nearest" });
     });
   }, [initialIdx, cats.length]);
 
@@ -90,8 +86,8 @@ export default function PortfolioLanding({
       if (!slides.length) return;
 
       const center = root.scrollLeft + root.clientWidth / 2;
-      let best = 0,
-        bestDist = Infinity;
+      let best = 0;
+      let bestDist = Infinity;
 
       slides.forEach((el, i) => {
         const mid = el.offsetLeft + el.offsetWidth / 2;
@@ -101,6 +97,7 @@ export default function PortfolioLanding({
           best = i;
         }
       });
+
       setActive(best);
 
       const sl = root.scrollLeft;
@@ -136,23 +133,70 @@ export default function PortfolioLanding({
   const showLeft = SHOW_ARROW_NAV && edge === "left" && canLeft;
   const showRight = SHOW_ARROW_NAV && edge === "right" && canRight;
 
+  // ===== Track-level “tap to open”
+  const onTrackPointerDownCapture = (e) => {
+    // record start; do NOT preventDefault (keeps scrolling natural)
+    if (e.pointerType === "mouse" && e.button !== 0) return;
+    gestureRef.current.down = true;
+    gestureRef.current.x = e.clientX;
+    gestureRef.current.y = e.clientY;
+  };
+
+  const onTrackPointerUpCapture = (e) => {
+    if (!gestureRef.current.down) return;
+    gestureRef.current.down = false;
+
+    const dx = e.clientX - gestureRef.current.x;
+    const dy = e.clientY - gestureRef.current.y;
+    const moved = Math.hypot(dx, dy);
+    if (moved > TAP_MOVE_PX) return; // swipe/drag => don’t open
+
+    const idx = idxFromPoint(e.clientX, e.clientY);
+    if (idx >= 0) guardedOpenByIdx(idx);
+  };
+
+  const onTrackPointerCancel = () => {
+    gestureRef.current.down = false;
+  };
+
+  // Touch fallback (some mobile browsers behave better with touch events)
+  const onTrackTouchStartCapture = (e) => {
+    const t = e.touches?.[0];
+    if (!t) return;
+    gestureRef.current.down = true;
+    gestureRef.current.x = t.clientX;
+    gestureRef.current.y = t.clientY;
+  };
+
+  const onTrackTouchEndCapture = (e) => {
+    if (!gestureRef.current.down) return;
+    gestureRef.current.down = false;
+
+    const t = e.changedTouches?.[0];
+    if (!t) return;
+
+    const dx = t.clientX - gestureRef.current.x;
+    const dy = t.clientY - gestureRef.current.y;
+    const moved = Math.hypot(dx, dy);
+    if (moved > TAP_MOVE_PX) return;
+
+    const idx = idxFromPoint(t.clientX, t.clientY);
+    if (idx >= 0) guardedOpenByIdx(idx);
+  };
+
   return (
     <section id="portfolio" className="py-2">
       <header className="mb-4">
-        <h2
-          className={`text-4xl md:text-5xl font-['Playfair_Display'] uppercase tracking-[0.08em] ${T.navTextStrong}`}
-        >
+        <h2 className={`text-4xl md:text-5xl font-['Playfair_Display'] uppercase tracking-[0.08em] ${T.navTextStrong}`}>
           Portfolio
         </h2>
-        <p className={`mt-2 ${T.muted}`}>
-          Hover near the edges for arrows, or use chips to jump.
-        </p>
+        <p className={`mt-2 ${T.muted}`}>Hover near the edges for arrows, or use chips to jump.</p>
 
         {showMediaBanner && (
           <div className="mt-3 rounded-xl border border-amber-300 bg-amber-50 text-amber-900 text-sm p-3">
-            Couldn’t load images right now. If this is a new deploy, ensure
-            your <span className="font-medium">manifest.json</span> contains
-            category paths, or try a refresh (<code>?refresh=1</code>).
+            Couldn’t load images right now. If this is a new deploy, ensure your{" "}
+            <span className="font-medium">manifest.json</span> contains category paths, or try a refresh (
+            <code>?refresh=1</code>).
           </div>
         )}
       </header>
@@ -188,12 +232,7 @@ export default function PortfolioLanding({
         </nav>
       )}
 
-      <div
-        ref={wrapRef}
-        className="relative"
-        onMouseMove={onPointerMove}
-        onMouseLeave={onPointerLeave}
-      >
+      <div ref={wrapRef} className="relative" onMouseMove={onPointerMove} onMouseLeave={onPointerLeave}>
         {SHOW_ARROW_NAV && (
           <>
             <button
@@ -203,9 +242,7 @@ export default function PortfolioLanding({
                 "pointer-events-auto absolute left-2 md:left-3 top-1/2 -translate-y-1/2",
                 "h-9 w-9 md:h-10 md:w-10 rounded-full border grid place-items-center transition",
                 "backdrop-blur-sm text-white",
-                showLeft
-                  ? "bg-black/40 hover:bg-black/55 border-white/20 opacity-100"
-                  : "opacity-0 pointer-events-none",
+                showLeft ? "bg-black/40 hover:bg-black/55 border-white/20 opacity-100" : "opacity-0 pointer-events-none",
               ].join(" ")}
               aria-label="Previous category"
               style={{ zIndex: 5 }}
@@ -220,9 +257,7 @@ export default function PortfolioLanding({
                 "pointer-events-auto absolute right-2 md:right-3 top-1/2 -translate-y-1/2",
                 "h-9 w-9 md:h-10 md:w-10 rounded-full border grid place-items-center transition",
                 "backdrop-blur-sm text-white",
-                showRight
-                  ? "bg-black/40 hover:bg-black/55 border-white/20 opacity-100"
-                  : "opacity-0 pointer-events-none",
+                showRight ? "bg-black/40 hover:bg-black/55 border-white/20 opacity-100" : "opacity-0 pointer-events-none",
               ].join(" ")}
               aria-label="Next category"
               style={{ zIndex: 5 }}
@@ -244,11 +279,13 @@ export default function PortfolioLanding({
           aria-roledescription="carousel"
           aria-label="Category cards"
           tabIndex={0}
+          onPointerDownCapture={onTrackPointerDownCapture}
+          onPointerUpCapture={onTrackPointerUpCapture}
+          onPointerCancel={onTrackPointerCancel}
+          onTouchStartCapture={onTrackTouchStartCapture}
+          onTouchEndCapture={onTrackTouchEndCapture}
         >
-          <div
-            className="flex-shrink-0 w-[6%] sm:w-[10%] md:w-[14%]"
-            aria-hidden="true"
-          />
+          <div className="flex-shrink-0 w-[6%] sm:w-[10%] md:w-[14%]" aria-hidden="true" />
 
           {cats.map((c, i) => {
             const st = states[i] || { images: [], loading: true, error: "" };
@@ -266,10 +303,9 @@ export default function PortfolioLanding({
                 onFocus={() => setHoverIdx(i)}
                 onBlur={() => setHoverIdx(-1)}
               >
-                <button
-                  type="button"
+                {/* IMPORTANT: no onClick/onPointer handlers here anymore */}
+                <div
                   className={[
-                    "touch-pan-x",
                     "group block w-full rounded-2xl overflow-hidden border shadow-sm transition-transform duration-200",
                     isActive ? "ring-2 ring-white/80" : "",
                     T.cardBorder,
@@ -279,42 +315,14 @@ export default function PortfolioLanding({
                     transform: `perspective(900px) rotateX(${rx}deg) rotateY(${ry}deg) scale(${s})`,
                   }}
                   aria-label={`Open ${c.label}`}
-
-                  // ✅ Desktop: open on mouse down (before snap steals the click)
-                  onMouseDown={(e) => {
-                    if (e.button !== 0) return; // left button only
-                    e.preventDefault();
-                    guardedOpen(i, c.label);
-                  }}
-
-                  // ✅ Mobile: record touch start
-                  onTouchStart={(e) => {
-                    const t = e.touches?.[0];
-                    if (!t) return;
-                    touchStartRef.current = { x: t.clientX, y: t.clientY };
-                  }}
-
-                  // ✅ Mobile: open only if it was a tap (not a swipe)
-                  onTouchEnd={(e) => {
-                    const t = e.changedTouches?.[0];
-                    if (!t) return;
-                    const dx = t.clientX - touchStartRef.current.x;
-                    const dy = t.clientY - touchStartRef.current.y;
-                    const moved = Math.hypot(dx, dy);
-                    if (moved > TAP_MOVE_PX) return;
-                    guardedOpen(i, c.label);
-                  }}
-
-                  // ✅ Keyboard accessibility
+                  role="button"
+                  tabIndex={0}
                   onKeyDown={(e) => {
                     if (e.key === "Enter" || e.key === " ") {
                       e.preventDefault();
-                      guardedOpen(i, c.label);
+                      guardedOpenByIdx(i);
                     }
                   }}
-
-                  // ✅ Fallback (some assistive tech triggers click)
-                  onClick={() => guardedOpen(i, c.label)}
                 >
                   <div className="aspect-[3/4] relative">
                     {cover ? (
@@ -339,15 +347,12 @@ export default function PortfolioLanding({
                       </span>
                     </div>
                   </div>
-                </button>
+                </div>
               </article>
             );
           })}
 
-          <div
-            className="flex-shrink-0 w-[6%] sm:w-[10%] md:w-[14%]"
-            aria-hidden="true"
-          />
+          <div className="flex-shrink-0 w-[6%] sm:w-[10%] md:w-[14%]" aria-hidden="true" />
         </div>
       </div>
     </section>
