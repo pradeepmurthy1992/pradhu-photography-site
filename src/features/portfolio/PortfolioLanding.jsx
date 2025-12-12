@@ -9,27 +9,12 @@ const SHOW_CHIP_BAR = true;
 const TAP_MOVE_PX = 12;
 const OPEN_GUARD_MS = 500;
 
-// toggle debug by adding ?debugPortfolio=1
-function isDebug() {
-  if (typeof window === "undefined") return false;
-  try {
-    return new URL(window.location.href).searchParams.get("debugPortfolio") === "1";
-  } catch {
-    return false;
-  }
-}
-
 export default function PortfolioLanding({ T, cats, states, openCat, initialIdx = 0 }) {
-  const DEBUG = isDebug();
-  const BUILD_TAG = "PORTF-LANDING-SNAPFIX-2025-12-12A";
-
   const [hoverIdx, setHoverIdx] = useState(-1);
   const [active, setActive] = useState(0);
   const [canLeft, setCanLeft] = useState(false);
   const [canRight, setCanRight] = useState(false);
   const [edge, setEdge] = useState(null);
-
-  const [dbg, setDbg] = useState("");
 
   const trackRef = useRef(null);
   const wrapRef = useRef(null);
@@ -38,11 +23,13 @@ export default function PortfolioLanding({ T, cats, states, openCat, initialIdx 
   const anyImages = states.some((s) => (s.images?.length || 0) > 0);
   const showMediaBanner = allLoaded && !anyImages;
 
+  // --- press tracking
   const pressRef = useRef({ active: false, moved: false, startX: 0, startY: 0, idx: -1 });
 
-  // snap disable/restore
+  // --- snap disable/restore
   const snapRef = useRef({ disabled: false, prev: "" });
   const snapRestoreTimer = useRef(null);
+
   const clearSnapTimer = () => {
     if (snapRestoreTimer.current) {
       clearTimeout(snapRestoreTimer.current);
@@ -56,7 +43,6 @@ export default function PortfolioLanding({ T, cats, states, openCat, initialIdx 
     snapRef.current.prev = root.style.scrollSnapType || "";
     root.style.scrollSnapType = "none";
     snapRef.current.disabled = true;
-    if (DEBUG) setDbg((s) => s + " | snapOff");
   };
 
   const restoreSnapSoon = () => {
@@ -66,10 +52,10 @@ export default function PortfolioLanding({ T, cats, states, openCat, initialIdx 
       if (!root || !snapRef.current.disabled) return;
       root.style.scrollSnapType = snapRef.current.prev || "";
       snapRef.current.disabled = false;
-      if (DEBUG) setDbg((s) => s + " | snapOn");
-    }, 120); // small delay allows inertia scroll to finish
+    }, 140);
   };
 
+  // --- open guard
   const openGuardRef = useRef({ label: "", ts: 0 });
 
   const scrollToIdx = (idx, behavior = "smooth") => {
@@ -87,10 +73,10 @@ export default function PortfolioLanding({ T, cats, states, openCat, initialIdx 
     if (prev.label === c.label && now - prev.ts < OPEN_GUARD_MS) return;
     openGuardRef.current = { label: c.label, ts: now };
 
+    // keep last center logic intact via your existing openCat/sessionStorage
     setActive(idx);
     requestAnimationFrame(() => scrollToIdx(idx, "smooth"));
 
-    if (DEBUG) setDbg((s) => s + ` | OPEN(${idx}:${c.label})`);
     openCat(c.label);
     trackEvent("portfolio_card_open", { category: c.label });
   };
@@ -115,7 +101,7 @@ export default function PortfolioLanding({ T, cats, states, openCat, initialIdx 
     });
   }, [initialIdx, cats.length]);
 
-  // Track which card is centered & arrows
+  // Track which card is visually centered & arrow availability
   useEffect(() => {
     const root = trackRef.current;
     if (!root) return;
@@ -125,16 +111,12 @@ export default function PortfolioLanding({ T, cats, states, openCat, initialIdx 
       if (!slides.length) return;
 
       const center = root.scrollLeft + root.clientWidth / 2;
-      let best = 0;
-      let bestDist = Infinity;
+      let best = 0, bestDist = Infinity;
 
       slides.forEach((el, i) => {
         const mid = el.offsetLeft + el.offsetWidth / 2;
         const d = Math.abs(mid - center);
-        if (d < bestDist) {
-          bestDist = d;
-          best = i;
-        }
+        if (d < bestDist) { bestDist = d; best = i; }
       });
 
       setActive(best);
@@ -174,16 +156,13 @@ export default function PortfolioLanding({ T, cats, states, openCat, initialIdx 
   const showLeft = SHOW_ARROW_NAV && edge === "left" && canLeft;
   const showRight = SHOW_ARROW_NAV && edge === "right" && canRight;
 
-  // ===== THE CORE: disable snap during press so the click isn't cancelled
+  // ===== Core: disable snap while pressing, detect tap vs swipe
   const onTrackPointerDownCapture = (e) => {
     if (e.pointerType === "mouse" && e.button !== 0) return;
-
     disableSnapNow();
 
     const idx = idxFromPoint(e.clientX, e.clientY);
     pressRef.current = { active: true, moved: false, startX: e.clientX, startY: e.clientY, idx };
-
-    if (DEBUG) setDbg(`${BUILD_TAG} | down idx=${idx}`);
   };
 
   const onTrackPointerMoveCapture = (e) => {
@@ -192,41 +171,35 @@ export default function PortfolioLanding({ T, cats, states, openCat, initialIdx 
 
     const dx = e.clientX - p.startX;
     const dy = e.clientY - p.startY;
-    const moved = Math.hypot(dx, dy) > TAP_MOVE_PX;
+    if (Math.hypot(dx, dy) > TAP_MOVE_PX) p.moved = true;
+  };
 
-    if (moved && !p.moved) {
-      p.moved = true;
-      if (DEBUG) setDbg((s) => s + " | moved");
-    }
+  const finishPress = () => {
+    pressRef.current.active = false;
+    restoreSnapSoon();
   };
 
   const onTrackPointerUpCapture = (e) => {
     const p = pressRef.current;
     if (!p.active) return;
-    p.active = false;
 
-    // restore snap after interaction
-    restoreSnapSoon();
-
-    if (p.moved) {
-      if (DEBUG) setDbg((s) => s + " | up(no open)");
-      return;
-    }
+    const moved = p.moved;
+    finishPress();
+    if (moved) return;
 
     const idx = idxFromPoint(e.clientX, e.clientY);
-    if (DEBUG) setDbg((s) => s + ` | up idx=${idx}`);
     if (idx >= 0) guardedOpenByIdx(idx);
   };
 
   const onTrackPointerCancel = () => {
     const p = pressRef.current;
     if (!p.active) return;
-    p.active = false;
-    restoreSnapSoon();
 
-    if (DEBUG) setDbg((s) => s + " | cancel");
-    // If cancel happens, do nothing: this is usually because scroll took over.
-    // Snap is off during press, so cancel should reduce drastically.
+    const moved = p.moved;
+    finishPress();
+
+    // If cancel happened without movement, treat it like a tap (fixes “first tap centers only”)
+    if (!moved && p.idx >= 0) guardedOpenByIdx(p.idx);
   };
 
   return (
@@ -237,26 +210,15 @@ export default function PortfolioLanding({ T, cats, states, openCat, initialIdx 
         </h2>
         <p className={`mt-2 ${T.muted}`}>Hover near the edges for arrows, or use chips to jump.</p>
 
-        {DEBUG && (
-          <div className="mt-2 text-[11px] opacity-70">
-            {BUILD_TAG} — {dbg}
-          </div>
-        )}
-
         {showMediaBanner && (
           <div className="mt-3 rounded-xl border border-amber-300 bg-amber-50 text-amber-900 text-sm p-3">
-            Couldn’t load images right now. If this is a new deploy, ensure your{" "}
-            <span className="font-medium">manifest.json</span> contains category paths, or try a refresh (
-            <code>?refresh=1</code>).
+            Couldn’t load images right now. Ensure manifest.json has category paths, or try <code>?refresh=1</code>.
           </div>
         )}
       </header>
 
       {SHOW_CHIP_BAR && (
-        <nav
-          aria-label="Categories"
-          className="mb-3 px-4 sm:px-6 md:px-8 overflow-x-auto [scrollbar-width:none] [&::-webkit-scrollbar]:hidden"
-        >
+        <nav aria-label="Categories" className="mb-3 px-4 sm:px-6 md:px-8 overflow-x-auto [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
           <ul className="flex gap-2 items-center">
             <li className="flex-shrink-0 w-1" aria-hidden="true" />
             {cats.map((c, i) => {
@@ -268,9 +230,7 @@ export default function PortfolioLanding({ T, cats, states, openCat, initialIdx 
                       scrollToIdx(i);
                       trackEvent("portfolio_chip_click", { category: c.label });
                     }}
-                    className={`px-3 py-1.5 rounded-2xl border text-sm transition shadow-sm ${
-                      isActive ? T.chipActive : T.chipInactive
-                    }`}
+                    className={`px-3 py-1.5 rounded-2xl border text-sm transition shadow-sm ${isActive ? T.chipActive : T.chipInactive}`}
                     aria-current={isActive ? "true" : undefined}
                   >
                     {c.label}
