@@ -1,5 +1,5 @@
 // src/features/portfolio/Portfolio.jsx
-import React, { useEffect, useMemo, useRef, useState, useCallback } from "react";
+import React, { useEffect, useRef, useState, useCallback } from "react";
 import { usePageMeta } from "@/app/seo";
 import { GH_CATEGORIES } from "./categoriesMeta";
 import PortfolioLanding from "./PortfolioLanding";
@@ -17,8 +17,18 @@ function parsePortfolioHash(h) {
   if (raw.startsWith("/")) raw = raw.slice(1);
   const segs = raw.split("/");
   if (segs[0] !== "portfolio") return { route: raw, label: "" };
-  const label = segs.length > 1 ? decodeURIComponent(segs.slice(1).join("/")) : "";
+  const label =
+    segs.length > 1 ? decodeURIComponent(segs.slice(1).join("/")) : "";
   return { route: "portfolio", label };
+}
+
+function readLastIdxSafe() {
+  try {
+    const n = Number(sessionStorage.getItem("pradhu:lastCat") || 0);
+    return Number.isFinite(n) ? n : 0;
+  } catch {
+    return 0;
+  }
 }
 
 export default function Portfolio({ T }) {
@@ -33,6 +43,9 @@ export default function Portfolio({ T }) {
 
   const [view, setView] = useState("landing");
   const [activeIdx, setActiveIdx] = useState(-1);
+
+  // ✅ This is the value you pass to PortfolioLanding (and it MUST update when you open categories)
+  const [lastIdx, setLastIdx] = useState(() => readLastIdxSafe());
 
   const hashRef = useRef(getHash());
 
@@ -51,12 +64,19 @@ export default function Portfolio({ T }) {
         (c) => c.label.toLowerCase() === label.toLowerCase()
       );
       if (idx < 0) return;
+
+      // ✅ Keep storing NUMBER index (your app expects this)
       try {
         sessionStorage.setItem("pradhu:lastCat", String(idx));
       } catch {}
+
+      // ✅ Update state too (so PortfolioLanding gets the latest initialIdx immediately)
+      setLastIdx(idx);
+
       setActiveIdx(idx);
       setView("page");
       setHash(`#/portfolio/${encodeURIComponent(GH_CATEGORIES[idx].label)}`);
+
       const el =
         typeof document !== "undefined"
           ? document.getElementById("portfolio")
@@ -69,6 +89,10 @@ export default function Portfolio({ T }) {
   const goLanding = useCallback(() => {
     setView("landing");
     setActiveIdx(-1);
+
+    // ✅ Optional: re-read from sessionStorage on back (extra safety)
+    setLastIdx(readLastIdxSafe());
+
     setHash("#/portfolio");
   }, [setHash]);
 
@@ -85,12 +109,14 @@ export default function Portfolio({ T }) {
         const h = getHash();
         if (h === hashRef.current) return;
         hashRef.current = h;
+
         const { route, label } = parsePortfolioHash(h);
         if (route !== "portfolio") {
           setView("landing");
           setActiveIdx(-1);
           return;
         }
+
         if (label) {
           const idx = GH_CATEGORIES.findIndex(
             (c) => c.label.toLowerCase() === label.toLowerCase()
@@ -101,6 +127,7 @@ export default function Portfolio({ T }) {
             return;
           }
         }
+
         setView("landing");
         setActiveIdx(-1);
       });
@@ -135,18 +162,10 @@ export default function Portfolio({ T }) {
       );
       if (!cancelled) setStates(results);
     })();
+
     return () => {
       cancelled = true;
     };
-  }, []);
-
-  const lastIdx = useMemo(() => {
-    try {
-      const n = Number(sessionStorage.getItem("pradhu:lastCat") || 0);
-      return Number.isFinite(n) ? n : 0;
-    } catch {
-      return 0;
-    }
   }, []);
 
   if (view === "page" && activeIdx >= 0) {
