@@ -33,35 +33,38 @@ import ContactPage from "@/components/pages/ContactPage";
 import ReviewsPage from "@/components/pages/ReviewsPage";
 import NotFound from "@/components/pages/NotFound";
 
-// Portfolio (uses slug from path: "/portfolio", "/portfolio/weddings")
+// Portfolio
 import Portfolio from "@/features/portfolio/Portfolio";
 
-// Optional SEO per-page (pages themselves may also call usePageMeta)
+// Optional SEO per-page
 import { usePageMeta } from "./seo";
 
 function getInitialTheme() {
   if (typeof window === "undefined") return "dark";
   const stored = window.localStorage.getItem("pradhu:theme");
   if (stored === "light" || stored === "dark") return stored;
-  const prefersDark = window.matchMedia?.("(prefers-color-scheme: dark)")
-    .matches;
-  return prefersDark ? "dark" : "dark"; // default to dark
+  const prefersDark = window.matchMedia?.("(prefers-color-scheme: dark)").matches;
+  return prefersDark ? "dark" : "dark";
 }
 
-// Decide if we should show intro on first load
 function shouldShowIntro() {
-  // If you ever want to disable entirely
   if (!INTRO_REMEMBER) return true;
-
   if (typeof window === "undefined") return true;
-
   try {
     const seen = window.localStorage.getItem("pradhu:introSeen");
-    // Show only if we have NOT marked it as seen
     return seen !== "yes";
   } catch {
     return true;
   }
+}
+
+/** ✅ IMPORTANT: keep Shell STABLE (do NOT define inside renderRoute) */
+function Shell({ children }) {
+  return (
+    <div className="w-full px-4 sm:px-8 lg:px-16 xl:px-24 2xl:px-32">
+      {children}
+    </div>
+  );
 }
 
 export default function App() {
@@ -69,52 +72,36 @@ export default function App() {
   const { T } = useThemeTokens(theme);
   const { path, setPath } = useHashRoute();
 
-  // Basic per-route SEO title/description
   useRouteSeo(path);
 
-  // Normalize path for CTAs & analytics
   const cleanPath = (path || "/").replace(/\/+$/, "") || "/";
 
-  // --- Google Analytics: init + page views using clean paths ---
-
-  // Initialize GA once
   useEffect(() => {
     initAnalytics();
   }, []);
 
-  // Track a page view whenever cleanPath changes
   useEffect(() => {
     trackPageView(cleanPath);
   }, [cleanPath]);
 
-  // Decide where to hide global CTAs (Home + Contact)
   const isHome = cleanPath === "/" || cleanPath === "/home";
   const isContact = cleanPath === "/contact";
   const hideCTAs = isHome || isContact;
 
-  // Intro shows only until user closes it once in this browser
   const [showIntro, setShowIntro] = useState(shouldShowIntro);
 
-  // Persist theme
   useEffect(() => {
     try {
       window.localStorage.setItem("pradhu:theme", theme);
-    } catch {
-      // ignore
-    }
+    } catch {}
   }, [theme]);
 
   const handleCloseIntro = useCallback(() => {
-    // Hide intro for current view
     setShowIntro(false);
-
     try {
-      // Remember that intro was seen in this browser
       if (INTRO_REMEMBER && typeof window !== "undefined") {
         window.localStorage.setItem("pradhu:introSeen", "yes");
       }
-
-      // If you're on the forced intro hash, move back to home
       if (
         typeof window !== "undefined" &&
         INTRO_FORCE_HASH &&
@@ -122,12 +109,9 @@ export default function App() {
       ) {
         setPath("/");
       }
-    } catch {
-      // ignore
-    }
+    } catch {}
   }, [setPath]);
 
-  // Optional auto-dismiss of intro
   useEffect(() => {
     if (!showIntro || !INTRO_AUTO_DISMISS_MS) return;
     if (typeof window === "undefined") return;
@@ -146,7 +130,7 @@ export default function App() {
     }
   };
 
-  const page = renderRoute(path, {
+  const page = renderRoute(cleanPath, {
     T,
     theme,
     setTheme,
@@ -155,7 +139,6 @@ export default function App() {
 
   return (
     <div className="min-h-screen text-sm md:text-base">
-      {/* Intro overlay */}
       {showIntro && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/80 backdrop-blur">
           <div className="relative mx-4 flex max-w-4xl flex-col overflow-hidden rounded-3xl border border-emerald-500/40 bg-slate-950/95 shadow-2xl md:flex-row">
@@ -198,35 +181,28 @@ export default function App() {
         </div>
       )}
 
-      {/* THEME-AWARE PAGE BACKGROUND */}
       <div
         className={`min-h-screen ${
           theme === "dark"
             ? "bg-gradient-to-b from-slate-950 via-slate-950/95 to-slate-950 text-slate-50"
-            : // soft, slightly warm light theme
-              "bg-[#f3eee5] bg-[radial-gradient(circle_at_top,_rgba(255,255,255,0.9),_transparent_60%),_radial-gradient(circle_at_bottom,_rgba(0,0,0,0.04),_transparent_65%)] text-neutral-900"
+            : "bg-[#f3eee5] bg-[radial-gradient(circle_at_top,_rgba(255,255,255,0.9),_transparent_60%),_radial-gradient(circle_at_bottom,_rgba(0,0,0,0.04),_transparent_65%)] text-neutral-900"
         }`}
       >
-        {/* Flex column so footer sits at the very bottom */}
         <div className="flex min-h-screen flex-col">
-          {/* NAVBAR */}
           <Navbar
             T={T}
-            path={path}
+            path={cleanPath}
             theme={theme}
             setTheme={setTheme}
             onNavigate={handleNavigate}
             brand={BRAND_NAME || "PRADHU PHOTOGRAPHY"}
           />
 
-          {/* MAIN */}
           <main className="flex-1 pt-20 pb-24">{page}</main>
 
-          {/* CTAs (fixed, but keep them near the bottom in DOM) */}
           <StickyCTA T={T} hide={hideCTAs} />
           <MobileActionFab hide={hideCTAs} />
 
-          {/* FOOTER */}
           <Footer T={T} theme={theme} onNavigate={handleNavigate} />
         </div>
       </div>
@@ -234,28 +210,14 @@ export default function App() {
   );
 }
 
-/**
- * Route → page mapping.
- */
 function renderRoute(path, { T, theme, setTheme, onNavigate }) {
   let clean = (path || "/").replace(/\/+$/, "") || "/";
-
-  // Treat "/faq" as home (fallback for old links)
   if (clean === "/faq") clean = "/";
-
-  // Full-width shell with side padding (wider layout)
-  const Shell = ({ children }) => (
-    <div className="w-full px-4 sm:px-8 lg:px-16 xl:px-24 2xl:px-32">
-      {children}
-    </div>
-  );
 
   if (clean === "/" || clean === "/home") {
     return (
       <>
-        {/* Hero full width */}
         <Hero T={T} />
-        {/* Home sections in wide shell */}
         <Shell>
           <section id="home-tiles" className="mt-12">
             <HomeTiles T={T} onNavigate={onNavigate} />
@@ -271,11 +233,7 @@ function renderRoute(path, { T, theme, setTheme, onNavigate }) {
     );
   }
 
-  if (
-    clean === "/services" ||
-    clean === "/services-pricing" ||
-    clean === "/pricing"
-  ) {
+  if (clean === "/services" || clean === "/services-pricing" || clean === "/pricing") {
     return (
       <Shell>
         <ServicesPricingPage T={T} />
@@ -315,7 +273,7 @@ function renderRoute(path, { T, theme, setTheme, onNavigate }) {
   if (clean.startsWith("/portfolio")) {
     return (
       <Shell>
-        <Portfolio T={T} path={clean} />
+        <Portfolio T={T} />
       </Shell>
     );
   }
@@ -327,13 +285,8 @@ function renderRoute(path, { T, theme, setTheme, onNavigate }) {
   );
 }
 
-/**
- * Per-route SEO
- */
 function useRouteSeo(path) {
   let clean = (path || "/").replace(/\/+$/, "") || "/";
-
-  // Alias /faq → home for SEO as well
   if (clean === "/faq") clean = "/";
 
   let title = "PRADHU Photography · Bengaluru Portrait & Fashion Photographer";
@@ -342,11 +295,7 @@ function useRouteSeo(path) {
 
   if (clean === "/" || clean === "/home") {
     // default
-  } else if (
-    clean === "/services" ||
-    clean === "/services-pricing" ||
-    clean === "/pricing"
-  ) {
+  } else if (clean === "/services" || clean === "/services-pricing" || clean === "/pricing") {
     title = "Services & Pricing · PRADHU Photography";
     desc =
       "Explore shoot packages, pricing, add-ons and booking policies for portrait, fashion and event photography.";
@@ -364,8 +313,7 @@ function useRouteSeo(path) {
       "Send an enquiry, pick a slot and connect via WhatsApp for your next shoot with Pradhu Photography.";
   } else if (clean === "/reviews") {
     title = "Client Reviews · PRADHU Photography";
-    desc =
-      "Hear from clients about their experience shooting with Pradhu Photography.";
+    desc = "Hear from clients about their experience shooting with Pradhu Photography.";
   } else {
     title = "Page Not Found · PRADHU Photography";
     desc =
