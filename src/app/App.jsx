@@ -5,6 +5,7 @@ import { initAnalytics, trackPageView } from "@/utils/analytics";
 
 import {
   BRAND_NAME,
+  CONTAINER,
   INTRO_ENABLED,
   INTRO_AUTO_DISMISS_MS,
   INTRO_FORCE_HASH,
@@ -14,7 +15,6 @@ import {
   INTRO_LEFT_IMAGE_URL,
   INTRO_REMEMBER,
 } from "./config";
-
 
 import { useHashRoute } from "@/hooks/useHashRoute";
 
@@ -42,6 +42,9 @@ import Portfolio from "@/features/portfolio/Portfolio";
 // Optional SEO per-page
 import { usePageMeta } from "./seo";
 
+// ✅ IMPORTANT: Shell must be stable (defined OUTSIDE renderRoute)
+const Shell = ({ children }) => <div className={CONTAINER}>{children}</div>;
+
 function getInitialTheme() {
   if (typeof window === "undefined") return "dark";
   const stored = window.localStorage.getItem("pradhu:theme");
@@ -58,7 +61,7 @@ function shouldShowIntro() {
   try {
     const u = new URL(window.location.href);
     const forcedByQuery =
-      INTRO_FORCE_QUERY && (u.searchParams.get(INTRO_FORCE_QUERY) === "1");
+      INTRO_FORCE_QUERY && u.searchParams.get(INTRO_FORCE_QUERY) === "1";
     const forcedByHash =
       INTRO_FORCE_HASH && window.location.hash === INTRO_FORCE_HASH;
 
@@ -78,7 +81,6 @@ function shouldShowIntro() {
     return true;
   }
 }
-
 
 export default function App() {
   const [theme, setTheme] = useState(getInitialTheme);
@@ -113,6 +115,7 @@ export default function App() {
     setShowIntro(false);
     try {
       if (INTRO_REMEMBER && typeof window !== "undefined") {
+        // ✅ session only
         window.sessionStorage.setItem("pradhu:introSeen", "yes");
       }
       if (
