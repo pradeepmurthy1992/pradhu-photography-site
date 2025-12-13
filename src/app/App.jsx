@@ -5,13 +5,16 @@ import { initAnalytics, trackPageView } from "@/utils/analytics";
 
 import {
   BRAND_NAME,
+  INTRO_ENABLED,
   INTRO_AUTO_DISMISS_MS,
   INTRO_FORCE_HASH,
+  INTRO_FORCE_QUERY,
   INTRO_BRAND,
   INTRO_NAME,
   INTRO_LEFT_IMAGE_URL,
   INTRO_REMEMBER,
 } from "./config";
+
 
 import { useHashRoute } from "@/hooks/useHashRoute";
 
@@ -48,24 +51,34 @@ function getInitialTheme() {
 }
 
 function shouldShowIntro() {
-  if (!INTRO_REMEMBER) return true;
+  if (!INTRO_ENABLED) return false;
   if (typeof window === "undefined") return true;
+
+  // Force intro if URL explicitly asks for it
   try {
-    const seen = window.localStorage.getItem("pradhu:introSeen");
+    const u = new URL(window.location.href);
+    const forcedByQuery =
+      INTRO_FORCE_QUERY && (u.searchParams.get(INTRO_FORCE_QUERY) === "1");
+    const forcedByHash =
+      INTRO_FORCE_HASH && window.location.hash === INTRO_FORCE_HASH;
+
+    if (forcedByQuery || forcedByHash) return true;
+  } catch {
+    // ignore
+  }
+
+  // If you don't want remembering at all
+  if (!INTRO_REMEMBER) return true;
+
+  // ✅ SESSION ONLY (resets when tab/browser closes)
+  try {
+    const seen = window.sessionStorage.getItem("pradhu:introSeen");
     return seen !== "yes";
   } catch {
     return true;
   }
 }
 
-/** ✅ IMPORTANT: keep Shell STABLE (do NOT define inside renderRoute) */
-function Shell({ children }) {
-  return (
-    <div className="w-full px-4 sm:px-8 lg:px-16 xl:px-24 2xl:px-32">
-      {children}
-    </div>
-  );
-}
 
 export default function App() {
   const [theme, setTheme] = useState(getInitialTheme);
@@ -100,7 +113,7 @@ export default function App() {
     setShowIntro(false);
     try {
       if (INTRO_REMEMBER && typeof window !== "undefined") {
-        window.localStorage.setItem("pradhu:introSeen", "yes");
+        window.sessionStorage.setItem("pradhu:introSeen", "yes");
       }
       if (
         typeof window !== "undefined" &&
