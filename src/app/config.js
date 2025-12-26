@@ -12,6 +12,9 @@ export const CINEMATIC_IMAGES_FALLBACK = [
 // ===== Brand =====
 export const BRAND_NAME = "PRADHU Photography";
 
+// ==== Journey tab
+export const JOURNEY_ENABLED = false; // keep hidden for now
+
 // ===== Intro overlay =====
 export const INTRO_ENABLED = true;
 export const INTRO_BRAND = "PRADEEP";
