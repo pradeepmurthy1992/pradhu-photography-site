@@ -14,6 +14,8 @@ import {
   INTRO_NAME,
   INTRO_LEFT_IMAGE_URL,
   INTRO_REMEMBER,
+  // ✅ NEW (add in config.js): export const JOURNEY_ENABLED = false;
+  JOURNEY_ENABLED,
 } from "./config";
 
 import { useHashRoute } from "@/hooks/useHashRoute";
@@ -35,6 +37,9 @@ import FaqSection from "@/components/pages/FaqSection";
 import ContactPage from "@/components/pages/ContactPage";
 import ReviewsPage from "@/components/pages/ReviewsPage";
 import NotFound from "@/components/pages/NotFound";
+
+// ✅ NEW: Journey (hidden route)
+import JourneyPage from "@/pages/JourneyPage";
 
 // Portfolio
 import Portfolio from "@/features/portfolio/Portfolio";
@@ -82,6 +87,29 @@ function shouldShowIntro() {
   }
 }
 
+// ✅ NEW: Preview gate for Journey (keeps it hidden unless you explicitly request)
+function isJourneyPreview() {
+  if (typeof window === "undefined") return false;
+
+  // Query string (recommended): https://site/?preview=1#/journey
+  try {
+    const qs = new URLSearchParams(window.location.search);
+    if (qs.get("preview") === "1") return true;
+  } catch {}
+
+  // Hash query fallback: #/journey?preview=1
+  try {
+    const hash = window.location.hash || "";
+    const qIndex = hash.indexOf("?");
+    if (qIndex >= 0) {
+      const hqs = new URLSearchParams(hash.slice(qIndex + 1));
+      if (hqs.get("preview") === "1") return true;
+    }
+  } catch {}
+
+  return false;
+}
+
 export default function App() {
   const [theme, setTheme] = useState(getInitialTheme);
   const { T } = useThemeTokens(theme);
@@ -90,6 +118,9 @@ export default function App() {
   useRouteSeo(path);
 
   const cleanPath = (path || "/").replace(/\/+$/, "") || "/";
+
+  // ✅ Journey visibility (hidden by default)
+  const showJourney = Boolean(JOURNEY_ENABLED) || isJourneyPreview();
 
   useEffect(() => {
     initAnalytics();
@@ -151,6 +182,7 @@ export default function App() {
     theme,
     setTheme,
     onNavigate: handleNavigate,
+    showJourney, // ✅ pass down
   });
 
   return (
@@ -226,7 +258,7 @@ export default function App() {
   );
 }
 
-function renderRoute(path, { T, theme, setTheme, onNavigate }) {
+function renderRoute(path, { T, theme, setTheme, onNavigate, showJourney }) {
   let clean = (path || "/").replace(/\/+$/, "") || "/";
   if (clean === "/faq") clean = "/";
 
@@ -286,6 +318,23 @@ function renderRoute(path, { T, theme, setTheme, onNavigate }) {
     );
   }
 
+  // ✅ NEW: Hidden Journey route
+  if (clean === "/journey") {
+    // If not enabled / not preview, behave like it doesn't exist
+    if (!showJourney) {
+      return (
+        <Shell>
+          <NotFound T={T} onNavigate={onNavigate} />
+        </Shell>
+      );
+    }
+    return (
+      <Shell>
+        <JourneyPage />
+      </Shell>
+    );
+  }
+
   if (clean.startsWith("/portfolio")) {
     return (
       <Shell>
@@ -330,6 +379,10 @@ function useRouteSeo(path) {
   } else if (clean === "/reviews") {
     title = "Client Reviews · PRADHU Photography";
     desc = "Hear from clients about their experience shooting with Pradhu Photography.";
+  } else if (clean === "/journey") {
+    // Even if hidden, SEO only applies if you open it in preview/enable later.
+    title = "Journey · PRADHU Photography";
+    desc = "Milestones, collaborators, and kind words from the Pradhu Photography journey.";
   } else {
     title = "Page Not Found · PRADHU Photography";
     desc =
