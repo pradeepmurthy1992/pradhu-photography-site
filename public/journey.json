@@ -1,0 +1,70 @@
+{
+  "headline": "Journey",
+  "subhead": "A small timeline of work, collaborations, and kind words.",
+
+  "launchDate": "2025-12-25",
+
+  "milestones": [
+    {
+      "date": "2025-12-25",
+      "title": "Website went live",
+      "note": "Portfolio + enquiry flow launched.",
+      "tag": "Launch"
+    },
+    {
+      "date": "2026-01-20",
+      "title": "Add pricing guide page",
+      "note": "Package-based pricing with add-ons.",
+      "tag": "Planned"
+    }
+  ],
+
+  "collaborators": [
+    {
+      "id": "ananya-rao",
+      "name": "Ananya Rao",
+      "role": "Designer",
+      "city": "Chennai",
+      "blurb": "Minimal couture. Editorial + campaign shoots.",
+      "instagram": "https://instagram.com/",
+      "website": "https://",
+      "tags": ["Editorial", "Couture"],
+      "featured": true,
+      "image": ""
+    },
+    {
+      "id": "sonam-gaur",
+      "name": "Sonam Gaur",
+      "role": "MUA",
+      "city": "Bangalore",
+      "blurb": "Bridal + soft glam looks. Workshops & collabs.",
+      "instagram": "https://instagram.com/",
+      "website": "",
+      "tags": ["Bridal"],
+      "featured": false,
+      "image": ""
+    }
+  ],
+
+  "testimonials": [
+    {
+      "id": "t1",
+      "type": "collaborator",
+      "authorId": "ananya-rao",
+      "authorName": "Ananya Rao",
+      "authorRole": "Designer",
+      "quote": "Super professional, quick delivery, and stunning frames.",
+      "date": "2025-11-12",
+      "instagram": "https://instagram.com/"
+    },
+    {
+      "id": "t2",
+      "type": "client",
+      "authorName": "Client Name",
+      "authorRole": "Portrait Session",
+      "quote": "Very comfortable shoot, and the edits came out amazing.",
+      "date": "2025-12-01",
+      "instagram": ""
+    }
+  ]
+}
