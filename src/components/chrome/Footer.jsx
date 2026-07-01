@@ -57,12 +57,12 @@ export default function Footer({ T, theme = "dark", onNavigate }) {
               <p className={bodyText}>
                 <span className="font-semibold">WhatsApp:</span>{" "}
                 <a
-                  href="https://wa.me/919332584410"
+                  href="https://wa.me/917708084410"
                   target="_blank"
                   rel="noreferrer"
                   className={linkText}
                 >
-                  +91 93325 84410
+                  +91 77080 84410
                 </a>
               </p>
               <p className={bodyText}>
