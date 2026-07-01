@@ -50,7 +50,7 @@ export const CONTACT_EMAIL = "pradhuphotography@gmail.com";
 export const SERVICE_CITIES = ["Bengaluru", "Chennai", "Pune"];
 
 export const IG_USERNAME = "pradhu_photography";
-export const WHATSAPP_NUMBER = "919322584410";
+export const WHATSAPP_NUMBER = "917708084410";
 
 export const SHEET_WEB_APP =
   "https://script.google.com/macros/s/AKfycbypBhkuSpztHIBlYU3nsJJBsJI1SULQRIpGynZvEY6sDb2hDnr1PXN4IZ8342sy5-Dj/exec";
